@@ -1,4 +1,4 @@
-package lexer
+package main
 
 import (
 	"fmt"
@@ -33,9 +33,7 @@ type token struct {
 const (
 	tokenError tokenType = iota
 	tokenText
-	tokenCloud
-	tokenNode
-	tokenActor
+	tokenComponent
 	tokenEOF
 )
 
@@ -51,6 +49,10 @@ func (t token) String() string {
 	}
 
 	return fmt.Sprintf("%q", t.val)
+}
+
+func (l *Lexer) Error(s string) {
+	fmt.Println("syntax error: ", s, l.pos)
 }
 
 func NewLexer(name, input string) *Lexer {
@@ -143,9 +145,9 @@ func (l *Lexer) isDelimiter() bool {
 }
 
 var components = map[string]tokenType{
-	"cloud": tokenCloud,
-	"node":  tokenNode,
-	"actor": tokenActor,
+	"cloud": tokenComponent,
+	"node":  tokenComponent,
+	"actor": tokenComponent,
 }
 
 func (l *Lexer) isComponent() bool {
@@ -157,9 +159,9 @@ func (l *Lexer) isComponent() bool {
 }
 
 func lexComponent(l *Lexer) stateFn {
-	token, _ := components[l.input[l.start:l.pos]]
+	//token, _ := components[l.input[l.start:l.pos]]
 
-	l.emit(token)
+	l.emit(COMPONENT)
 	return lexText
 }
 
@@ -184,7 +186,7 @@ func lexText(l *Lexer) stateFn {
 				return lexComponent
 			}
 			if l.pos > l.start {
-				l.emit(tokenText)
+				l.emit(TEXT)
 				return lexText
 			}
 		}
@@ -194,15 +196,21 @@ func lexText(l *Lexer) stateFn {
 	}
 
 	// Correctly reached EOF
-	l.emit(tokenEOF)
+	// EOF is 0 for yacc
+	l.emit(0)
 	return nil
 }
 
-func (l *Lexer) nextToken() token {
+func (l *Lexer) Lex(lval *TdocSymType) int {
+
 	for {
 		select {
 		case token := <-l.tokens:
-			return token
+			lval.line = token.line
+			lval.pos = int(token.pos)
+			lval.token = int(token.typ)
+			lval.val = token.val
+			return int(token.typ)
 		default:
 			l.state = l.state(l)
 		}
