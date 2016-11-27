@@ -1,0 +1,4 @@
+language: go
+script: make test
+before_install:
+  - make yacc
