@@ -19,6 +19,7 @@ type TdocSymType struct {
 
 const COMPONENT = 57346
 const TEXT = 57347
+const ERROR = 57348
 
 var TdocToknames = [...]string{
 	"$end",
@@ -26,6 +27,7 @@ var TdocToknames = [...]string{
 	"$unk",
 	"COMPONENT",
 	"TEXT",
+	"ERROR",
 }
 var TdocStatenames = [...]string{}
 
@@ -37,7 +39,7 @@ const TdocInitialStackSize = 16
 /* Start of the program */
 
 func main() {
-	TdocParse(NewLexer("foo", "cloud foo"))
+	TdocParse(NewLexer("cloud foo"))
 }
 
 //line yacctab:1
@@ -89,7 +91,7 @@ var TdocTok1 = [...]int{
 }
 var TdocTok2 = [...]int{
 
-	2, 3, 4, 5,
+	2, 3, 4, 5, 6,
 }
 var TdocTok3 = [...]int{
 	0,

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strings"
 	"unicode/utf8"
 )
 
@@ -13,7 +12,6 @@ type stateFn func(*Lexer) stateFn
 type tokenType int
 
 type Lexer struct {
-	name   string // used for error reports
 	input  string // input to scan
 	start  Pos    // start position of this item
 	pos    Pos    // current position of the input
@@ -30,18 +28,11 @@ type token struct {
 	line int       // Line
 }
 
-const (
-	tokenError tokenType = iota
-	tokenText
-	tokenComponent
-	tokenEOF
-)
-
 func (t token) String() string {
 	switch t.typ {
-	case tokenEOF:
+	case 0:
 		return "EOF"
-	case tokenError:
+	case ERROR:
 		return t.val
 	}
 	if len(t.val) > 10 {
@@ -55,9 +46,8 @@ func (l *Lexer) Error(s string) {
 	fmt.Println("syntax error: ", s, l.pos)
 }
 
-func NewLexer(name, input string) *Lexer {
+func NewLexer(input string) *Lexer {
 	l := &Lexer{
-		name:   name,
 		input:  input,
 		state:  lexText,
 		tokens: make(chan token, 2),
@@ -72,9 +62,10 @@ func (l *Lexer) emit(t tokenType) {
 	l.start = l.pos
 }
 
+// Error token to expose errors through yacc
 func (l *Lexer) errorf(format string, args ...interface{}) stateFn {
 	l.tokens <- token{
-		tokenError,
+		ERROR,
 		l.start,
 		fmt.Sprintf(format, args...),
 		l.line,
@@ -118,21 +109,6 @@ func (l *Lexer) peek() rune {
 	return r
 }
 
-// Check if next rune is acceptable
-func (l *Lexer) accept(valid string) bool {
-	if strings.IndexRune(valid, l.next()) >= 0 {
-		return true
-	}
-	l.backup()
-	return false
-}
-
-func (l *Lexer) acceptRun(valid string) {
-	for strings.IndexRune(valid, l.next()) >= 0 {
-	}
-	l.backup()
-}
-
 func (l *Lexer) isDelimiter() bool {
 	c := l.peek()
 
@@ -145,9 +121,9 @@ func (l *Lexer) isDelimiter() bool {
 }
 
 var components = map[string]tokenType{
-	"cloud": tokenComponent,
-	"node":  tokenComponent,
-	"actor": tokenComponent,
+	"cloud": COMPONENT,
+	"node":  COMPONENT,
+	"actor": COMPONENT,
 }
 
 func (l *Lexer) isComponent() bool {
@@ -158,9 +134,8 @@ func (l *Lexer) isComponent() bool {
 	return false
 }
 
+// We already know its a component
 func lexComponent(l *Lexer) stateFn {
-	//token, _ := components[l.input[l.start:l.pos]]
-
 	l.emit(COMPONENT)
 	return lexText
 }
@@ -201,8 +176,8 @@ func lexText(l *Lexer) stateFn {
 	return nil
 }
 
+// This function gets called from yacc
 func (l *Lexer) Lex(lval *TdocSymType) int {
-
 	for {
 		select {
 		case token := <-l.tokens:
@@ -215,11 +190,4 @@ func (l *Lexer) Lex(lval *TdocSymType) int {
 			l.state = l.state(l)
 		}
 	}
-}
-
-func (l *Lexer) run() {
-	for state := lexText; state != nil; {
-		state = state(l)
-	}
-	close(l.tokens)
 }

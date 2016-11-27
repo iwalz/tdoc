@@ -8,7 +8,7 @@ import (
 
 %}
 
-%token COMPONENT TEXT
+%token COMPONENT TEXT ERROR
 
 %union{
   val string
@@ -38,5 +38,5 @@ declaration:
 %% /* Start of the program */
 
 func main() {
-  TdocParse(NewLexer("foo", "cloud foo"))
+  TdocParse(NewLexer("cloud foo"))
 }

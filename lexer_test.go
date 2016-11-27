@@ -13,7 +13,7 @@ func TestSimpleTextNextToken(t *testing.T) {
 		{TEXT, "foo"},
 	}
 
-	l := NewLexer("foo", input)
+	l := NewLexer(input)
 	for i, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -26,7 +26,7 @@ func TestSimpleTextNextToken(t *testing.T) {
 func TestEmptyInput(t *testing.T) {
 	input := ``
 
-	l := NewLexer("foo", input)
+	l := NewLexer(input)
 	lval := &TdocSymType{}
 	tok := l.Lex(lval)
 
@@ -56,7 +56,7 @@ func TestComplexTextNextToken(t *testing.T) {
 		{TEXT, "le"},
 	}
 
-	l := NewLexer("foo", input)
+	l := NewLexer(input)
 	for i, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -78,7 +78,7 @@ func TestSimpleComponentNextToken(t *testing.T) {
 		{COMPONENT, "node"},
 	}
 
-	l := NewLexer("foo", input)
+	l := NewLexer(input)
 	for i, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -103,7 +103,7 @@ func TestSimpleMixNextToken(t *testing.T) {
 		{TEXT, "duck"},
 	}
 
-	l := NewLexer("foo", input)
+	l := NewLexer(input)
 	for i, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -130,7 +130,7 @@ func TestUnicodeMixNextToken(t *testing.T) {
 		{COMPONENT, "node"},
 	}
 
-	l := NewLexer("foo", input)
+	l := NewLexer(input)
 	for i, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
