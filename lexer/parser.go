@@ -18,6 +18,7 @@ type TdocSymType struct {
 const COMPONENT = 57346
 const TEXT = 57347
 const ERROR = 57348
+const IDENTIFIER = 57349
 
 var TdocToknames = [...]string{
 	"$end",
@@ -26,6 +27,7 @@ var TdocToknames = [...]string{
 	"COMPONENT",
 	"TEXT",
 	"ERROR",
+	"IDENTIFIER",
 }
 var TdocStatenames = [...]string{}
 
@@ -57,7 +59,7 @@ var TdocAct = [...]int{
 }
 var TdocPact = [...]int{
 
-	-3, -1000, -1000, -5, -1000,
+	-3, -1000, -1000, -7, -1000,
 }
 var TdocPgo = [...]int{
 
@@ -73,7 +75,7 @@ var TdocR2 = [...]int{
 }
 var TdocChk = [...]int{
 
-	-1000, -1, -2, 4, 5,
+	-1000, -1, -2, 4, 7,
 }
 var TdocDef = [...]int{
 
@@ -85,7 +87,7 @@ var TdocTok1 = [...]int{
 }
 var TdocTok2 = [...]int{
 
-	2, 3, 4, 5, 6,
+	2, 3, 4, 5, 6, 7,
 }
 var TdocTok3 = [...]int{
 	0,

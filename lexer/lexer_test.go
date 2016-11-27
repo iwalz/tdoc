@@ -74,7 +74,7 @@ func TestSimpleComponentNextToken(t *testing.T) {
 		expectedLiteral string
 	}{
 		{COMPONENT, "cloud"},
-		{COMPONENT, "actor"},
+		{ERROR, "actor"},
 		{COMPONENT, "node"},
 	}
 
@@ -96,11 +96,60 @@ func TestSimpleMixNextToken(t *testing.T) {
 		expectedLiteral string
 	}{
 		{COMPONENT, "cloud"},
-		{TEXT, "foo"},
+		{IDENTIFIER, "foo"},
 		{COMPONENT, "actor"},
-		{TEXT, "bar"},
+		{IDENTIFIER, "bar"},
 		{COMPONENT, "node"},
-		{TEXT, "duck"},
+		{IDENTIFIER, "duck"},
+	}
+
+	l := NewLexer(input)
+	for i, tt := range tests {
+		lval := &TdocSymType{}
+		tok := l.Lex(lval)
+		if tok != tt.extectedType {
+			t.Fatalf("test[%d] - wrong type, expected=%q, got=%q", i, tt.extectedType, tok)
+		}
+		if lval.val != tt.expectedLiteral {
+			t.Fatalf("test[%d] - wrong value, expected=%q, got=%q", i, tt.expectedLiteral, lval.val)
+		}
+	}
+}
+
+func TestSingleQuoteIdentifier(t *testing.T) {
+	input := `actor 'test foo'`
+
+	tests := []struct {
+		extectedType    int
+		expectedLiteral string
+	}{
+		{COMPONENT, "actor"},
+		{IDENTIFIER, "test foo"},
+	}
+
+	l := NewLexer(input)
+	for i, tt := range tests {
+		lval := &TdocSymType{}
+		tok := l.Lex(lval)
+		if tok != tt.extectedType {
+			t.Fatalf("test[%d] - wrong type, expected=%q, got=%q", i, tt.extectedType, tok)
+		}
+		if lval.val != tt.expectedLiteral {
+			t.Fatalf("test[%d] - wrong value, expected=%q, got=%q", i, tt.expectedLiteral, lval.val)
+		}
+	}
+}
+
+func TestDoubleQuoteIdentifier(t *testing.T) {
+	input := `actor "test
+	foo"`
+
+	tests := []struct {
+		extectedType    int
+		expectedLiteral string
+	}{
+		{COMPONENT, "actor"},
+		{IDENTIFIER, "test foo"},
 	}
 
 	l := NewLexer(input)
@@ -124,9 +173,9 @@ func TestUnicodeMixNextToken(t *testing.T) {
 		expectedLiteral string
 	}{
 		{COMPONENT, "cloud"},
-		{TEXT, "✓"},
+		{IDENTIFIER, "✓"},
 		{COMPONENT, "actor"},
-		{TEXT, "✓"},
+		{IDENTIFIER, "✓"},
 		{COMPONENT, "node"},
 	}
 

@@ -6,7 +6,7 @@ import "fmt"
 
 %}
 
-%token COMPONENT TEXT ERROR
+%token COMPONENT TEXT ERROR IDENTIFIER
 
 %union{
   val string
@@ -21,7 +21,7 @@ program:
   declaration
 ;
 declaration:
-  COMPONENT TEXT
+  COMPONENT IDENTIFIER
   {
     fmt.Println($1.val, $2.val)
   }

@@ -62,7 +62,6 @@ func (l *Lexer) emit(t tokenType) {
 	l.start = l.pos
 }
 
-// Error token to expose errors through yacc
 func (l *Lexer) errorf(format string, args ...interface{}) stateFn {
 	l.tokens <- token{
 		ERROR,
@@ -134,9 +133,44 @@ func (l *Lexer) isComponent() bool {
 	return false
 }
 
-// We already know its a component
 func lexComponent(l *Lexer) stateFn {
+	// After component, you always need an identifier
 	l.emit(COMPONENT)
+	return lexIdentifier
+}
+
+func lexIdentifier(l *Lexer) stateFn {
+	l.stripWhitespaces()
+	firstChar := l.peek()
+	skipEscape := false
+	if firstChar == '"' || firstChar == '\'' {
+		skipEscape = true
+		// Ignore first char
+		l.next()
+		l.ignore()
+	}
+	for {
+		c := l.next()
+		if skipEscape && c == firstChar {
+			l.backup()
+			l.emit(IDENTIFIER)
+			l.next()
+			l.ignore()
+			break
+		}
+
+		if l.isComponent() {
+			// Emit error if component follows
+			l.emit(ERROR)
+			break
+		}
+
+		if !skipEscape && l.isDelimiter() {
+			l.emit(IDENTIFIER)
+			break
+		}
+	}
+
 	return lexText
 }
 
@@ -176,8 +210,8 @@ func lexText(l *Lexer) stateFn {
 	return nil
 }
 
-// This function gets called from yacc
 func (l *Lexer) Lex(lval *TdocSymType) int {
+
 	for {
 		select {
 		case token := <-l.tokens:
