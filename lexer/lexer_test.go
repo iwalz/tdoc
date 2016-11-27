@@ -141,8 +141,7 @@ func TestSingleQuoteIdentifier(t *testing.T) {
 }
 
 func TestDoubleQuoteIdentifier(t *testing.T) {
-	input := `actor "test
-	foo"`
+	input := `actor "test foo"`
 
 	tests := []struct {
 		extectedType    int
@@ -150,6 +149,31 @@ func TestDoubleQuoteIdentifier(t *testing.T) {
 	}{
 		{COMPONENT, "actor"},
 		{IDENTIFIER, "test foo"},
+	}
+
+	l := NewLexer(input)
+	for i, tt := range tests {
+		lval := &TdocSymType{}
+		tok := l.Lex(lval)
+		if tok != tt.extectedType {
+			t.Fatalf("test[%d] - wrong type, expected=%q, got=%q", i, tt.extectedType, tok)
+		}
+		if lval.val != tt.expectedLiteral {
+			t.Fatalf("test[%d] - wrong value, expected=%q, got=%q", i, tt.expectedLiteral, lval.val)
+		}
+	}
+}
+
+func TestDoubleQuoteMultilineIdentifier(t *testing.T) {
+	input := `actor "test 
+foo"`
+
+	tests := []struct {
+		extectedType    int
+		expectedLiteral string
+	}{
+		{COMPONENT, "actor"},
+		{IDENTIFIER, "test \nfoo"},
 	}
 
 	l := NewLexer(input)
