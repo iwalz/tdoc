@@ -17,7 +17,7 @@ import "fmt"
 
 %%
 
-program:
+input:
   declaration
 ;
 declaration:

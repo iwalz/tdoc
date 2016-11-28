@@ -74,7 +74,7 @@ func TestSimpleComponentNextToken(t *testing.T) {
 		expectedLiteral string
 	}{
 		{COMPONENT, "cloud"},
-		{ERROR, "actor"},
+		{ERROR, "A component can't be next to a component - need an identifier first"},
 		{COMPONENT, "node"},
 	}
 
@@ -242,6 +242,58 @@ func TestSimpleAliasDeclaration(t *testing.T) {
 	}
 }
 
+func TestDigitContainingAndUnicodeAliasDeclaration(t *testing.T) {
+	input := `actor test as fo12☂o`
+
+	tests := []struct {
+		extectedType    int
+		expectedLiteral string
+	}{
+		{COMPONENT, "actor"},
+		{IDENTIFIER, "test"},
+		{ALIAS, "as"},
+		{TEXT, "fo12☂o"},
+	}
+
+	l := NewLexer(input)
+	for i, tt := range tests {
+		lval := &TdocSymType{}
+		tok := l.Lex(lval)
+		if tok != tt.extectedType {
+			t.Fatalf("test[%d] - wrong type, expected=%q, got=%q", i, tt.extectedType, tok)
+		}
+		if lval.val != tt.expectedLiteral {
+			t.Fatalf("test[%d] - wrong value, expected=%q, got=%q", i, tt.expectedLiteral, lval.val)
+		}
+	}
+}
+
+func TestAliasAsIdentifierDeclaration(t *testing.T) {
+	input := `actor test as "foo 12"`
+
+	tests := []struct {
+		extectedType    int
+		expectedLiteral string
+	}{
+		{COMPONENT, "actor"},
+		{IDENTIFIER, "test"},
+		{ALIAS, "as"},
+		{ERROR, "Aliases are not allowed to be quoted"},
+	}
+
+	l := NewLexer(input)
+	for i, tt := range tests {
+		lval := &TdocSymType{}
+		tok := l.Lex(lval)
+		if tok != tt.extectedType {
+			t.Fatalf("test[%d] - wrong type, expected=%q, got=%q", i, tt.extectedType, tok)
+		}
+		if lval.val != tt.expectedLiteral {
+			t.Fatalf("test[%d] - wrong value, expected=%q, got=%q", i, tt.expectedLiteral, lval.val)
+		}
+	}
+}
+
 func TestUnicodeMixNextToken(t *testing.T) {
 	input := `cloud ✓ actor ✓ node`
 
@@ -254,6 +306,36 @@ func TestUnicodeMixNextToken(t *testing.T) {
 		{COMPONENT, "actor"},
 		{IDENTIFIER, "✓"},
 		{COMPONENT, "node"},
+	}
+
+	l := NewLexer(input)
+	for i, tt := range tests {
+		lval := &TdocSymType{}
+		tok := l.Lex(lval)
+		if tok != tt.extectedType {
+			t.Fatalf("test[%d] - wrong type, expected=%q, got=%q", i, tt.extectedType, tok)
+		}
+		if lval.val != tt.expectedLiteral {
+			t.Fatalf("test[%d] - wrong value, expected=%q, got=%q", i, tt.expectedLiteral, lval.val)
+		}
+	}
+}
+
+func TestDeclarationCombination(t *testing.T) {
+	input := `actor "test for multiple words" as f✓o cloud 'and again' as bar☂`
+
+	tests := []struct {
+		extectedType    int
+		expectedLiteral string
+	}{
+		{COMPONENT, "actor"},
+		{IDENTIFIER, "test for multiple words"},
+		{ALIAS, "as"},
+		{TEXT, "f✓o"},
+		{COMPONENT, "cloud"},
+		{IDENTIFIER, "and again"},
+		{ALIAS, "as"},
+		{TEXT, "bar☂"},
 	}
 
 	l := NewLexer(input)

@@ -108,6 +108,8 @@ func (l *Lexer) peek() rune {
 	return r
 }
 
+// Check if it indicates a new token
+// lexIdentifier doesn't respect this
 func (l *Lexer) isDelimiter() bool {
 	c := l.peek()
 
@@ -129,6 +131,7 @@ var keywords = map[string]tokenType{
 	"as": ALIAS,
 }
 
+// Check for components
 func (l *Lexer) isComponent() bool {
 	if _, ok := components[l.input[l.start:l.pos]]; ok {
 		return true
@@ -137,6 +140,7 @@ func (l *Lexer) isComponent() bool {
 	return false
 }
 
+// Check for keywords
 func (l *Lexer) isKeyword() bool {
 	if _, ok := keywords[l.input[l.start:l.pos]]; ok {
 		return true
@@ -147,16 +151,37 @@ func (l *Lexer) isKeyword() bool {
 
 // we already know its a keyword
 func lexKeyword(l *Lexer) stateFn {
+	if int(keywords[l.input[l.start:l.pos]]) == ALIAS {
+		l.emit(keywords[l.input[l.start:l.pos]])
+		return lexAlias
+	}
+
 	l.emit(keywords[l.input[l.start:l.pos]])
 	return lexText
 }
 
+// Push a component off the heap
 func lexComponent(l *Lexer) stateFn {
 	// After component, you always need an identifier
 	l.emit(COMPONENT)
 	return lexIdentifier
 }
 
+// Alias is not allowed to be quoted
+// Error check and continues with lexText
+func lexAlias(l *Lexer) stateFn {
+	l.stripWhitespaces()
+	firstChar := l.peek()
+
+	if firstChar == '"' || firstChar == '\'' {
+		l.errorf("Aliases are not allowed to be quoted")
+	}
+
+	return lexText
+}
+
+// Lexes identifiers, matches foo as well as "foo bar" and 'bar
+// baz' (including new line)
 func lexIdentifier(l *Lexer) stateFn {
 	l.stripWhitespaces()
 	firstChar := l.peek()
@@ -179,7 +204,7 @@ func lexIdentifier(l *Lexer) stateFn {
 
 		if l.isComponent() {
 			// Emit error if component follows
-			l.emit(ERROR)
+			l.errorf("A component can't be next to a component - need an identifier first")
 			break
 		}
 
@@ -204,11 +229,12 @@ func (l *Lexer) stripWhitespaces() {
 	l.ignore()
 }
 
+// lex text - entrypoint if you don't know what type of text follows
 func lexText(l *Lexer) stateFn {
 	l.stripWhitespaces()
 	for {
 		if l.isDelimiter() {
-			// Component found, name next
+			// Component found, identifier next
 			if l.isComponent() {
 				return lexComponent
 			}
