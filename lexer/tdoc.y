@@ -6,7 +6,7 @@ import "fmt"
 
 %}
 
-%token COMPONENT TEXT ERROR IDENTIFIER
+%token COMPONENT TEXT ERROR IDENTIFIER ALIAS
 
 %union{
   val string
@@ -21,7 +21,8 @@ program:
   declaration
 ;
 declaration:
-  COMPONENT IDENTIFIER
+  declaration ALIAS TEXT
+  | COMPONENT IDENTIFIER
   {
     fmt.Println($1.val, $2.val)
   }

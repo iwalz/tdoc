@@ -165,7 +165,7 @@ func TestDoubleQuoteIdentifier(t *testing.T) {
 }
 
 func TestDoubleQuoteMultilineIdentifier(t *testing.T) {
-	input := `actor "test 
+	input := `actor "test
 foo"`
 
 	tests := []struct {
@@ -173,7 +173,33 @@ foo"`
 		expectedLiteral string
 	}{
 		{COMPONENT, "actor"},
-		{IDENTIFIER, "test \nfoo"},
+		{IDENTIFIER, "test\nfoo"},
+	}
+
+	l := NewLexer(input)
+	for i, tt := range tests {
+		lval := &TdocSymType{}
+		tok := l.Lex(lval)
+		if tok != tt.extectedType {
+			t.Fatalf("test[%d] - wrong type, expected=%q, got=%q", i, tt.extectedType, tok)
+		}
+		if lval.val != tt.expectedLiteral {
+			t.Fatalf("test[%d] - wrong value, expected=%q, got=%q", i, tt.expectedLiteral, lval.val)
+		}
+	}
+}
+
+func TestSimpleAliasDeclaration(t *testing.T) {
+	input := `actor test as foo`
+
+	tests := []struct {
+		extectedType    int
+		expectedLiteral string
+	}{
+		{COMPONENT, "actor"},
+		{IDENTIFIER, "test"},
+		{ALIAS, "as"},
+		{TEXT, "foo"},
 	}
 
 	l := NewLexer(input)

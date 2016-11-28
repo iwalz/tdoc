@@ -19,6 +19,7 @@ const COMPONENT = 57346
 const TEXT = 57347
 const ERROR = 57348
 const IDENTIFIER = 57349
+const ALIAS = 57350
 
 var TdocToknames = [...]string{
 	"$end",
@@ -28,6 +29,7 @@ var TdocToknames = [...]string{
 	"TEXT",
 	"ERROR",
 	"IDENTIFIER",
+	"ALIAS",
 }
 var TdocStatenames = [...]string{}
 
@@ -35,7 +37,7 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line lexer/tdoc.y:36
+//line lexer/tdoc.y:37
 /* Start of the program */
 
 //line yacctab:1
@@ -45,41 +47,41 @@ var TdocExca = [...]int{
 	-2, 0,
 }
 
-const TdocNprod = 4
+const TdocNprod = 5
 const TdocPrivate = 57344
 
 var TdocTokenNames []string
 var TdocStates []string
 
-const TdocLast = 4
+const TdocLast = 6
 
 var TdocAct = [...]int{
 
-	4, 3, 2, 1,
+	4, 5, 6, 3, 2, 1,
 }
 var TdocPact = [...]int{
 
-	-3, -1000, -1000, -7, -1000,
+	-1, -1000, -8, -6, -3, -1000, -1000,
 }
 var TdocPgo = [...]int{
 
-	0, 3, 2,
+	0, 5, 4,
 }
 var TdocR1 = [...]int{
 
-	0, 1, 2, 2,
+	0, 1, 2, 2, 2,
 }
 var TdocR2 = [...]int{
 
-	0, 1, 2, 1,
+	0, 1, 3, 2, 1,
 }
 var TdocChk = [...]int{
 
-	-1000, -1, -2, 4, 7,
+	-1000, -1, -2, 4, 8, 7, 5,
 }
 var TdocDef = [...]int{
 
-	0, -2, 1, 3, 2,
+	0, -2, 1, 4, 0, 3, 2,
 }
 var TdocTok1 = [...]int{
 
@@ -87,7 +89,7 @@ var TdocTok1 = [...]int{
 }
 var TdocTok2 = [...]int{
 
-	2, 3, 4, 5, 6, 7,
+	2, 3, 4, 5, 6, 7, 8,
 }
 var TdocTok3 = [...]int{
 	0,
@@ -430,15 +432,15 @@ Tdocdefault:
 	// dummy call; replaced with literal code
 	switch Tdocnt {
 
-	case 2:
+	case 3:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line lexer/tdoc.y:25
+		//line lexer/tdoc.y:26
 		{
 			fmt.Println(TdocDollar[1].val, TdocDollar[2].val)
 		}
-	case 3:
+	case 4:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line lexer/tdoc.y:31
+		//line lexer/tdoc.y:32
 		{
 			fmt.Println(TdocDollar[1].val)
 		}

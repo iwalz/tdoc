@@ -125,12 +125,30 @@ var components = map[string]tokenType{
 	"actor": COMPONENT,
 }
 
+var keywords = map[string]tokenType{
+	"as": ALIAS,
+}
+
 func (l *Lexer) isComponent() bool {
 	if _, ok := components[l.input[l.start:l.pos]]; ok {
 		return true
 	}
 
 	return false
+}
+
+func (l *Lexer) isKeyword() bool {
+	if _, ok := keywords[l.input[l.start:l.pos]]; ok {
+		return true
+	}
+
+	return false
+}
+
+// we already know its a keyword
+func lexKeyword(l *Lexer) stateFn {
+	l.emit(keywords[l.input[l.start:l.pos]])
+	return lexText
 }
 
 func lexComponent(l *Lexer) stateFn {
@@ -193,6 +211,9 @@ func lexText(l *Lexer) stateFn {
 			// Component found, name next
 			if l.isComponent() {
 				return lexComponent
+			}
+			if l.isKeyword() {
+				return lexKeyword
 			}
 			if l.pos > l.start {
 				l.emit(TEXT)
