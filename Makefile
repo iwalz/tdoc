@@ -4,6 +4,9 @@ default: yacc
 test:
 	@echo "Testing lexer:"
 	@go test ./lexer -cover -v
+	@echo "Testing Components:"
+	@go test ./component -cover -v
+
 
 yacc:
 	@go tool yacc -o lexer/parser.go -p Tdoc lexer/tdoc.y

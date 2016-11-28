@@ -2,17 +2,24 @@
 
 package lexer
 
-import "fmt"
+import (
+    "fmt"
+    "github.com/iwalz/tdoc/component"
+)
+
+var Components []*component.Component
 
 %}
 
-%token COMPONENT TEXT ERROR IDENTIFIER ALIAS
+%token <val> COMPONENT TEXT ERROR IDENTIFIER ALIAS
+%type <comp> declaration
 
 %union{
   val string
   pos int
   line int
   token int
+  comp *component.Component
 }
 
 %%
@@ -24,14 +31,18 @@ declaration:
   declaration ALIAS TEXT
   | COMPONENT IDENTIFIER
   {
-    fmt.Println($1.val, $2.val)
+    Components = append(Components, &component.Component{Typ: $1, Identifier: $2})
   }
 ;
 declaration:
   COMPONENT
   {
-    fmt.Println($1.val)
+    fmt.Println($1)
   }
   ;
 
 %% /* Start of the program */
+
+func (p *TdocParserImpl) AST() []*component.Component {
+  return Components
+}

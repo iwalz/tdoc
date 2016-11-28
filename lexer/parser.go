@@ -4,15 +4,21 @@ package lexer
 import __yyfmt__ "fmt"
 
 //line lexer/tdoc.y:3
-import "fmt"
+import (
+	"fmt"
+	"github.com/iwalz/tdoc/component"
+)
 
-//line lexer/tdoc.y:11
+var Components []*component.Component
+
+//line lexer/tdoc.y:17
 type TdocSymType struct {
 	yys   int
 	val   string
 	pos   int
 	line  int
 	token int
+	comp  *component.Component
 }
 
 const COMPONENT = 57346
@@ -37,8 +43,12 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line lexer/tdoc.y:37
+//line lexer/tdoc.y:45
 /* Start of the program */
+
+func (p *TdocParserImpl) AST() []*component.Component {
+	return Components
+}
 
 //line yacctab:1
 var TdocExca = [...]int{
@@ -57,7 +67,7 @@ const TdocLast = 6
 
 var TdocAct = [...]int{
 
-	4, 5, 6, 3, 2, 1,
+	4, 5, 6, 3, 1, 2,
 }
 var TdocPact = [...]int{
 
@@ -69,7 +79,7 @@ var TdocPgo = [...]int{
 }
 var TdocR1 = [...]int{
 
-	0, 1, 2, 2, 2,
+	0, 2, 1, 1, 1,
 }
 var TdocR2 = [...]int{
 
@@ -77,7 +87,7 @@ var TdocR2 = [...]int{
 }
 var TdocChk = [...]int{
 
-	-1000, -1, -2, 4, 8, 7, 5,
+	-1000, -2, -1, 4, 8, 7, 5,
 }
 var TdocDef = [...]int{
 
@@ -434,13 +444,14 @@ Tdocdefault:
 
 	case 3:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line lexer/tdoc.y:26
+		//line lexer/tdoc.y:33
 		{
-			fmt.Println(TdocDollar[1].val, TdocDollar[2].val)
+			Components = append(Components, &component.Component{Typ: TdocDollar[1].val, Identifier: TdocDollar[2].val})
+			fmt.Println("Component", TdocVAL.comp)
 		}
 	case 4:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line lexer/tdoc.y:32
+		//line lexer/tdoc.y:40
 		{
 			fmt.Println(TdocDollar[1].val)
 		}
