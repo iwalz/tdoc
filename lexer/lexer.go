@@ -9,7 +9,7 @@ const eof = -1
 
 type Pos int
 type stateFn func(*Lexer) stateFn
-type tokenType int
+type TokenType int
 
 type Lexer struct {
 	input  string // input to scan
@@ -22,7 +22,7 @@ type Lexer struct {
 }
 
 type token struct {
-	typ  tokenType // The type
+	typ  TokenType // The type
 	pos  Pos       // and position
 	val  string    // The value
 	line int       // Line
@@ -57,7 +57,7 @@ func NewLexer(input string) *Lexer {
 }
 
 // Sends a new item to the channel
-func (l *Lexer) emit(t tokenType) {
+func (l *Lexer) emit(t TokenType) {
 	l.tokens <- token{t, l.start, l.input[l.start:l.pos], l.line}
 	l.start = l.pos
 }
@@ -121,13 +121,13 @@ func (l *Lexer) isDelimiter() bool {
 	return false
 }
 
-var components = map[string]tokenType{
+var components = map[string]TokenType{
 	"cloud": COMPONENT,
 	"node":  COMPONENT,
 	"actor": COMPONENT,
 }
 
-var keywords = map[string]tokenType{
+var keywords = map[string]TokenType{
 	"as": ALIAS,
 }
 
