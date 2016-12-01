@@ -6,6 +6,8 @@ test:
 	@go test ./lexer -cover -v
 	@echo "Testing Components:"
 	@go test ./component -cover -v
+	@echo "Testing AST:"
+	@go test ./ast -cover -v
 
 
 yacc:

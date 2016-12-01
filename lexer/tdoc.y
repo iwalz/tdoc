@@ -3,46 +3,73 @@
 package lexer
 
 import (
-    "fmt"
-    "github.com/iwalz/tdoc/component"
+  "github.com/iwalz/tdoc/ast"
 )
 
-var Components []*component.Component
+var Program ast.Node
 
 %}
 
 %token <val> COMPONENT TEXT ERROR IDENTIFIER ALIAS
-%type <comp> declaration
+%type <node> program statement_list statement
 
 %union{
   val string
   pos int
   line int
   token int
-  comp *component.Component
+  node ast.Node
 }
 
 %%
 
-input:
-  declaration
+program: statement_list
+{
+  //fmt.Println("Program")
+  $$ = ast.NewProgramNode($1)
+  Program = $$
+  //fmt.Printf("Return: %+v\n", $$)
+  //fmt.Printf("First: %+v\n", $1)
+}
+statement_list: statement
+{
+  //fmt.Println("statement_list")
+
+  $$ = ast.NewDefaultNode($1)
+  //fmt.Printf("Return: %+v\n", $$)
+  //fmt.Printf("First: %+v\n", $1)
+}
+| statement statement_list
+{
+  //fmt.Println("statement_list alt")
+  $$ = ast.NewListNode($1, $2)
+  //fmt.Printf("Return: %+v\n", $$)
+  //fmt.Printf("First: %+v\n", $1)
+  //fmt.Printf("Second: %+v\n", $2)
+}
 ;
-declaration:
-  declaration ALIAS TEXT
-  | COMPONENT IDENTIFIER
-  {
-    Components = append(Components, &component.Component{Typ: $1, Identifier: $2})
-  }
+statement: COMPONENT IDENTIFIER
+{
+  //fmt.Println("statement")
+  $$ = ast.NewComponentNode(nil, nil, $1, $2)
+  //fmt.Printf("Return: %+v\n", $$)
+  //fmt.Printf("First: %+v\n", $1)
+  //fmt.Printf("Second: %+v\n", $2)
+}
 ;
-declaration:
-  COMPONENT
-  {
-    fmt.Println($1)
-  }
-  ;
+statement: statement ALIAS TEXT
+{
+  //fmt.Println("alias")
+  $$ = ast.NewAliasNode($1, $3)
+  //fmt.Printf("Return: %+v\n", $$)
+  //fmt.Printf("First: %+v\n", $1)
+  //fmt.Printf("Second: %+v\n", $2)
+  //fmt.Printf("Third: %+v\n", $3)
+}
+;
 
 %% /* Start of the program */
 
-func (p *TdocParserImpl) AST() []*component.Component {
-  return Components
+func (p *TdocParserImpl) AST() ast.Node {
+  return Program
 }
