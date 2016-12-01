@@ -1,12 +1,8 @@
 %{
 
-package lexer
+package parser
 
-import (
-  "github.com/iwalz/tdoc/ast"
-)
-
-var Program ast.Node
+var Program Node
 
 %}
 
@@ -18,7 +14,7 @@ var Program ast.Node
   pos int
   line int
   token int
-  node ast.Node
+  node Node
 }
 
 %%
@@ -26,7 +22,7 @@ var Program ast.Node
 program: statement_list
 {
   //fmt.Println("Program")
-  $$ = ast.NewProgramNode($1)
+  $$ = NewProgramNode($1)
   Program = $$
   //fmt.Printf("Return: %+v\n", $$)
   //fmt.Printf("First: %+v\n", $1)
@@ -35,14 +31,14 @@ statement_list: statement
 {
   //fmt.Println("statement_list")
 
-  $$ = ast.NewDefaultNode($1)
+  $$ = NewDefaultNode($1)
   //fmt.Printf("Return: %+v\n", $$)
   //fmt.Printf("First: %+v\n", $1)
 }
 | statement statement_list
 {
   //fmt.Println("statement_list alt")
-  $$ = ast.NewListNode($1, $2)
+  $$ = NewListNode($1, $2)
   //fmt.Printf("Return: %+v\n", $$)
   //fmt.Printf("First: %+v\n", $1)
   //fmt.Printf("Second: %+v\n", $2)
@@ -51,7 +47,7 @@ statement_list: statement
 statement: COMPONENT IDENTIFIER
 {
   //fmt.Println("statement")
-  $$ = ast.NewComponentNode(nil, nil, $1, $2)
+  $$ = NewComponentNode(nil, nil, $1, $2)
   //fmt.Printf("Return: %+v\n", $$)
   //fmt.Printf("First: %+v\n", $1)
   //fmt.Printf("Second: %+v\n", $2)
@@ -60,7 +56,7 @@ statement: COMPONENT IDENTIFIER
 statement: statement ALIAS TEXT
 {
   //fmt.Println("alias")
-  $$ = ast.NewAliasNode($1, $3)
+  $$ = NewAliasNode($1, $3)
   //fmt.Printf("Return: %+v\n", $$)
   //fmt.Printf("First: %+v\n", $1)
   //fmt.Printf("Second: %+v\n", $2)
@@ -70,6 +66,6 @@ statement: statement ALIAS TEXT
 
 %% /* Start of the program */
 
-func (p *TdocParserImpl) AST() ast.Node {
+func (p *TdocParserImpl) AST() Node {
   return Program
 }

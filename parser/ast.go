@@ -1,4 +1,4 @@
-package ast
+package parser
 
 var count int
 

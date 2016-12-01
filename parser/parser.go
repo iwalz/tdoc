@@ -1,23 +1,19 @@
-//line lexer/tdoc.y:2
-package lexer
+//line parser/tdoc.y:2
+package parser
 
 import __yyfmt__ "fmt"
 
-//line lexer/tdoc.y:3
-import (
-	"github.com/iwalz/tdoc/ast"
-)
+//line parser/tdoc.y:3
+var Program Node
 
-var Program ast.Node
-
-//line lexer/tdoc.y:16
+//line parser/tdoc.y:12
 type TdocSymType struct {
 	yys   int
 	val   string
 	pos   int
 	line  int
 	token int
-	node  ast.Node
+	node  Node
 }
 
 const COMPONENT = 57346
@@ -42,11 +38,11 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line lexer/tdoc.y:71
+//line parser/tdoc.y:67
 
 /* Start of the program */
 
-func (p *TdocParserImpl) AST() ast.Node {
+func (p *TdocParserImpl) AST() Node {
 	return Program
 }
 
@@ -444,50 +440,50 @@ Tdocdefault:
 
 	case 1:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line lexer/tdoc.y:27
+		//line parser/tdoc.y:23
 		{
 			//fmt.Println("Program")
-			TdocVAL.node = ast.NewProgramNode(TdocDollar[1].node)
+			TdocVAL.node = NewProgramNode(TdocDollar[1].node)
 			Program = TdocVAL.node
 			//fmt.Printf("Return: %+v\n", $$)
 			//fmt.Printf("First: %+v\n", $1)
 		}
 	case 2:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line lexer/tdoc.y:35
+		//line parser/tdoc.y:31
 		{
 			//fmt.Println("statement_list")
 
-			TdocVAL.node = ast.NewDefaultNode(TdocDollar[1].node)
+			TdocVAL.node = NewDefaultNode(TdocDollar[1].node)
 			//fmt.Printf("Return: %+v\n", $$)
 			//fmt.Printf("First: %+v\n", $1)
 		}
 	case 3:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line lexer/tdoc.y:43
+		//line parser/tdoc.y:39
 		{
 			//fmt.Println("statement_list alt")
-			TdocVAL.node = ast.NewListNode(TdocDollar[1].node, TdocDollar[2].node)
+			TdocVAL.node = NewListNode(TdocDollar[1].node, TdocDollar[2].node)
 			//fmt.Printf("Return: %+v\n", $$)
 			//fmt.Printf("First: %+v\n", $1)
 			//fmt.Printf("Second: %+v\n", $2)
 		}
 	case 4:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line lexer/tdoc.y:52
+		//line parser/tdoc.y:48
 		{
 			//fmt.Println("statement")
-			TdocVAL.node = ast.NewComponentNode(nil, nil, TdocDollar[1].val, TdocDollar[2].val)
+			TdocVAL.node = NewComponentNode(nil, nil, TdocDollar[1].val, TdocDollar[2].val)
 			//fmt.Printf("Return: %+v\n", $$)
 			//fmt.Printf("First: %+v\n", $1)
 			//fmt.Printf("Second: %+v\n", $2)
 		}
 	case 5:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line lexer/tdoc.y:61
+		//line parser/tdoc.y:57
 		{
 			//fmt.Println("alias")
-			TdocVAL.node = ast.NewAliasNode(TdocDollar[1].node, TdocDollar[3].val)
+			TdocVAL.node = NewAliasNode(TdocDollar[1].node, TdocDollar[3].val)
 			//fmt.Printf("Return: %+v\n", $$)
 			//fmt.Printf("First: %+v\n", $1)
 			//fmt.Printf("Second: %+v\n", $2)

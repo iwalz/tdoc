@@ -2,16 +2,11 @@ default: yacc
 	@go run main.go
 
 test:
-	@echo "Testing lexer:"
-	@go test ./lexer -cover -v
-	@echo "Testing Components:"
-	@go test ./component -cover -v
-	@echo "Testing AST:"
-	@go test ./ast -cover -v
-
+	@echo "Testing parser:"
+	@go test ./parser -cover -v
 
 yacc:
-	@go tool yacc -o lexer/parser.go -p Tdoc lexer/tdoc.y
+	@go tool yacc -o parser/parser.go -p Tdoc parser/tdoc.y
 
 cover:
 	@go tool cover -html=coverage.out
