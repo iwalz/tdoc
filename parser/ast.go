@@ -40,7 +40,7 @@ func (b *BasicNode) Next() Node {
 }
 
 func CreateBasicNode(id int) BasicNode {
-	b := BasicNode{BasicNodeId: count}
+	b := BasicNode{BasicNodeId: id}
 	b.children = make([]Node, 0)
 	return b
 }
@@ -49,10 +49,6 @@ type ComponentNode struct {
 	BasicNode
 	Component  string
 	Identifier string
-}
-
-type DefaultNode struct {
-	BasicNode
 }
 
 type ListNode struct {
@@ -104,17 +100,6 @@ func NewListNode(l, r Node) Node {
 	}
 	count++
 	return ln
-}
-
-func NewDefaultNode(r Node) Node {
-	b := CreateBasicNode(count)
-	b.AppendChild(r)
-
-	cn := &DefaultNode{
-		BasicNode: b,
-	}
-	count++
-	return cn
 }
 
 func NewAliasNode(n Node, alias string) Node {

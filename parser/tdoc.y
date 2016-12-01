@@ -31,7 +31,7 @@ statement_list: statement
 {
   //fmt.Println("statement_list")
 
-  $$ = NewDefaultNode($1)
+  //$$ = NewDefaultNode($1)
   //fmt.Printf("Return: %+v\n", $$)
   //fmt.Printf("First: %+v\n", $1)
 }

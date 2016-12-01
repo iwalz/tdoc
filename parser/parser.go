@@ -454,7 +454,7 @@ Tdocdefault:
 		{
 			//fmt.Println("statement_list")
 
-			TdocVAL.node = NewDefaultNode(TdocDollar[1].node)
+			//$$ = NewDefaultNode($1)
 			//fmt.Printf("Return: %+v\n", $$)
 			//fmt.Printf("First: %+v\n", $1)
 		}
