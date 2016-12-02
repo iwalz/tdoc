@@ -67,13 +67,8 @@ type AliasNode struct {
 func NewComponentNode(l, r Node, comp, identifier string) Node {
 	b := CreateBasicNode(count)
 
-	if l != nil {
-		b.AppendChild(l)
-	}
-
-	if r != nil {
-		b.AppendChild(r)
-	}
+	b.AppendChild(l)
+	b.AppendChild(r)
 
 	cn := &ComponentNode{
 		BasicNode:  b,

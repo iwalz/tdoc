@@ -53,4 +53,6 @@ func TestRecursiveAliasComponent(t *testing.T) {
 	assert.Equal(t, "*parser.ComponentNode", reflect.TypeOf(c1).String())
 	assert.Equal(t, "node", c1.(*ComponentNode).Component)
 	assert.Equal(t, "blubb", c1.(*ComponentNode).Identifier)
+
+	assert.Equal(t, nil, l.Next())
 }
