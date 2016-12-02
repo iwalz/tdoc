@@ -471,7 +471,7 @@ Tdocdefault:
 		//line parser/tdoc.y:40
 		{
 			//fmt.Println("statement_list alt")
-			TdocVAL.node = NewListNode(TdocDollar[1].node, TdocDollar[2].node)
+			//$$ = NewListNode($1, $2)
 			//fmt.Printf("Return: %+v\n", $$)
 			//fmt.Printf("First: %+v\n", $1)
 			//fmt.Printf("Second: %+v\n", $2)

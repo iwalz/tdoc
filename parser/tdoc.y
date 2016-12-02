@@ -39,7 +39,7 @@ statement_list: statement
 | statement statement_list
 {
   //fmt.Println("statement_list alt")
-  $$ = NewListNode($1, $2)
+  //$$ = NewListNode($1, $2)
   //fmt.Printf("Return: %+v\n", $$)
   //fmt.Printf("First: %+v\n", $1)
   //fmt.Printf("Second: %+v\n", $2)
