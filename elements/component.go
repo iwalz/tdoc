@@ -1,4 +1,4 @@
-package component
+package elements
 
 type Stackable interface {
 	Add(*Component)
