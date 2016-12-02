@@ -2,5 +2,6 @@ language: go
 script: make test
 install:
   - go get github.com/stretchr/testify/assert
+  - go get github.com/davecgh/go-spew/spew
 before_install:
   - make yacc
