@@ -2,8 +2,7 @@ default: yacc
 	@go run main.go
 
 test:
-	@echo "Testing parser:"
-	@go test ./parser -cover -v
+	@go test ./... -cover -v
 
 yacc:
 	@go tool yacc -o parser/parser.go -p Tdoc parser/tdoc.y
