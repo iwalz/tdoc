@@ -42,7 +42,7 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:77
+//line parser/tdoc.y:75
 
 /* Start of the program */
 
@@ -491,7 +491,9 @@ Tdocdefault:
 		//line parser/tdoc.y:58
 		{
 			//fmt.Println("alias")
-			TdocVAL.node = NewAliasNode(TdocDollar[1].node, TdocDollar[3].val)
+			if c, ok := TdocDollar[1].node.(*ComponentNode); ok {
+				c.Alias = TdocDollar[3].val
+			}
 			//fmt.Printf("Return: %+v\n", $$)
 			//fmt.Printf("First: %+v\n", $1)
 			//fmt.Printf("Second: %+v\n", $2)
@@ -499,13 +501,9 @@ Tdocdefault:
 		}
 	case 6:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:68
+		//line parser/tdoc.y:70
 		{
-			if _, ok := TdocDollar[1].node.(*AliasNode); ok {
-				TdocDollar[1].node.Front().AppendChild(TdocDollar[3].node)
-			} else {
-				TdocDollar[1].node.AppendChild(TdocDollar[3].node)
-			}
+			TdocDollar[1].node.AppendChild(TdocDollar[3].node)
 		}
 	}
 	goto Tdocstack /* stack new state and value */

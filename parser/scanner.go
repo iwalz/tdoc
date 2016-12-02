@@ -63,15 +63,10 @@ func (s *Scanner) Scan(node Node) *elements.Matrix {
 func (s *Scanner) convert(curr, prev Node) {
 	switch curr.(type) {
 	case *ComponentNode:
-		// Is alias defined?
-		alias := ""
-		if a, ok := prev.(*AliasNode); ok {
-			alias = a.Alias
-		}
 		c := &elements.Component{
 			Typ:        curr.(*ComponentNode).Component,
 			Identifier: curr.(*ComponentNode).Identifier,
-			Alias:      alias,
+			Alias:      curr.(*ComponentNode).Alias,
 		}
 		s.matrix.Add(c)
 	default:

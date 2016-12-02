@@ -57,7 +57,9 @@ statement: COMPONENT IDENTIFIER
 statement: statement ALIAS TEXT
 {
   //fmt.Println("alias")
-  $$ = NewAliasNode($1, $3)
+  if c, ok := $1.(*ComponentNode); ok {
+    c.Alias = $3
+  }
   //fmt.Printf("Return: %+v\n", $$)
   //fmt.Printf("First: %+v\n", $1)
   //fmt.Printf("Second: %+v\n", $2)
@@ -66,11 +68,7 @@ statement: statement ALIAS TEXT
 ;
 statement: statement SCOPEIN statement SCOPEOUT
 {
-  if _, ok := $1.(*AliasNode); ok {
-    $1.Front().AppendChild($3)
-  } else {
-    $1.AppendChild($3)
-  }
+  $1.AppendChild($3)
 }
 ;
 
