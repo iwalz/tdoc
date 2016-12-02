@@ -6,6 +6,7 @@ var Program Node
 
 %}
 
+%token SCOPEIN SCOPEOUT
 %token <val> COMPONENT TEXT ERROR IDENTIFIER ALIAS
 %type <node> program statement_list statement
 
@@ -61,6 +62,15 @@ statement: statement ALIAS TEXT
   //fmt.Printf("First: %+v\n", $1)
   //fmt.Printf("Second: %+v\n", $2)
   //fmt.Printf("Third: %+v\n", $3)
+}
+;
+statement: statement SCOPEIN statement SCOPEOUT
+{
+  if _, ok := $1.(*AliasNode); ok {
+    $1.Front().AppendChild($3)
+  } else {
+    $1.AppendChild($3)
+  }
 }
 ;
 

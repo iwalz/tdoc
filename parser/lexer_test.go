@@ -307,3 +307,53 @@ func TestDeclarationCombination(t *testing.T) {
 		assert.Equal(t, tt.expectedLiteral, lval.val)
 	}
 }
+
+func TestMultipleNonAliasedMixedTokens(t *testing.T) {
+	input := `cloud foo actor bar as quo node baz`
+
+	tests := []struct {
+		expectedType    int
+		expectedLiteral string
+	}{
+		{COMPONENT, "cloud"},
+		{IDENTIFIER, "foo"},
+		{COMPONENT, "actor"},
+		{IDENTIFIER, "bar"},
+		{ALIAS, "as"},
+		{TEXT, "quo"},
+		{COMPONENT, "node"},
+		{IDENTIFIER, "baz"},
+	}
+
+	l := NewLexer(input)
+	for _, tt := range tests {
+		lval := &TdocSymType{}
+		tok := l.Lex(lval)
+		assert.Equal(t, tt.expectedType, tok)
+		assert.Equal(t, tt.expectedLiteral, lval.val)
+	}
+}
+
+func TestScopeToken(t *testing.T) {
+	input := `cloud foo as bar { }`
+
+	tests := []struct {
+		expectedType    int
+		expectedLiteral string
+	}{
+		{COMPONENT, "cloud"},
+		{IDENTIFIER, "foo"},
+		{ALIAS, "as"},
+		{TEXT, "bar"},
+		{SCOPEIN, "{"},
+		{SCOPEOUT, "}"},
+	}
+
+	l := NewLexer(input)
+	for _, tt := range tests {
+		lval := &TdocSymType{}
+		tok := l.Lex(lval)
+		assert.Equal(t, tt.expectedType, tok)
+		assert.Equal(t, tt.expectedLiteral, lval.val)
+	}
+}

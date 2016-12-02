@@ -49,6 +49,7 @@ type ComponentNode struct {
 	BasicNode
 	Component  string
 	Identifier string
+	Alias      string
 }
 
 type ListNode struct {
@@ -66,9 +67,12 @@ type AliasNode struct {
 
 func NewComponentNode(l, r Node, comp, identifier string) Node {
 	b := CreateBasicNode(count)
-
-	b.AppendChild(l)
-	b.AppendChild(r)
+	if l != nil {
+		b.AppendChild(l)
+	}
+	if r != nil {
+		b.AppendChild(r)
+	}
 
 	cn := &ComponentNode{
 		BasicNode:  b,

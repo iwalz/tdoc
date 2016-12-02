@@ -113,7 +113,7 @@ func (l *Lexer) peek() rune {
 func (l *Lexer) isDelimiter() bool {
 	c := l.peek()
 
-	if c == ' ' || c == '\n' || c == eof || c == '\t' {
+	if c == ' ' || c == '\n' || c == eof || c == '\t' || c == '{' || c == '}' {
 
 		return true
 	}
@@ -129,6 +129,8 @@ var components = map[string]TokenType{
 
 var keywords = map[string]TokenType{
 	"as": ALIAS,
+	"{":  SCOPEIN,
+	"}":  SCOPEOUT,
 }
 
 // Check for components

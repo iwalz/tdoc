@@ -6,7 +6,7 @@ import __yyfmt__ "fmt"
 //line parser/tdoc.y:3
 var Program Node
 
-//line parser/tdoc.y:12
+//line parser/tdoc.y:13
 type TdocSymType struct {
 	yys   int
 	val   string
@@ -16,16 +16,20 @@ type TdocSymType struct {
 	node  Node
 }
 
-const COMPONENT = 57346
-const TEXT = 57347
-const ERROR = 57348
-const IDENTIFIER = 57349
-const ALIAS = 57350
+const SCOPEIN = 57346
+const SCOPEOUT = 57347
+const COMPONENT = 57348
+const TEXT = 57349
+const ERROR = 57350
+const IDENTIFIER = 57351
+const ALIAS = 57352
 
 var TdocToknames = [...]string{
 	"$end",
 	"error",
 	"$unk",
+	"SCOPEIN",
+	"SCOPEOUT",
 	"COMPONENT",
 	"TEXT",
 	"ERROR",
@@ -38,7 +42,7 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:67
+//line parser/tdoc.y:77
 
 /* Start of the program */
 
@@ -53,41 +57,45 @@ var TdocExca = [...]int{
 	-2, 0,
 }
 
-const TdocNprod = 6
+const TdocNprod = 7
 const TdocPrivate = 57344
 
 var TdocTokenNames []string
 var TdocStates []string
 
-const TdocLast = 10
+const TdocLast = 15
 
 var TdocAct = [...]int{
 
-	4, 7, 8, 4, 6, 2, 3, 1, 0, 5,
+	7, 11, 7, 8, 4, 3, 6, 9, 6, 4,
+	2, 1, 0, 10, 5,
 }
 var TdocPact = [...]int{
 
-	-1, -1000, -1000, -4, -6, -1000, -3, -1000, -1000,
+	3, -1000, -1000, -2, -6, -1000, 0, 3, -1000, -1000,
+	-4, -1000,
 }
 var TdocPgo = [...]int{
 
-	0, 7, 5, 6,
+	0, 11, 10, 5,
 }
 var TdocR1 = [...]int{
 
-	0, 1, 2, 2, 3, 3,
+	0, 1, 2, 2, 3, 3, 3,
 }
 var TdocR2 = [...]int{
 
-	0, 1, 1, 2, 2, 3,
+	0, 1, 1, 2, 2, 3, 4,
 }
 var TdocChk = [...]int{
 
-	-1000, -1, -2, -3, 4, -2, 8, 7, 5,
+	-1000, -1, -2, -3, 6, -2, 10, 4, 9, 7,
+	-3, 5,
 }
 var TdocDef = [...]int{
 
-	0, -2, 1, 2, 0, 3, 0, 4, 5,
+	0, -2, 1, 2, 0, 3, 0, 0, 4, 5,
+	0, 6,
 }
 var TdocTok1 = [...]int{
 
@@ -95,7 +103,7 @@ var TdocTok1 = [...]int{
 }
 var TdocTok2 = [...]int{
 
-	2, 3, 4, 5, 6, 7, 8,
+	2, 3, 4, 5, 6, 7, 8, 9, 10,
 }
 var TdocTok3 = [...]int{
 	0,
@@ -440,7 +448,7 @@ Tdocdefault:
 
 	case 1:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:23
+		//line parser/tdoc.y:24
 		{
 			//fmt.Println("Program")
 			TdocVAL.node = NewProgramNode(TdocDollar[1].node)
@@ -450,7 +458,7 @@ Tdocdefault:
 		}
 	case 2:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:31
+		//line parser/tdoc.y:32
 		{
 			//fmt.Println("statement_list")
 
@@ -460,7 +468,7 @@ Tdocdefault:
 		}
 	case 3:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:39
+		//line parser/tdoc.y:40
 		{
 			//fmt.Println("statement_list alt")
 			TdocVAL.node = NewListNode(TdocDollar[1].node, TdocDollar[2].node)
@@ -470,7 +478,7 @@ Tdocdefault:
 		}
 	case 4:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:48
+		//line parser/tdoc.y:49
 		{
 			//fmt.Println("statement")
 			TdocVAL.node = NewComponentNode(nil, nil, TdocDollar[1].val, TdocDollar[2].val)
@@ -480,7 +488,7 @@ Tdocdefault:
 		}
 	case 5:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:57
+		//line parser/tdoc.y:58
 		{
 			//fmt.Println("alias")
 			TdocVAL.node = NewAliasNode(TdocDollar[1].node, TdocDollar[3].val)
@@ -488,6 +496,16 @@ Tdocdefault:
 			//fmt.Printf("First: %+v\n", $1)
 			//fmt.Printf("Second: %+v\n", $2)
 			//fmt.Printf("Third: %+v\n", $3)
+		}
+	case 6:
+		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
+		//line parser/tdoc.y:68
+		{
+			if _, ok := TdocDollar[1].node.(*AliasNode); ok {
+				TdocDollar[1].node.Front().AppendChild(TdocDollar[3].node)
+			} else {
+				TdocDollar[1].node.AppendChild(TdocDollar[3].node)
+			}
 		}
 	}
 	goto Tdocstack /* stack new state and value */
