@@ -4,16 +4,23 @@ package parser
 import __yyfmt__ "fmt"
 
 //line parser/tdoc.y:3
-var Program Node
+import (
+	"github.com/iwalz/tdoc/elements"
+)
 
-//line parser/tdoc.y:13
+var Program elements.Element
+var depth int
+var root []elements.Element
+var comp []elements.Element
+
+//line parser/tdoc.y:20
 type TdocSymType struct {
-	yys   int
-	val   string
-	pos   int
-	line  int
-	token int
-	node  Node
+	yys     int
+	val     string
+	pos     int
+	line    int
+	token   int
+	element elements.Element
 }
 
 const SCOPEIN = 57346
@@ -42,11 +49,11 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:75
+//line parser/tdoc.y:68
 
 /* Start of the program */
 
-func (p *TdocParserImpl) AST() Node {
+func (p *TdocParserImpl) AST() elements.Element {
 	return Program
 }
 
@@ -63,21 +70,21 @@ const TdocPrivate = 57344
 var TdocTokenNames []string
 var TdocStates []string
 
-const TdocLast = 15
+const TdocLast = 13
 
 var TdocAct = [...]int{
 
-	7, 11, 7, 8, 4, 3, 6, 9, 6, 4,
-	2, 1, 0, 10, 5,
+	7, 11, 7, 8, 3, 4, 6, 5, 6, 9,
+	2, 1, 10,
 }
 var TdocPact = [...]int{
 
-	3, -1000, -1000, -2, -6, -1000, 0, 3, -1000, -1000,
+	-1, -1000, -1, -2, -6, -2, 2, -1, -1000, -1000,
 	-4, -1000,
 }
 var TdocPgo = [...]int{
 
-	0, 11, 10, 5,
+	0, 11, 10, 4,
 }
 var TdocR1 = [...]int{
 
@@ -89,7 +96,7 @@ var TdocR2 = [...]int{
 }
 var TdocChk = [...]int{
 
-	-1000, -1, -2, -3, 6, -2, 10, 4, 9, 7,
+	-1000, -1, -2, -3, 6, -3, 10, 4, 9, 7,
 	-3, 5,
 }
 var TdocDef = [...]int{
@@ -448,62 +455,48 @@ Tdocdefault:
 
 	case 1:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:24
+		//line parser/tdoc.y:31
 		{
-			//fmt.Println("Program")
-			TdocVAL.node = NewProgramNode(TdocDollar[1].node)
-			Program = TdocVAL.node
-			//fmt.Printf("Return: %+v\n", $$)
-			//fmt.Printf("First: %+v\n", $1)
+			if _, ok := TdocDollar[1].element.(*elements.Matrix); ok {
+				Program = TdocDollar[1].element
+			}
+			for _, v := range comp {
+				Program.Add(v)
+			}
+			comp = make([]elements.Element, 0)
 		}
 	case 2:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:32
+		//line parser/tdoc.y:41
 		{
-			//fmt.Println("statement_list")
-
-			//$$ = NewDefaultNode($1)
-			//fmt.Printf("Return: %+v\n", $$)
-			//fmt.Printf("First: %+v\n", $1)
+			TdocVAL.element = elements.NewMatrix(nil)
 		}
 	case 3:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:40
+		//line parser/tdoc.y:45
 		{
-			//fmt.Println("statement_list alt")
-			//$$ = NewListNode($1, $2)
-			//fmt.Printf("Return: %+v\n", $$)
-			//fmt.Printf("First: %+v\n", $1)
-			//fmt.Printf("Second: %+v\n", $2)
+
 		}
 	case 4:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:49
+		//line parser/tdoc.y:50
 		{
-			//fmt.Println("statement")
-			TdocVAL.node = NewComponentNode(nil, nil, TdocDollar[1].val, TdocDollar[2].val)
-			//fmt.Printf("Return: %+v\n", $$)
-			//fmt.Printf("First: %+v\n", $1)
-			//fmt.Printf("Second: %+v\n", $2)
+			TdocVAL.element = elements.NewComponent(nil, nil, TdocDollar[1].val, TdocDollar[2].val)
+			comp = append(comp, TdocVAL.element)
 		}
 	case 5:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:58
+		//line parser/tdoc.y:56
 		{
-			//fmt.Println("alias")
-			if c, ok := TdocDollar[1].node.(*ComponentNode); ok {
+			if c, ok := TdocDollar[1].element.(*elements.Component); ok {
 				c.Alias = TdocDollar[3].val
 			}
-			//fmt.Printf("Return: %+v\n", $$)
-			//fmt.Printf("First: %+v\n", $1)
-			//fmt.Printf("Second: %+v\n", $2)
-			//fmt.Printf("Third: %+v\n", $3)
 		}
 	case 6:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:70
+		//line parser/tdoc.y:63
 		{
-			TdocDollar[1].node.AppendChild(TdocDollar[3].node)
+			TdocDollar[1].element.Add(TdocDollar[3].element)
 		}
 	}
 	goto Tdocstack /* stack new state and value */

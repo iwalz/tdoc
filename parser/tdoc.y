@@ -2,78 +2,71 @@
 
 package parser
 
-var Program Node
+import (
+  "github.com/iwalz/tdoc/elements"
+)
+
+var Program elements.Element
+var depth int
+var root []elements.Element
+var comp []elements.Element
 
 %}
 
 %token SCOPEIN SCOPEOUT
 %token <val> COMPONENT TEXT ERROR IDENTIFIER ALIAS
-%type <node> program statement_list statement
+%type <element> program statement_list statement
 
 %union{
   val string
   pos int
   line int
   token int
-  node Node
+  element elements.Element
 }
 
 %%
 
 program: statement_list
 {
-  //fmt.Println("Program")
-  $$ = NewProgramNode($1)
-  Program = $$
-  //fmt.Printf("Return: %+v\n", $$)
-  //fmt.Printf("First: %+v\n", $1)
+  if _, ok := $1.(*elements.Matrix); ok {
+    Program = $1
+  }
+  for _, v := range comp {
+    Program.Add(v)
+  }
+  comp = make([]elements.Element, 0)
 }
 statement_list: statement
 {
-  //fmt.Println("statement_list")
-
-  //$$ = NewDefaultNode($1)
-  //fmt.Printf("Return: %+v\n", $$)
-  //fmt.Printf("First: %+v\n", $1)
+  $$ = elements.NewMatrix(nil)
 }
-| statement statement_list
+| statement_list statement
 {
-  //fmt.Println("statement_list alt")
-  //$$ = NewListNode($1, $2)
-  //fmt.Printf("Return: %+v\n", $$)
-  //fmt.Printf("First: %+v\n", $1)
-  //fmt.Printf("Second: %+v\n", $2)
+
 }
 ;
 statement: COMPONENT IDENTIFIER
 {
-  //fmt.Println("statement")
-  $$ = NewComponentNode(nil, nil, $1, $2)
-  //fmt.Printf("Return: %+v\n", $$)
-  //fmt.Printf("First: %+v\n", $1)
-  //fmt.Printf("Second: %+v\n", $2)
+  $$ = elements.NewComponent(nil, nil, $1, $2)
+  comp = append(comp, $$)
 }
 ;
 statement: statement ALIAS TEXT
 {
-  //fmt.Println("alias")
-  if c, ok := $1.(*ComponentNode); ok {
+  if c, ok := $1.(*elements.Component); ok {
     c.Alias = $3
   }
-  //fmt.Printf("Return: %+v\n", $$)
-  //fmt.Printf("First: %+v\n", $1)
-  //fmt.Printf("Second: %+v\n", $2)
-  //fmt.Printf("Third: %+v\n", $3)
 }
 ;
 statement: statement SCOPEIN statement SCOPEOUT
 {
-  $1.AppendChild($3)
+  $1.Add($3)
 }
 ;
 
 %% /* Start of the program */
 
-func (p *TdocParserImpl) AST() Node {
+func (p *TdocParserImpl) AST() elements.Element {
   return Program
 }
