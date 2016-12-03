@@ -1,14 +1,13 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/dnephin/cobra"
 	"github.com/iwalz/tdoc/parser"
-	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
@@ -19,16 +18,8 @@ var RootCmd = &cobra.Command{
 	Use:   "tdoc file.tdoc",
 	Short: "Short description",
 	Long:  `Long description`,
+	Args:  CheckFile,
 	RunE: func(cmd *cobra.Command, args []string) error {
-
-		if len(args) == 0 {
-			return errors.New("File missing")
-		}
-
-		if _, err := os.Stat(args[0]); os.IsNotExist(err) {
-			return errors.New("File not found " + args[0])
-		}
-
 		content, err := ioutil.ReadFile(args[0])
 		if err != nil {
 			return err
