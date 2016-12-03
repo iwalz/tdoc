@@ -5,7 +5,6 @@ import __yyfmt__ "fmt"
 
 //line parser/tdoc.y:3
 import (
-	"fmt"
 	"github.com/iwalz/tdoc/elements"
 )
 
@@ -53,7 +52,7 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:72
+//line parser/tdoc.y:78
 
 /* Start of the program */
 
@@ -90,11 +89,11 @@ var TdocPact = [...]int{
 }
 var TdocPgo = [...]int{
 
-	0, 10, 4, 0,
+	0, 4, 0, 10,
 }
 var TdocR1 = [...]int{
 
-	0, 1, 2, 2, 3, 3, 3,
+	0, 3, 1, 1, 2, 2, 2,
 }
 var TdocR2 = [...]int{
 
@@ -102,8 +101,8 @@ var TdocR2 = [...]int{
 }
 var TdocChk = [...]int{
 
-	-1000, -1, -2, -3, 6, -3, 10, 4, 9, 7,
-	-2, 5,
+	-1000, -3, -1, -2, 6, -2, 10, 4, 9, 7,
+	-1, 5,
 }
 var TdocDef = [...]int{
 
@@ -463,29 +462,32 @@ Tdocdefault:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
 		//line parser/tdoc.y:35
 		{
-			//Program.Add($1)
+			Program.Add(TdocDollar[1].element)
 		}
 	case 2:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:39
+		//line parser/tdoc.y:40
 		{
-			Program.Add(TdocDollar[1].element)
+			//fmt.Printf("statement")
+			//if $1.Root() != Program {
+			//$1.Root().Add($1)
+			//}
 		}
 	case 3:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:43
+		//line parser/tdoc.y:48
 		{
+			//fmt.Println("statement_list")
 			TdocDollar[1].element.Root().Add(TdocDollar[2].element)
 		}
 	case 4:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:48
+		//line parser/tdoc.y:54
 		{
 			if Program == nil {
 				Program = elements.NewMatrix(nil)
 				root = append(root, Program)
 			}
-			fmt.Println(TdocDollar[1].val, TdocDollar[2].val)
 			TdocVAL.element = elements.NewComponent(nil, nil, TdocDollar[1].val, TdocDollar[2].val)
 			if TdocVAL.element.Root() == nil {
 				TdocVAL.element.Parent(Program)
@@ -493,7 +495,7 @@ Tdocdefault:
 		}
 	case 5:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:60
+		//line parser/tdoc.y:65
 		{
 			if c, ok := TdocDollar[1].element.(*elements.Component); ok {
 				c.Alias = TdocDollar[3].val
@@ -501,9 +503,10 @@ Tdocdefault:
 		}
 	case 6:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:66
+		//line parser/tdoc.y:71
 		{
 			TdocDollar[3].element.Parent(TdocDollar[1].element)
+			TdocVAL.element = TdocDollar[3].element
 		}
 	}
 	goto Tdocstack /* stack new state and value */

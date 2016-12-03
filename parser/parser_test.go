@@ -24,7 +24,6 @@ func TestManyComponents(t *testing.T) {
 	p := &TdocParserImpl{}
 	p.Parse(NewLexer("cloud foo1 as bar1 cloud foo2 as bar2 cloud foo3 as bar3 cloud foo4 as bar4"))
 	ast := p.AST()
-	spew.Dump(ast)
 	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
 	c1 := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c1).String())
@@ -66,7 +65,6 @@ func TestRecursiveAliasComponent(t *testing.T) {
 	p := &TdocParserImpl{}
 	p.Parse(NewLexer("cloud foo as bar node blubb as baz"))
 	ast := p.AST()
-	spew.Dump(ast)
 	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
 
 	c := ast.Next()
@@ -84,8 +82,9 @@ func TestRecursiveAliasComponent(t *testing.T) {
 
 func TestScopedComponent(t *testing.T) {
 	p := &TdocParserImpl{}
-	p.Parse(NewLexer("cloud foo { actor blubb }"))
+	p.Parse(NewLexer("cloud foo as bar { actor blubb }"))
 	ast := p.AST()
+	spew.Dump(ast)
 	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
 	c := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
