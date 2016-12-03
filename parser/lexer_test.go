@@ -357,3 +357,37 @@ func TestScopeToken(t *testing.T) {
 		assert.Equal(t, tt.expectedLiteral, lval.val)
 	}
 }
+
+func TestNestedScopeToken(t *testing.T) {
+	input := `cloud foo as bar { node foo1 as blubb { cloud foo2 as baz } }`
+
+	tests := []struct {
+		expectedType    int
+		expectedLiteral string
+	}{
+		{COMPONENT, "cloud"},
+		{IDENTIFIER, "foo"},
+		{ALIAS, "as"},
+		{TEXT, "bar"},
+		{SCOPEIN, "{"},
+		{COMPONENT, "node"},
+		{IDENTIFIER, "foo1"},
+		{ALIAS, "as"},
+		{TEXT, "blubb"},
+		{SCOPEIN, "{"},
+		{COMPONENT, "cloud"},
+		{IDENTIFIER, "foo2"},
+		{ALIAS, "as"},
+		{TEXT, "baz"},
+		{SCOPEOUT, "}"},
+		{SCOPEOUT, "}"},
+	}
+
+	l := NewLexer(input)
+	for _, tt := range tests {
+		lval := &TdocSymType{}
+		tok := l.Lex(lval)
+		assert.Equal(t, tt.expectedType, tok)
+		assert.Equal(t, tt.expectedLiteral, lval.val)
+	}
+}

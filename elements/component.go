@@ -7,21 +7,36 @@ type Stackable interface {
 type Element interface {
 	Add(Element)
 	Next() Element
+	Parent(Element)
+	Root() Element
 }
 
 type DefaultElement struct {
 	index int
 	stack []Element
+	root  Element
 }
 
 func (d *DefaultElement) Add(e Element) {
 	d.stack = append(d.stack, e)
 }
 
+func (d *DefaultElement) Parent(p Element) {
+	d.root = p
+}
+
+func (d *DefaultElement) Root() Element {
+	return d.root
+}
+
 func (d *DefaultElement) Next() Element {
 	index := d.index
 
-	if len(d.stack) >= d.index {
+	if index == 0 && len(d.stack) == 1 && d.stack[0] == nil {
+		return d
+	}
+
+	if len(d.stack) > d.index {
 		d.index++
 		return d.stack[index]
 	}

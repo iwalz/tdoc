@@ -13,13 +13,16 @@ var depth int
 var root []elements.Element
 var comp []elements.Element
 
-//line parser/tdoc.y:20
+const yydebug = 1
+
+//line parser/tdoc.y:22
 type TdocSymType struct {
 	yys     int
 	val     string
 	pos     int
 	line    int
 	token   int
+	depth   int
 	element elements.Element
 }
 
@@ -49,12 +52,14 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:68
+//line parser/tdoc.y:70
 
 /* Start of the program */
 
 func (p *TdocParserImpl) AST() elements.Element {
-	return Program
+	ret := Program
+	Program = nil
+	return ret
 }
 
 //line yacctab:1
@@ -74,17 +79,17 @@ const TdocLast = 13
 
 var TdocAct = [...]int{
 
-	7, 11, 7, 8, 3, 4, 6, 5, 6, 9,
-	2, 1, 10,
+	3, 7, 8, 5, 2, 11, 4, 6, 9, 4,
+	1, 5, 10,
 }
 var TdocPact = [...]int{
 
-	-1, -1000, -1, -2, -6, -2, 2, -1, -1000, -1000,
-	-4, -1000,
+	3, -1000, 3, -3, -7, -3, 1, 3, -1000, -1000,
+	0, -1000,
 }
 var TdocPgo = [...]int{
 
-	0, 11, 10, 4,
+	0, 10, 4, 0,
 }
 var TdocR1 = [...]int{
 
@@ -97,7 +102,7 @@ var TdocR2 = [...]int{
 var TdocChk = [...]int{
 
 	-1000, -1, -2, -3, 6, -3, 10, 4, 9, 7,
-	-3, 5,
+	-2, 5,
 }
 var TdocDef = [...]int{
 
@@ -455,34 +460,32 @@ Tdocdefault:
 
 	case 1:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:31
+		//line parser/tdoc.y:34
 		{
-			if _, ok := TdocDollar[1].element.(*elements.Matrix); ok {
-				Program = TdocDollar[1].element
-			}
-			for _, v := range comp {
-				Program.Add(v)
-			}
-			comp = make([]elements.Element, 0)
+			//  Program.Add($1)
 		}
 	case 2:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:41
-		{
-			TdocVAL.element = elements.NewMatrix(nil)
-		}
-	case 3:
-		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:45
+		//line parser/tdoc.y:38
 		{
 
 		}
+	case 3:
+		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
+		//line parser/tdoc.y:42
+		{
+			root[depth].Add(TdocDollar[2].element)
+		}
 	case 4:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:50
+		//line parser/tdoc.y:47
 		{
 			TdocVAL.element = elements.NewComponent(nil, nil, TdocDollar[1].val, TdocDollar[2].val)
-			comp = append(comp, TdocVAL.element)
+			if Program == nil {
+				Program = elements.NewMatrix(nil)
+				root = append(root, Program)
+			}
+			depth--
 		}
 	case 5:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
@@ -494,8 +497,10 @@ Tdocdefault:
 		}
 	case 6:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:63
+		//line parser/tdoc.y:62
 		{
+			root = append(root, TdocDollar[1].element)
+			depth++
 			TdocDollar[1].element.Add(TdocDollar[3].element)
 		}
 	}

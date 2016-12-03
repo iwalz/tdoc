@@ -11,9 +11,11 @@ var depth int
 var root []elements.Element
 var comp []elements.Element
 
+const yydebug=1
+
 %}
 
-%token SCOPEIN SCOPEOUT
+%token <val> SCOPEIN SCOPEOUT
 %token <val> COMPONENT TEXT ERROR IDENTIFIER ALIAS
 %type <element> program statement_list statement
 
@@ -22,6 +24,7 @@ var comp []elements.Element
   pos int
   line int
   token int
+  depth int
   element elements.Element
 }
 
@@ -29,44 +32,45 @@ var comp []elements.Element
 
 program: statement_list
 {
-  if _, ok := $1.(*elements.Matrix); ok {
-    Program = $1
-  }
-  for _, v := range comp {
-    Program.Add(v)
-  }
-  comp = make([]elements.Element, 0)
+  Program.Add($1)
 }
 statement_list: statement
 {
-  $$ = elements.NewMatrix(nil)
+
 }
 | statement_list statement
 {
-
+  $1.Add($2)
 }
 ;
 statement: COMPONENT IDENTIFIER
 {
   $$ = elements.NewComponent(nil, nil, $1, $2)
-  comp = append(comp, $$)
+  if Program == nil {
+    Program = elements.NewMatrix(nil)
+    root = append(root, Program)
+  }
+  depth--
 }
-;
-statement: statement ALIAS TEXT
+| statement ALIAS TEXT
 {
   if c, ok := $1.(*elements.Component); ok {
     c.Alias = $3
   }
 }
-;
-statement: statement SCOPEIN statement SCOPEOUT
+| statement SCOPEIN statement_list SCOPEOUT
 {
+  root = append(root, $1)
+  depth++
   $1.Add($3)
 }
 ;
 
+
 %% /* Start of the program */
 
 func (p *TdocParserImpl) AST() elements.Element {
-  return Program
+  ret := Program
+  Program = nil
+  return ret
 }
