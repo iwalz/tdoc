@@ -470,7 +470,7 @@ Tdocdefault:
 		{
 			//fmt.Printf("statement")
 			//if $1.Root() != Program {
-			//$1.Root().Add($1)
+			TdocDollar[1].element.Root().Add(TdocDollar[1].element)
 			//}
 		}
 	case 3:

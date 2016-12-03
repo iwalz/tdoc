@@ -1,20 +1,13 @@
 package main
 
 import (
-	"github.com/davecgh/go-spew/spew"
-	"github.com/iwalz/tdoc/parser"
+	"os"
+
+	"github.com/iwalz/tdoc/cmd"
 )
 
 func main() {
-	content := `
-	cloud foo as bar {
-		node blubb as depth1
-		node blub as deh1 
+	if err := cmd.RootCmd.Execute(); err != nil {
+		os.Exit(-1)
 	}
-
-	`
-	p := &parser.TdocParserImpl{}
-	l := parser.NewLexer(content)
-	p.Parse(l)
-	spew.Dump(p.AST())
 }

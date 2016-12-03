@@ -40,7 +40,7 @@ statement_list: statement
 {
   //fmt.Printf("statement")
   //if $1.Root() != Program {
-    //$1.Root().Add($1)
+    $1.Root().Add($1)
   //}
 }
 |
