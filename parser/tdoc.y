@@ -3,6 +3,7 @@
 package parser
 
 import (
+  "fmt"
   "github.com/iwalz/tdoc/elements"
 )
 
@@ -32,25 +33,28 @@ const yydebug=1
 
 program: statement_list
 {
-  Program.Add($1)
+  //Program.Add($1)
 }
 statement_list: statement
 {
-
+  Program.Add($1)
 }
 | statement_list statement
 {
-  $1.Add($2)
+  $1.Root().Add($2)
 }
 ;
 statement: COMPONENT IDENTIFIER
 {
-  $$ = elements.NewComponent(nil, nil, $1, $2)
   if Program == nil {
     Program = elements.NewMatrix(nil)
     root = append(root, Program)
   }
-  depth--
+  fmt.Println($1, $2)
+  $$ = elements.NewComponent(nil, nil, $1, $2)
+  if $$.Root() == nil {
+    $$.Parent(Program)
+  }
 }
 | statement ALIAS TEXT
 {
@@ -60,9 +64,7 @@ statement: COMPONENT IDENTIFIER
 }
 | statement SCOPEIN statement_list SCOPEOUT
 {
-  root = append(root, $1)
-  depth++
-  $1.Add($3)
+  $3.Parent($1)
 }
 ;
 

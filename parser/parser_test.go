@@ -13,7 +13,6 @@ func TestSimpleComponent(t *testing.T) {
 	p := &TdocParserImpl{}
 	p.Parse(NewLexer("cloud abc"))
 	ast := p.AST()
-	spew.Dump(ast)
 	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
 	c := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
@@ -76,7 +75,7 @@ func TestRecursiveAliasComponent(t *testing.T) {
 	assert.Equal(t, "foo", c.(*elements.Component).Identifier)
 	assert.Equal(t, "bar", c.(*elements.Component).Alias)
 
-	c1 := c.Next()
+	c1 := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c1).String())
 	assert.Equal(t, "node", c1.(*elements.Component).Typ)
 	assert.Equal(t, "blubb", c1.(*elements.Component).Identifier)
@@ -87,13 +86,12 @@ func TestScopedComponent(t *testing.T) {
 	p := &TdocParserImpl{}
 	p.Parse(NewLexer("cloud foo { actor blubb }"))
 	ast := p.AST()
-	spew.Dump(ast)
 	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
 	c := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
 	assert.Equal(t, "foo", c.(*elements.Component).Identifier)
 	assert.Equal(t, "cloud", c.(*elements.Component).Typ)
-	c1 := c.Next()
+	c1 := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c1).String())
 	assert.Equal(t, "blubb", c1.(*elements.Component).Identifier)
 	assert.Equal(t, "actor", c1.(*elements.Component).Typ)

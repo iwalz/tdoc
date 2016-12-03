@@ -5,6 +5,7 @@ import __yyfmt__ "fmt"
 
 //line parser/tdoc.y:3
 import (
+	"fmt"
 	"github.com/iwalz/tdoc/elements"
 )
 
@@ -15,7 +16,7 @@ var comp []elements.Element
 
 const yydebug = 1
 
-//line parser/tdoc.y:22
+//line parser/tdoc.y:23
 type TdocSymType struct {
 	yys     int
 	val     string
@@ -52,7 +53,7 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:70
+//line parser/tdoc.y:72
 
 /* Start of the program */
 
@@ -460,36 +461,39 @@ Tdocdefault:
 
 	case 1:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:34
+		//line parser/tdoc.y:35
 		{
-			//  Program.Add($1)
+			//Program.Add($1)
 		}
 	case 2:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:38
+		//line parser/tdoc.y:39
 		{
-
+			Program.Add(TdocDollar[1].element)
 		}
 	case 3:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:42
+		//line parser/tdoc.y:43
 		{
-			root[depth].Add(TdocDollar[2].element)
+			TdocDollar[1].element.Root().Add(TdocDollar[2].element)
 		}
 	case 4:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:47
+		//line parser/tdoc.y:48
 		{
-			TdocVAL.element = elements.NewComponent(nil, nil, TdocDollar[1].val, TdocDollar[2].val)
 			if Program == nil {
 				Program = elements.NewMatrix(nil)
 				root = append(root, Program)
 			}
-			depth--
+			fmt.Println(TdocDollar[1].val, TdocDollar[2].val)
+			TdocVAL.element = elements.NewComponent(nil, nil, TdocDollar[1].val, TdocDollar[2].val)
+			if TdocVAL.element.Root() == nil {
+				TdocVAL.element.Parent(Program)
+			}
 		}
 	case 5:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:56
+		//line parser/tdoc.y:60
 		{
 			if c, ok := TdocDollar[1].element.(*elements.Component); ok {
 				c.Alias = TdocDollar[3].val
@@ -497,11 +501,9 @@ Tdocdefault:
 		}
 	case 6:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:62
+		//line parser/tdoc.y:66
 		{
-			root = append(root, TdocDollar[1].element)
-			depth++
-			TdocDollar[1].element.Add(TdocDollar[3].element)
+			TdocDollar[3].element.Parent(TdocDollar[1].element)
 		}
 	}
 	goto Tdocstack /* stack new state and value */

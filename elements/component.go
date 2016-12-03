@@ -32,12 +32,8 @@ func (d *DefaultElement) Root() Element {
 func (d *DefaultElement) Next() Element {
 	index := d.index
 
-	if index == 0 && len(d.stack) == 1 && d.stack[0] == nil {
-		return d
-	}
-
 	if len(d.stack) > d.index {
-		d.index++
+		d.index = d.index + 1
 		return d.stack[index]
 	}
 
