@@ -5,17 +5,13 @@ import __yyfmt__ "fmt"
 
 //line parser/tdoc.y:3
 import (
+	"fmt"
 	"github.com/iwalz/tdoc/elements"
 )
 
 var Program elements.Element
-var depth int
-var root []elements.Element
-var comp []elements.Element
 
-const yydebug = 1
-
-//line parser/tdoc.y:23
+//line parser/tdoc.y:19
 type TdocSymType struct {
 	yys     int
 	val     string
@@ -52,7 +48,7 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:78
+//line parser/tdoc.y:95
 
 /* Start of the program */
 
@@ -69,45 +65,45 @@ var TdocExca = [...]int{
 	-2, 0,
 }
 
-const TdocNprod = 7
+const TdocNprod = 8
 const TdocPrivate = 57344
 
 var TdocTokenNames []string
 var TdocStates []string
 
-const TdocLast = 13
+const TdocLast = 12
 
 var TdocAct = [...]int{
 
-	3, 7, 8, 5, 2, 11, 4, 6, 9, 4,
-	1, 5, 10,
+	10, 8, 3, 12, 5, 6, 11, 7, 1, 4,
+	9, 2,
 }
 var TdocPact = [...]int{
 
-	3, -1000, 3, -3, -7, -3, 1, 3, -1000, -1000,
-	0, -1000,
+	-2, -1000, -2, 3, -1000, -8, -1000, -2, -10, 1,
+	-4, -1000, -1000,
 }
 var TdocPgo = [...]int{
 
-	0, 4, 0, 10,
+	0, 11, 2, 9, 8,
 }
 var TdocR1 = [...]int{
 
-	0, 3, 1, 1, 2, 2, 2,
+	0, 4, 1, 1, 1, 2, 3, 3,
 }
 var TdocR2 = [...]int{
 
-	0, 1, 1, 2, 2, 3, 4,
+	0, 1, 1, 2, 4, 1, 2, 4,
 }
 var TdocChk = [...]int{
 
-	-1000, -3, -1, -2, 6, -2, 10, 4, 9, 7,
-	-1, 5,
+	-1000, -4, -1, -2, -3, 6, -2, 4, 9, -2,
+	10, 5, 7,
 }
 var TdocDef = [...]int{
 
-	0, -2, 1, 2, 0, 3, 0, 0, 4, 5,
-	0, 6,
+	0, -2, 1, 2, 5, 0, 3, 0, 6, 0,
+	0, 4, 7,
 }
 var TdocTok1 = [...]int{
 
@@ -460,53 +456,71 @@ Tdocdefault:
 
 	case 1:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:35
+		//line parser/tdoc.y:31
 		{
-			Program.Add(TdocDollar[1].element)
+			//fmt.Println("program")
+			TdocDollar[1].element.Root().Add(TdocDollar[1].element)
 		}
 	case 2:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:40
+		//line parser/tdoc.y:37
 		{
-			//fmt.Printf("statement")
-			//if $1.Root() != Program {
+			//fmt.Println("statement_list")
 			TdocDollar[1].element.Root().Add(TdocDollar[1].element)
-			//}
 		}
 	case 3:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:48
+		//line parser/tdoc.y:43
 		{
 			//fmt.Println("statement_list")
-			TdocDollar[1].element.Root().Add(TdocDollar[2].element)
+			//if $2.Root() == nil {
+			TdocDollar[2].element.Parent(TdocDollar[1].element.Root())
+			TdocDollar[2].element.Root().Add(TdocDollar[2].element)
+			//}
 		}
 	case 4:
-		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:54
+		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
+		//line parser/tdoc.y:52
 		{
+			fmt.Println("Declaration scope")
+			TdocDollar[1].element.Root().Add(TdocDollar[1].element)
+			TdocDollar[3].element.Parent(TdocDollar[1].element)
+			TdocDollar[3].element.Root().Add(TdocDollar[3].element)
+		}
+	case 5:
+		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
+		//line parser/tdoc.y:61
+		{
+			//fmt.Println("Statement")
+			//$1.Root().Add($1)
+		}
+	case 6:
+		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
+		//line parser/tdoc.y:69
+		{
+			//fmt.Println("Component", $1, $2)
+			TdocVAL.element = elements.NewComponent(nil, nil, TdocDollar[1].val, TdocDollar[2].val, "")
 			if Program == nil {
 				Program = elements.NewMatrix(nil)
-				root = append(root, Program)
 			}
-			TdocVAL.element = elements.NewComponent(nil, nil, TdocDollar[1].val, TdocDollar[2].val)
+
 			if TdocVAL.element.Root() == nil {
 				TdocVAL.element.Parent(Program)
 			}
 		}
-	case 5:
-		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:65
-		{
-			if c, ok := TdocDollar[1].element.(*elements.Component); ok {
-				c.Alias = TdocDollar[3].val
-			}
-		}
-	case 6:
+	case 7:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:71
+		//line parser/tdoc.y:81
 		{
-			TdocDollar[3].element.Parent(TdocDollar[1].element)
-			TdocVAL.element = TdocDollar[3].element
+			//fmt.Println("alias")
+			TdocVAL.element = elements.NewComponent(nil, nil, TdocDollar[1].val, TdocDollar[2].val, TdocDollar[4].val)
+			if Program == nil {
+				Program = elements.NewMatrix(nil)
+			}
+
+			if TdocVAL.element.Root() == nil {
+				TdocVAL.element.Parent(Program)
+			}
 		}
 	}
 	goto Tdocstack /* stack new state and value */
