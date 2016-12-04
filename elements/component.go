@@ -1,5 +1,7 @@
 package elements
 
+import "fmt"
+
 type Stackable interface {
 	Add(*Component)
 }
@@ -18,6 +20,7 @@ type DefaultElement struct {
 }
 
 func (d *DefaultElement) Add(e Element) {
+	fmt.Printf("Add %+v to %+v\n", e, d)
 	d.stack = append(d.stack, e)
 }
 
@@ -53,7 +56,7 @@ type Component struct {
 	Alias      string
 }
 
-func NewComponent(l, r Element, typ, identifier string) Element {
+func NewComponent(l, r Element, typ, identifier, alias string) Element {
 	d := NewDefaultElement()
 	if l != nil {
 		d.Add(l)
@@ -66,6 +69,7 @@ func NewComponent(l, r Element, typ, identifier string) Element {
 		DefaultElement: d,
 		Typ:            typ,
 		Identifier:     identifier,
+		Alias:          alias,
 	}
 
 	return c
