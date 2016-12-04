@@ -458,21 +458,21 @@ Tdocdefault:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
 		//line parser/tdoc.y:31
 		{
-			//fmt.Println("program")
-			TdocDollar[1].element.Root().Add(TdocDollar[1].element)
+			fmt.Println("program")
+			//$1.Root().Add($1)
 		}
 	case 2:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
 		//line parser/tdoc.y:37
 		{
-			//fmt.Println("statement_list")
+			fmt.Println("statement_list")
 			TdocDollar[1].element.Root().Add(TdocDollar[1].element)
 		}
 	case 3:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
 		//line parser/tdoc.y:43
 		{
-			//fmt.Println("statement_list")
+			fmt.Println("statement_list")
 			//if $2.Root() == nil {
 			TdocDollar[2].element.Parent(TdocDollar[1].element.Root())
 			TdocDollar[2].element.Root().Add(TdocDollar[2].element)

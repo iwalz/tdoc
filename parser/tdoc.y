@@ -29,19 +29,19 @@ var Program elements.Element
 
 program: statement_list
 {
-  //fmt.Println("program")
-  $1.Root().Add($1)
+  fmt.Println("program")
+  //$1.Root().Add($1)
 }
 ;
 statement_list: statement
 {
-  //fmt.Println("statement_list")
+  fmt.Println("statement_list")
   $1.Root().Add($1)
 }
 |
 statement_list statement
 {
-  //fmt.Println("statement_list")
+  fmt.Println("statement_list")
   //if $2.Root() == nil {
   $2.Parent($1.Root())
   $2.Root().Add($2)
