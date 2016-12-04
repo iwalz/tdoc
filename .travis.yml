@@ -4,5 +4,6 @@ install:
   - go get github.com/stretchr/testify/assert
   - go get github.com/davecgh/go-spew/spew
   - go get github.com/spf13/cobra/cobra
+  - go get github.com/ajstarks/svgo
 before_install:
   - make yacc
