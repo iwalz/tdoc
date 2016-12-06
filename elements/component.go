@@ -1,7 +1,5 @@
 package elements
 
-import "fmt"
-
 type Stackable interface {
 	Add(*Component)
 }
@@ -20,7 +18,6 @@ type DefaultElement struct {
 }
 
 func (d *DefaultElement) Add(e Element) {
-	fmt.Printf("Add %+v to %+v\n", e, d)
 	d.stack = append(d.stack, e)
 }
 
@@ -90,20 +87,4 @@ func NewMatrix(e1 Element) Element {
 	}
 
 	return m
-}
-
-type List struct {
-	DefaultElement
-}
-
-func NewList(e1, e2 Element) Element {
-	d := NewDefaultElement()
-	d.Add(e1)
-	d.Add(e2)
-
-	l := &List{
-		DefaultElement: d,
-	}
-
-	return l
 }
