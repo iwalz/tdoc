@@ -113,12 +113,6 @@ func (m *Middleware) Render(w http.ResponseWriter, req *http.Request) error {
 	canvas.Start(gwidth, gheight)
 	compose(startx, starty, count, byrow, []string{"pics/cloud.svg", "pics/cloud.svg"})
 	canvas.End()
-	/*
-		w.Header().Set("Content-Type", "image/svg+xml")
-		s := svg.New(w)
-		s.Start(500, 500)
-		s.Circle(250, 250, 125, "fill:none;stroke:black")
-		s.End()
-	*/
+
 	return nil
 }
