@@ -9,7 +9,7 @@ import (
 	"github.com/iwalz/tdoc/elements"
 )
 
-var Program elements.Element
+var program elements.Element
 
 const debug = false
 
@@ -20,7 +20,6 @@ type TdocSymType struct {
 	pos     int
 	line    int
 	token   int
-	depth   int
 	element elements.Element
 }
 
@@ -55,9 +54,7 @@ const TdocInitialStackSize = 16
 /* Start of the program */
 
 func (p *TdocParserImpl) AST() elements.Element {
-	ret := Program
-	Program = nil
-	return ret
+	return program
 }
 
 //line yacctab:1
@@ -458,11 +455,12 @@ Tdocdefault:
 
 	case 1:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:34
+		//line parser/tdoc.y:33
 		{
 			if debug {
 				fmt.Println("program")
 			}
+			TdocVAL.element = program
 		}
 	case 2:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
@@ -501,12 +499,12 @@ Tdocdefault:
 				fmt.Println("Component", TdocDollar[1].val, TdocDollar[2].val)
 			}
 			TdocVAL.element = elements.NewComponent(nil, nil, TdocDollar[1].val, TdocDollar[2].val, "")
-			if Program == nil {
-				Program = elements.NewMatrix(nil)
+			if program == nil {
+				program = elements.NewMatrix(nil)
 			}
 
 			if TdocVAL.element.Root() == nil {
-				TdocVAL.element.Parent(Program)
+				TdocVAL.element.Parent(program)
 			}
 		}
 	case 7:
@@ -517,12 +515,12 @@ Tdocdefault:
 				fmt.Println("alias")
 			}
 			TdocVAL.element = elements.NewComponent(nil, nil, TdocDollar[1].val, TdocDollar[2].val, TdocDollar[4].val)
-			if Program == nil {
-				Program = elements.NewMatrix(nil)
+			if program == nil {
+				program = elements.NewMatrix(nil)
 			}
 
 			if TdocVAL.element.Root() == nil {
-				TdocVAL.element.Parent(Program)
+				TdocVAL.element.Parent(program)
 			}
 		}
 	}

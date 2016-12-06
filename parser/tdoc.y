@@ -7,23 +7,22 @@ import (
   "github.com/iwalz/tdoc/elements"
 )
 
-var Program elements.Element
+var program elements.Element
 
 const debug = false
 
 %}
 
-%token <val> SCOPEIN SCOPEOUT
+%token <token> SCOPEIN SCOPEOUT
 %token <val> COMPONENT TEXT ERROR IDENTIFIER ALIAS
 %type <element> statement_list statement declaration
-%type <val> program
+%type <element> program
 
 %union{
   val string
   pos int
   line int
   token int
-  depth int
   element elements.Element
 }
 
@@ -35,6 +34,7 @@ program: statement_list
   if debug {
     fmt.Println("program")
   }
+  $$ = program
 }
 ;
 statement_list: statement
@@ -72,12 +72,12 @@ declaration: COMPONENT IDENTIFIER
     fmt.Println("Component", $1, $2)
   }
   $$ = elements.NewComponent(nil, nil, $1, $2, "")
-  if Program == nil {
-    Program = elements.NewMatrix(nil)
+  if program == nil {
+    program = elements.NewMatrix(nil)
   }
 
   if $$.Root() == nil {
-    $$.Parent(Program)
+    $$.Parent(program)
   }
 }
 | COMPONENT IDENTIFIER ALIAS TEXT
@@ -86,12 +86,12 @@ declaration: COMPONENT IDENTIFIER
     fmt.Println("alias")
   }
   $$ = elements.NewComponent(nil, nil, $1, $2, $4)
-  if Program == nil {
-    Program = elements.NewMatrix(nil)
+  if program == nil {
+    program = elements.NewMatrix(nil)
   }
 
   if $$.Root() == nil {
-    $$.Parent(Program)
+    $$.Parent(program)
   }
 }
 ;
@@ -99,7 +99,5 @@ declaration: COMPONENT IDENTIFIER
 %% /* Start of the program */
 
 func (p *TdocParserImpl) AST() elements.Element {
-  ret := Program
-  Program = nil
-  return ret
+  return program
 }
