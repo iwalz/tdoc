@@ -24,7 +24,7 @@ var serveCmd = &cobra.Command{
 			return err
 		}
 		p := &parser.TdocParserImpl{}
-		l := parser.NewLexer(string(content))
+		l := parser.NewLexer(string(content), SvgDir)
 		p.Parse(l)
 		m := renderer.NewMiddleware(p.AST())
 

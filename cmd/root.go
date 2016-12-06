@@ -12,6 +12,7 @@ import (
 )
 
 var cfgFile string
+var SvgDir string
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -25,7 +26,7 @@ var RootCmd = &cobra.Command{
 			return err
 		}
 		p := &parser.TdocParserImpl{}
-		l := parser.NewLexer(string(content))
+		l := parser.NewLexer(string(content), SvgDir)
 		p.Parse(l)
 		spew.Dump(p.AST())
 
@@ -48,8 +49,8 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
-
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.tdoc.yaml)")
+	RootCmd.PersistentFlags().StringVar(&SvgDir, "svgdir", "/home/ingo/svg", "Source directory for components. foo.svg will make component foo available")
 }
 
 // initConfig reads in config file and ENV variables if set.
