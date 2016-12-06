@@ -11,7 +11,9 @@ import (
 
 var Program elements.Element
 
-//line parser/tdoc.y:19
+const debug = false
+
+//line parser/tdoc.y:21
 type TdocSymType struct {
 	yys     int
 	val     string
@@ -48,7 +50,7 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:95
+//line parser/tdoc.y:99
 
 /* Start of the program */
 
@@ -71,25 +73,25 @@ const TdocPrivate = 57344
 var TdocTokenNames []string
 var TdocStates []string
 
-const TdocLast = 12
+const TdocLast = 13
 
 var TdocAct = [...]int{
 
-	10, 8, 3, 12, 5, 6, 11, 7, 1, 4,
-	9, 2,
+	10, 8, 3, 12, 5, 6, 7, 11, 7, 1,
+	9, 4, 2,
 }
 var TdocPact = [...]int{
 
-	-2, -1000, -2, 3, -1000, -8, -1000, -2, -10, 1,
+	-2, -1000, -2, 4, -1000, -8, 4, -2, -10, 2,
 	-4, -1000, -1000,
 }
 var TdocPgo = [...]int{
 
-	0, 11, 2, 9, 8,
+	0, 12, 2, 11, 9,
 }
 var TdocR1 = [...]int{
 
-	0, 4, 1, 1, 1, 2, 3, 3,
+	0, 4, 1, 1, 2, 2, 3, 3,
 }
 var TdocR2 = [...]int{
 
@@ -456,49 +458,48 @@ Tdocdefault:
 
 	case 1:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:31
+		//line parser/tdoc.y:34
 		{
-			fmt.Println("program")
-			//$1.Root().Add($1)
+			if debug {
+				fmt.Println("program")
+			}
 		}
 	case 2:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:37
+		//line parser/tdoc.y:41
 		{
-			fmt.Println("statement_list")
+			if debug {
+				fmt.Println("statement_list single")
+			}
 			TdocDollar[1].element.Root().Add(TdocDollar[1].element)
 		}
 	case 3:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:43
+		//line parser/tdoc.y:49
 		{
-			fmt.Println("statement_list")
-			//if $2.Root() == nil {
+			if debug {
+				fmt.Println("statement_list multi")
+			}
 			TdocDollar[2].element.Parent(TdocDollar[1].element.Root())
 			TdocDollar[2].element.Root().Add(TdocDollar[2].element)
-			//}
 		}
 	case 4:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:52
+		//line parser/tdoc.y:58
 		{
-			fmt.Println("Declaration scope")
-			TdocDollar[1].element.Root().Add(TdocDollar[1].element)
+			if debug {
+				fmt.Println("Declaration scope")
+			}
 			TdocDollar[3].element.Parent(TdocDollar[1].element)
 			TdocDollar[3].element.Root().Add(TdocDollar[3].element)
 		}
-	case 5:
-		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:61
-		{
-			//fmt.Println("Statement")
-			//$1.Root().Add($1)
-		}
 	case 6:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:69
+		//line parser/tdoc.y:70
 		{
-			//fmt.Println("Component", $1, $2)
+			if debug {
+				fmt.Println("Component", TdocDollar[1].val, TdocDollar[2].val)
+			}
 			TdocVAL.element = elements.NewComponent(nil, nil, TdocDollar[1].val, TdocDollar[2].val, "")
 			if Program == nil {
 				Program = elements.NewMatrix(nil)
@@ -510,9 +511,11 @@ Tdocdefault:
 		}
 	case 7:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:81
+		//line parser/tdoc.y:84
 		{
-			//fmt.Println("alias")
+			if debug {
+				fmt.Println("alias")
+			}
 			TdocVAL.element = elements.NewComponent(nil, nil, TdocDollar[1].val, TdocDollar[2].val, TdocDollar[4].val)
 			if Program == nil {
 				Program = elements.NewMatrix(nil)

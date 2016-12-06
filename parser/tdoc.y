@@ -9,6 +9,8 @@ import (
 
 var Program elements.Element
 
+const debug = false
+
 %}
 
 %token <val> SCOPEIN SCOPEOUT
@@ -27,47 +29,48 @@ var Program elements.Element
 
 %%
 
+// Statement declaration, only do add here
 program: statement_list
 {
-  fmt.Println("program")
-  //$1.Root().Add($1)
+  if debug {
+    fmt.Println("program")
+  }
 }
 ;
 statement_list: statement
 {
-  fmt.Println("statement_list")
+  if debug {
+    fmt.Println("statement_list single")
+  }
   $1.Root().Add($1)
 }
 |
 statement_list statement
 {
-  fmt.Println("statement_list")
-  //if $2.Root() == nil {
+  if debug {
+    fmt.Println("statement_list multi")
+  }
   $2.Parent($1.Root())
   $2.Root().Add($2)
-  //}
 }
-|
-statement SCOPEIN statement SCOPEOUT
+;
+statement: statement SCOPEIN statement SCOPEOUT
 {
-  fmt.Println("Declaration scope")
-  $1.Root().Add($1)
+  if debug {
+    fmt.Println("Declaration scope")
+  }
   $3.Parent($1)
   $3.Root().Add($3)
 }
 ;
 
 statement: declaration
-{
-  //fmt.Println("Statement")
-  //$1.Root().Add($1)
-}
-
-
 
 declaration: COMPONENT IDENTIFIER
 {
-  //fmt.Println("Component", $1, $2)
+  if debug {
+    fmt.Println("Component", $1, $2)
+  }
   $$ = elements.NewComponent(nil, nil, $1, $2, "")
   if Program == nil {
     Program = elements.NewMatrix(nil)
@@ -79,7 +82,9 @@ declaration: COMPONENT IDENTIFIER
 }
 | COMPONENT IDENTIFIER ALIAS TEXT
 {
-  //fmt.Println("alias")
+  if debug {
+    fmt.Println("alias")
+  }
   $$ = elements.NewComponent(nil, nil, $1, $2, $4)
   if Program == nil {
     Program = elements.NewMatrix(nil)
@@ -90,7 +95,6 @@ declaration: COMPONENT IDENTIFIER
   }
 }
 ;
-
 
 %% /* Start of the program */
 
