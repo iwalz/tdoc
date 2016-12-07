@@ -11,11 +11,25 @@ import (
 	"github.com/iwalz/tdoc/elements"
 )
 
+//var components chan elements.Element
+
+type PictureLocation struct {
+	x   int
+	y   int
+	typ string
+}
+
 type SVG struct {
 	Width  string `xml:"width,attr"`
 	Height string `xml:"height,attr"`
 	Doc    string `xml:",innerxml"`
 }
+
+const width = 100
+const height = 100
+
+const borderwidth = 25
+const borderheight = 25
 
 var (
 	byrow                                          bool
@@ -60,32 +74,6 @@ func placepic(x, y int, filename string) (int, int) {
 	return width, height
 }
 
-// compose places files row or column-wise
-func compose(x, y, n int, rflag bool, files []string) {
-	px := x
-	py := y
-	var pw, ph int
-	for i, f := range files {
-		if i > 0 && i%n == 0 {
-			if rflag {
-				px = x
-				py += gutter + ph
-			} else {
-				px += gutter + pw
-				py = y
-			}
-		}
-		pw, ph = placepic(px, py, f)
-		fmt.Println("Widht", pw)
-		fmt.Println("Height", ph)
-		if rflag {
-			px += gutter + pw
-		} else {
-			py += gutter + ph
-		}
-	}
-}
-
 type Renderer interface {
 	Render(io.Writer) error
 }
@@ -94,25 +82,94 @@ type Middleware struct {
 	matrix elements.Element
 }
 
+// Flatted and SVG compatible AST implementation
+type BaseMatrix struct {
+	widthoffset  int // width
+	heightoffset int // height
+	rows         int
+	columns      int
+	count        int
+	posx         int      // Current position on x
+	posy         int      // Current position on y
+	canvas       *svg.SVG // The root SVG
+	components   []*PictureLocation
+}
+
 func NewMiddleware(e elements.Element) *Middleware {
 	return &Middleware{
 		matrix: e,
 	}
 }
 
+func (b *BaseMatrix) HasFreeSlots() bool {
+	if b.rows*b.columns-b.count > 0 {
+		return true
+	}
+	return false
+}
+
+func (b BaseMatrix) width() int {
+	return b.widthoffset + (b.columns * width)
+}
+
+func (b BaseMatrix) height() int {
+	return b.heightoffset + (b.rows * height)
+}
+
+// Scans recursivly add elements and calculates
+// required rows and columns + offset for borders of nested COMPONENTs
+func (b *BaseMatrix) scan(e elements.Element) {
+	for {
+		// break loop if next is nil
+		elem := e.Next()
+		if elem == nil {
+			break
+		}
+
+		// e is a nested COMPONENT
+		// increase offset for the border
+		// and go on looping for this COMPONENT
+		if elem.HasChilds() {
+			b.heightoffset += borderheight
+			b.widthoffset += borderwidth
+			b.scan(elem)
+		} else {
+			if !b.HasFreeSlots() {
+				// Resize matrix if no available slots
+				if b.columns > b.rows {
+					b.rows = b.rows + 1
+					b.columns = 1
+				} else {
+					b.columns = b.columns + 1
+				}
+			}
+
+			// Since it's the left starting corner, the width and height
+			// of itself has to be substracted
+			b.posy = (b.heightoffset + (b.rows * height)) - width
+			b.posx = (b.widthoffset + (b.columns * width)) - height
+
+			// Add elements here
+			b.count = b.count + 1
+			typ := elem.(*elements.Component).Typ
+			b.components = append(b.components, &PictureLocation{x: b.posx, y: b.posy, typ: typ})
+		}
+	}
+}
+
 func (m *Middleware) Render(w http.ResponseWriter, req *http.Request) error {
-	startx = 0
-	starty = 0
-	byrow = true
-	count = 3
-	gutter = 100
-	gwidth = 10240
-	gheight = 7680
+
+	b := &BaseMatrix{rows: 1, columns: 1}
+	b.scan(m.matrix)
 
 	canvas = svg.New(w)
-	canvas.Start(gwidth, gheight)
-	compose(startx, starty, count, byrow, []string{"pics/cloud.svg", "pics/cloud.svg"})
+	canvas.Start(b.width(), b.height())
+	for _, v := range b.components {
+		file := "/home/ingo/svg/" + v.typ + ".svg"
+		placepic(v.x, v.y, file)
+	}
 	canvas.End()
+	m.matrix.Reset()
 
 	return nil
 }
