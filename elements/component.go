@@ -9,6 +9,7 @@ type Element interface {
 	Next() Element
 	Parent(Element)
 	Root() Element
+	HasChilds() bool
 }
 
 type DefaultElement struct {
@@ -38,6 +39,14 @@ func (d *DefaultElement) Next() Element {
 	}
 
 	return nil
+}
+
+func (d *DefaultElement) HasChilds() bool {
+	if len(d.stack) > 0 {
+		return true
+	}
+
+	return false
 }
 
 func NewDefaultElement() DefaultElement {
