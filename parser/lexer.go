@@ -159,6 +159,14 @@ func (l *Lexer) isComponent() bool {
 	return false
 }
 
+func (l *Lexer) isScope() bool {
+	if l.input[l.start:l.pos] == "}" || l.input[l.start:l.pos] == "{" {
+		return true
+	}
+
+	return false
+}
+
 // Check for keywords
 func (l *Lexer) isKeyword() bool {
 	if _, ok := keywords[l.input[l.start:l.pos]]; ok {
@@ -252,6 +260,10 @@ func (l *Lexer) stripWhitespaces() {
 func lexText(l *Lexer) stateFn {
 	l.stripWhitespaces()
 	for {
+		if l.isScope() {
+			return lexKeyword
+		}
+
 		if l.isDelimiter() {
 			// Component found, identifier next
 			if l.isComponent() {
@@ -265,9 +277,11 @@ func lexText(l *Lexer) stateFn {
 				return lexText
 			}
 		}
+
 		if c := l.next(); c == eof {
 			break
 		}
+
 	}
 
 	// Correctly reached EOF

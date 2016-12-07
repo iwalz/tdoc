@@ -359,7 +359,7 @@ func TestScopeToken(t *testing.T) {
 }
 
 func TestNestedScopeToken(t *testing.T) {
-	input := `cloud foo as bar { node foo1 as blubb { cloud foo2 as baz } }`
+	input := `cloud foo as bar     {node foo1 as blubb     { cloud foo2 as baz}}`
 
 	tests := []struct {
 		expectedType    int

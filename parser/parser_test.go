@@ -114,7 +114,7 @@ func TestAliasScopedComponent(t *testing.T) {
 
 func TestMultiNestedComponent(t *testing.T) {
 	p := &TdocParserImpl{}
-	p.Parse(NewLexer("cloud foo as bar { actor blubb as baz { node foo as quo } } ", ""))
+	p.Parse(NewLexer("cloud foo as bar{actor blubb as baz{node foo as quo     }}", ""))
 	ast := p.AST()
 	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
 	c := ast.Next()
