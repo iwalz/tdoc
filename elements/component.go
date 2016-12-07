@@ -10,6 +10,7 @@ type Element interface {
 	Parent(Element)
 	Root() Element
 	HasChilds() bool
+	Reset()
 }
 
 type DefaultElement struct {
@@ -24,6 +25,10 @@ func (d *DefaultElement) Add(e Element) {
 
 func (d *DefaultElement) Parent(p Element) {
 	d.root = p
+}
+
+func (d *DefaultElement) Reset() {
+	d.index = 0
 }
 
 func (d *DefaultElement) Root() Element {
