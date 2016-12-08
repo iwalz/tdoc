@@ -68,7 +68,7 @@ func TestNestedComponents(t *testing.T) {
 
 	b.scan(m)
 	assert.Equal(t, 2, b.rows)
-	assert.Equal(t, 3, b.columns)
+	assert.Equal(t, 2, b.columns)
 
 	assert.Equal(t, 50, b.heightoffset)
 	assert.Equal(t, 50, b.widthoffset)
@@ -110,7 +110,7 @@ func TestMultiNestedComponents(t *testing.T) {
 	assert.Equal(t, true, e2.HasChilds())
 
 	b.scan(m)
-	assert.Equal(t, 3, b.rows)
+	assert.Equal(t, 2, b.rows)
 	assert.Equal(t, 3, b.columns)
 	assert.Equal(t, 75, b.heightoffset)
 	assert.Equal(t, 75, b.widthoffset)

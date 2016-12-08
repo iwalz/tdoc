@@ -120,6 +120,7 @@ func (b BaseMatrix) height() int {
 // Scans recursivly add elements and calculates
 // required rows and columns + offset for borders of nested COMPONENTs
 func (b *BaseMatrix) scan(e elements.Element) {
+	e.Reset()
 	for {
 		// break loop if next is nil
 		elem := e.Next()
@@ -164,10 +165,11 @@ func (b *BaseMatrix) scan(e elements.Element) {
 				}
 				// fmt.Println("Else, X: ", elem.X(), " Y: ", elem.Y())
 			}
+			// Add elements here
+			b.count = b.count + 1
+			b.components = append(b.components, elem)
 		}
-		// Add elements here
-		b.count = b.count + 1
-		b.components = append(b.components, elem)
+		// Add border here
 	}
 }
 
@@ -182,8 +184,8 @@ func (m *Middleware) Render(w http.ResponseWriter, req *http.Request) error {
 		c, ok := v.(*elements.Component)
 		if ok {
 			file := "/home/ingo/svg/" + c.Typ + ".svg"
-			posy := c.Y()*height - height
-			posx := c.X()*width - width
+			posy := (c.Y()*height - height) + b.heightoffset
+			posx := (c.X()*width - width) + b.widthoffset
 			placepic(posx, posy, file)
 		}
 	}
