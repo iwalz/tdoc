@@ -11,12 +11,34 @@ type Element interface {
 	Root() Element
 	HasChilds() bool
 	Reset()
+	SetX(int)
+	SetY(int)
+	X() int
+	Y() int
 }
 
 type DefaultElement struct {
 	index int
 	stack []Element
 	root  Element
+	x     int
+	y     int
+}
+
+func (d *DefaultElement) SetX(x int) {
+	d.x = x
+}
+
+func (d *DefaultElement) SetY(y int) {
+	d.y = y
+}
+
+func (d *DefaultElement) X() int {
+	return d.x
+}
+
+func (d *DefaultElement) Y() int {
+	return d.y
 }
 
 func (d *DefaultElement) Add(e Element) {

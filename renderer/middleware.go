@@ -92,7 +92,8 @@ type BaseMatrix struct {
 	posx         int      // Current position on x
 	posy         int      // Current position on y
 	canvas       *svg.SVG // The root SVG
-	components   []*PictureLocation
+	components   []elements.Element
+	matrix       map[int]map[int]bool
 }
 
 func NewMiddleware(e elements.Element) *Middleware {
@@ -137,23 +138,36 @@ func (b *BaseMatrix) scan(e elements.Element) {
 			if !b.HasFreeSlots() {
 				// Resize matrix if no available slots
 				if b.columns > b.rows {
+					// Row added, y is row*height+heightoffset
+					// x is only offset
 					b.rows = b.rows + 1
-					b.columns = 1
+					// Set y to new row and x to 1
+					elem.SetY(b.rows)
+					elem.SetX(1)
+					// fmt.Println("Row added, X: ", elem.X(), " Y: ", elem.Y())
 				} else {
 					b.columns = b.columns + 1
+					// Column added, x is column*width+offset
+					elem.SetY(1)
+					elem.SetX(b.columns)
+					// fmt.Println("Col added, X: ", elem.X(), " Y: ", elem.Y())
 				}
+			} else {
+
+				if b.columns > b.rows {
+					elem.SetX(b.columns)
+					elem.SetY(b.count%b.rows + 1)
+				} else {
+					elem.SetX(b.count%b.columns + 1)
+					elem.SetY(b.rows)
+
+				}
+				// fmt.Println("Else, X: ", elem.X(), " Y: ", elem.Y())
 			}
-
-			// Since it's the left starting corner, the width and height
-			// of itself has to be substracted
-			b.posy = (b.heightoffset + (b.rows * height)) - width
-			b.posx = (b.widthoffset + (b.columns * width)) - height
-
-			// Add elements here
-			b.count = b.count + 1
-			typ := elem.(*elements.Component).Typ
-			b.components = append(b.components, &PictureLocation{x: b.posx, y: b.posy, typ: typ})
 		}
+		// Add elements here
+		b.count = b.count + 1
+		b.components = append(b.components, elem)
 	}
 }
 
@@ -165,8 +179,13 @@ func (m *Middleware) Render(w http.ResponseWriter, req *http.Request) error {
 	canvas = svg.New(w)
 	canvas.Start(b.width(), b.height())
 	for _, v := range b.components {
-		file := "/home/ingo/svg/" + v.typ + ".svg"
-		placepic(v.x, v.y, file)
+		c, ok := v.(*elements.Component)
+		if ok {
+			file := "/home/ingo/svg/" + c.Typ + ".svg"
+			posy := c.Y()*height - height
+			posx := c.X()*width - width
+			placepic(posx, posy, file)
+		}
 	}
 	canvas.End()
 	m.matrix.Reset()

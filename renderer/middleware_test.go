@@ -18,8 +18,8 @@ func TestAddSingleComponent(t *testing.T) {
 	assert.Equal(t, 1, b.columns)
 
 	components := b.components
-	assert.Equal(t, 0, components[0].x)
-	assert.Equal(t, 0, components[0].y)
+	assert.Equal(t, 1, components[0].X())
+	assert.Equal(t, 1, components[0].Y())
 }
 
 func TestThreeComponents(t *testing.T) {
@@ -34,11 +34,11 @@ func TestThreeComponents(t *testing.T) {
 
 	b.scan(m)
 	assert.Equal(t, 2, b.rows)
-	assert.Equal(t, 1, b.columns)
+	assert.Equal(t, 2, b.columns)
 
 	components := b.components
-	assert.Equal(t, 0, components[0].x)
-	assert.Equal(t, 0, components[0].y)
+	assert.Equal(t, 1, components[0].X())
+	assert.Equal(t, 1, components[0].Y())
 
 	/*assert.Equal(t, 100, components[1].x)
 	assert.Equal(t, 0, components[1].y)
@@ -68,15 +68,15 @@ func TestNestedComponents(t *testing.T) {
 
 	b.scan(m)
 	assert.Equal(t, 2, b.rows)
-	assert.Equal(t, 2, b.columns)
+	assert.Equal(t, 3, b.columns)
 
 	assert.Equal(t, 50, b.heightoffset)
 	assert.Equal(t, 50, b.widthoffset)
 
 	components := b.components
 	// First component is nested, so we have a border
-	assert.Equal(t, 25, components[0].x)
-	assert.Equal(t, 25, components[0].y)
+	assert.Equal(t, 1, components[0].X())
+	assert.Equal(t, 1, components[0].Y())
 
 	/*assert.Equal(t, 125, components[1].x)
 	assert.Equal(t, 25, components[1].y)
@@ -110,7 +110,7 @@ func TestMultiNestedComponents(t *testing.T) {
 	assert.Equal(t, true, e2.HasChilds())
 
 	b.scan(m)
-	assert.Equal(t, 2, b.rows)
+	assert.Equal(t, 3, b.rows)
 	assert.Equal(t, 3, b.columns)
 	assert.Equal(t, 75, b.heightoffset)
 	assert.Equal(t, 75, b.widthoffset)
