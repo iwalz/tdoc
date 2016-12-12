@@ -9,7 +9,7 @@ import (
 
 var program elements.Element
 
-const debug = false
+const debug = true
 
 %}
 
@@ -54,7 +54,7 @@ statement_list statement
   $2.Root().Add($2)
 }
 ;
-statement: statement SCOPEIN statement SCOPEOUT
+statement: statement SCOPEIN statement_list SCOPEOUT
 {
   if debug {
     fmt.Println("Declaration scope")

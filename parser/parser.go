@@ -11,7 +11,7 @@ import (
 
 var program elements.Element
 
-const debug = false
+const debug = true
 
 //line parser/tdoc.y:21
 type TdocSymType struct {
@@ -70,21 +70,21 @@ const TdocPrivate = 57344
 var TdocTokenNames []string
 var TdocStates []string
 
-const TdocLast = 13
+const TdocLast = 14
 
 var TdocAct = [...]int{
 
-	10, 8, 3, 12, 5, 6, 7, 11, 7, 1,
-	9, 4, 2,
+	3, 10, 8, 6, 2, 12, 11, 5, 5, 7,
+	6, 1, 9, 4,
 }
 var TdocPact = [...]int{
 
-	-2, -1000, -2, 4, -1000, -8, 4, -2, -10, 2,
-	-4, -1000, -1000,
+	2, -1000, 2, 5, -1000, -7, 5, 2, -9, 1,
+	-2, -1000, -1000,
 }
 var TdocPgo = [...]int{
 
-	0, 12, 2, 11, 9,
+	0, 4, 0, 13, 11,
 }
 var TdocR1 = [...]int{
 
@@ -96,7 +96,7 @@ var TdocR2 = [...]int{
 }
 var TdocChk = [...]int{
 
-	-1000, -4, -1, -2, -3, 6, -2, 4, 9, -2,
+	-1000, -4, -1, -2, -3, 6, -2, 4, 9, -1,
 	10, 5, 7,
 }
 var TdocDef = [...]int{

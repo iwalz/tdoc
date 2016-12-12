@@ -79,6 +79,29 @@ func TestRecursiveAliasComponent(t *testing.T) {
 	assert.Equal(t, "baz", c1.(*elements.Component).Alias)
 }
 
+func TestNewlineScopedComponent(t *testing.T) {
+	p := &TdocParserImpl{}
+	p.Parse(NewLexer(`cloud foo {
+		actor blubb
+		actor baz
+	}
+	`, ""))
+	ast := p.AST()
+	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	c := ast.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
+	assert.Equal(t, "foo", c.(*elements.Component).Identifier)
+	assert.Equal(t, "cloud", c.(*elements.Component).Typ)
+	c1 := c.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c1).String())
+	assert.Equal(t, "blubb", c1.(*elements.Component).Identifier)
+	assert.Equal(t, "actor", c1.(*elements.Component).Typ)
+	c2 := c.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c2).String())
+	assert.Equal(t, "baz", c2.(*elements.Component).Identifier)
+	assert.Equal(t, "actor", c2.(*elements.Component).Typ)
+}
+
 func TestScopedComponent(t *testing.T) {
 	p := &TdocParserImpl{}
 	p.Parse(NewLexer("cloud foo as bar { actor blubb as baz }", ""))
