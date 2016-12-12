@@ -15,6 +15,8 @@ type Element interface {
 	SetY(int)
 	X() int
 	Y() int
+	Added(bool)
+	IsAdded() bool
 }
 
 type DefaultElement struct {
@@ -23,10 +25,19 @@ type DefaultElement struct {
 	root  Element
 	x     int
 	y     int
+	added bool
 }
 
 func (d *DefaultElement) SetX(x int) {
 	d.x = x
+}
+
+func (d *DefaultElement) Added(a bool) {
+	d.added = a
+}
+
+func (d *DefaultElement) IsAdded() bool {
+	return d.added
 }
 
 func (d *DefaultElement) SetY(y int) {

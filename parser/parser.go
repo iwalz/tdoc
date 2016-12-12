@@ -6,14 +6,17 @@ import __yyfmt__ "fmt"
 //line parser/tdoc.y:3
 import (
 	"fmt"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/iwalz/tdoc/elements"
 )
 
 var program elements.Element
+var roots []elements.Element
+var depth int
 
 const debug = true
 
-//line parser/tdoc.y:21
+//line parser/tdoc.y:24
 type TdocSymType struct {
 	yys     int
 	val     string
@@ -49,11 +52,12 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:99
+//line parser/tdoc.y:124
 
 /* Start of the program */
 
 func (p *TdocParserImpl) AST() elements.Element {
+	roots = nil
 	return program
 }
 
@@ -64,45 +68,45 @@ var TdocExca = [...]int{
 	-2, 0,
 }
 
-const TdocNprod = 8
+const TdocNprod = 9
 const TdocPrivate = 57344
 
 var TdocTokenNames []string
 var TdocStates []string
 
-const TdocLast = 14
+const TdocLast = 11
 
 var TdocAct = [...]int{
 
-	3, 10, 8, 6, 2, 12, 11, 5, 5, 7,
-	6, 1, 9, 4,
+	10, 9, 11, 4, 6, 8, 3, 1, 5, 7,
+	2,
 }
 var TdocPact = [...]int{
 
-	2, -1000, 2, 5, -1000, -7, 5, 2, -9, 1,
-	-2, -1000, -1000,
+	-2, -1000, -2, 1, -1000, -1000, -8, 1, -1000, -10,
+	-5, -1000,
 }
 var TdocPgo = [...]int{
 
-	0, 4, 0, 13, 11,
+	0, 10, 6, 8, 7,
 }
 var TdocR1 = [...]int{
 
-	0, 4, 1, 1, 2, 2, 3, 3,
+	0, 4, 1, 1, 2, 2, 2, 3, 3,
 }
 var TdocR2 = [...]int{
 
-	0, 1, 1, 2, 4, 1, 2, 4,
+	0, 1, 1, 2, 2, 1, 1, 2, 4,
 }
 var TdocChk = [...]int{
 
-	-1000, -4, -1, -2, -3, 6, -2, 4, 9, -1,
-	10, 5, 7,
+	-1000, -4, -1, -2, 5, -3, 6, -2, 4, 9,
+	10, 7,
 }
 var TdocDef = [...]int{
 
-	0, -2, 1, 2, 5, 0, 3, 0, 6, 0,
-	0, 4, 7,
+	0, -2, 1, 2, 5, 6, 0, 3, 4, 7,
+	0, 8,
 }
 var TdocTok1 = [...]int{
 
@@ -455,72 +459,96 @@ Tdocdefault:
 
 	case 1:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:33
+		//line parser/tdoc.y:36
 		{
 			if debug {
 				fmt.Println("program")
 			}
-			TdocVAL.element = program
+			spew.Dump(roots)
+
+			for i, v := range roots {
+				if i > 0 {
+					v.Added(true)
+					roots[i-1].Add(v)
+				}
+			}
+			TdocVAL.element = roots[0]
+			program = TdocVAL.element
+			//spew.Dump(program)
 		}
 	case 2:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:41
+		//line parser/tdoc.y:54
 		{
 			if debug {
-				fmt.Println("statement_list single")
+				fmt.Println("statement_list single", depth)
 			}
-			TdocDollar[1].element.Root().Add(TdocDollar[1].element)
+			if depth == 0 && !TdocDollar[1].element.IsAdded() {
+				TdocDollar[1].element.Added(true)
+				roots[depth].Add(TdocDollar[1].element)
+			}
+			//spew.Dump(roots[depth])
 		}
 	case 3:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:49
+		//line parser/tdoc.y:66
 		{
 			if debug {
-				fmt.Println("statement_list multi")
+				fmt.Println("statement_list multi", depth)
 			}
-			TdocDollar[2].element.Parent(TdocDollar[1].element.Root())
-			TdocDollar[2].element.Root().Add(TdocDollar[2].element)
+			if TdocDollar[2].element != nil && !TdocDollar[2].element.IsAdded() {
+				TdocDollar[2].element.Added(true)
+				roots[depth].Add(TdocDollar[2].element)
+				fmt.Println("Added")
+				//spew.Dump(roots[depth])
+			}
 		}
 	case 4:
-		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:58
+		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
+		//line parser/tdoc.y:79
 		{
 			if debug {
-				fmt.Println("Declaration scope")
+				fmt.Println("Scope in")
 			}
-			TdocDollar[3].element.Parent(TdocDollar[1].element)
-			TdocDollar[3].element.Root().Add(TdocDollar[3].element)
+			depth = depth + 1
+			roots = append(roots, TdocDollar[1].element)
 		}
-	case 6:
+	case 5:
+		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
+		//line parser/tdoc.y:87
+		{
+			if debug {
+				fmt.Println("Scope out")
+			}
+			depth = depth - 1
+		}
+	case 7:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:70
+		//line parser/tdoc.y:98
 		{
 			if debug {
 				fmt.Println("Component", TdocDollar[1].val, TdocDollar[2].val)
 			}
 			TdocVAL.element = elements.NewComponent(nil, nil, TdocDollar[1].val, TdocDollar[2].val, "")
-			if program == nil {
-				program = elements.NewMatrix(nil)
-			}
 
-			if TdocVAL.element.Root() == nil {
-				TdocVAL.element.Parent(program)
+			if roots == nil {
+				roots = make([]elements.Element, 0)
+				program = elements.NewMatrix(nil)
+				roots = append(roots, program)
 			}
 		}
-	case 7:
+	case 8:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:84
+		//line parser/tdoc.y:111
 		{
 			if debug {
 				fmt.Println("alias")
 			}
 			TdocVAL.element = elements.NewComponent(nil, nil, TdocDollar[1].val, TdocDollar[2].val, TdocDollar[4].val)
-			if program == nil {
+			if roots == nil {
+				roots = make([]elements.Element, 0)
 				program = elements.NewMatrix(nil)
-			}
-
-			if TdocVAL.element.Root() == nil {
-				TdocVAL.element.Parent(program)
+				roots = append(roots, program)
 			}
 		}
 	}

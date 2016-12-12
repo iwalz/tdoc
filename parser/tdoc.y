@@ -5,9 +5,12 @@ package parser
 import (
   "fmt"
   "github.com/iwalz/tdoc/elements"
+  "github.com/davecgh/go-spew/spew"
 )
 
 var program elements.Element
+var roots []elements.Element
+var depth int
 
 const debug = true
 
@@ -34,33 +37,58 @@ program: statement_list
   if debug {
     fmt.Println("program")
   }
-  $$ = program
+  spew.Dump(roots)
+
+  for i, v := range roots {
+    if i > 0 {
+      v.Added(true)
+      roots[i-1].Add(v)
+    }
+  }
+  $$ = roots[0]
+  program = $$
+  //spew.Dump(program)
 }
 ;
 statement_list: statement
 {
   if debug {
-    fmt.Println("statement_list single")
+    fmt.Println("statement_list single", depth)
   }
-  $1.Root().Add($1)
+  if depth == 0 && !$1.IsAdded() {
+    $1.Added(true)
+    roots[depth].Add($1)
+  }
+  //spew.Dump(roots[depth])
 }
 |
 statement_list statement
 {
   if debug {
-    fmt.Println("statement_list multi")
+    fmt.Println("statement_list multi", depth)
   }
-  $2.Parent($1.Root())
-  $2.Root().Add($2)
+  if $2 != nil && !$2.IsAdded() {
+    $2.Added(true)
+    roots[depth].Add($2)
+    fmt.Println("Added")
+    //spew.Dump(roots[depth])
+  }
 }
 ;
-statement: statement SCOPEIN statement_list SCOPEOUT
+statement: statement SCOPEIN
 {
   if debug {
-    fmt.Println("Declaration scope")
+    fmt.Println("Scope in")
   }
-  $3.Parent($1)
-  $3.Root().Add($3)
+  depth = depth + 1
+  roots = append(roots, $1)
+}
+statement: SCOPEOUT
+{
+  if debug {
+    fmt.Println("Scope out")
+  }
+  depth = depth - 1
 }
 ;
 
@@ -72,12 +100,11 @@ declaration: COMPONENT IDENTIFIER
     fmt.Println("Component", $1, $2)
   }
   $$ = elements.NewComponent(nil, nil, $1, $2, "")
-  if program == nil {
-    program = elements.NewMatrix(nil)
-  }
 
-  if $$.Root() == nil {
-    $$.Parent(program)
+  if roots == nil {
+    roots = make([]elements.Element, 0)
+    program = elements.NewMatrix(nil)
+    roots = append(roots, program)
   }
 }
 | COMPONENT IDENTIFIER ALIAS TEXT
@@ -86,12 +113,10 @@ declaration: COMPONENT IDENTIFIER
     fmt.Println("alias")
   }
   $$ = elements.NewComponent(nil, nil, $1, $2, $4)
-  if program == nil {
+  if roots == nil {
+    roots = make([]elements.Element, 0)
     program = elements.NewMatrix(nil)
-  }
-
-  if $$.Root() == nil {
-    $$.Parent(program)
+    roots = append(roots, program)
   }
 }
 ;
@@ -99,5 +124,6 @@ declaration: COMPONENT IDENTIFIER
 %% /* Start of the program */
 
 func (p *TdocParserImpl) AST() elements.Element {
+  roots = nil
   return program
 }
