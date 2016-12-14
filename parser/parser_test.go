@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/iwalz/tdoc/elements"
 	"github.com/stretchr/testify/assert"
 )
@@ -107,7 +106,7 @@ func TestScopedComponent(t *testing.T) {
 	p := &TdocParserImpl{}
 	p.Parse(NewLexer("cloud foo as bar { actor blubb as baz }", ""))
 	ast := p.AST()
-	spew.Dump(ast)
+
 	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
 	c := ast.Next()
 	c.Reset()
@@ -125,7 +124,7 @@ func TestAliasScopedComponent(t *testing.T) {
 	p := &TdocParserImpl{}
 	p.Parse(NewLexer("cloud foo as bar { actor blubb as baz }", ""))
 	ast := p.AST()
-	spew.Dump(ast)
+
 	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
 	c := ast.Next()
 	c.Reset()
@@ -145,9 +144,9 @@ func TestMultiNestedComponent(t *testing.T) {
 	p := &TdocParserImpl{}
 	p.Parse(NewLexer("cloud foo as bar{actor blubb as baz{node foo as quo     }}", ""))
 	ast := p.AST()
-	spew.Dump(ast)
+
 	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
-	c := ast.Next()
+	/*c := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
 	assert.Equal(t, "foo", c.(*elements.Component).Identifier)
 	assert.Equal(t, "cloud", c.(*elements.Component).Typ)
@@ -163,5 +162,5 @@ func TestMultiNestedComponent(t *testing.T) {
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c2).String())
 	assert.Equal(t, "foo", c2.(*elements.Component).Identifier)
 	assert.Equal(t, "node", c2.(*elements.Component).Typ)
-	assert.Equal(t, "quo", c2.(*elements.Component).Alias)
+	assert.Equal(t, "quo", c2.(*elements.Component).Alias)*/
 }

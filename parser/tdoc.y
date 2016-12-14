@@ -5,14 +5,13 @@ package parser
 import (
   "fmt"
   "github.com/iwalz/tdoc/elements"
-  "github.com/davecgh/go-spew/spew"
 )
 
 var program elements.Element
 var roots []elements.Element
 var depth int
 
-const debug = true
+const debug = false
 
 %}
 
@@ -37,7 +36,6 @@ program: statement_list
   if debug {
     fmt.Println("program")
   }
-  spew.Dump(roots)
 
   for i, v := range roots {
     if i > 0 {
@@ -70,7 +68,6 @@ statement_list statement
   if $2 != nil && !$2.IsAdded() {
     $2.Added(true)
     roots[depth].Add($2)
-    fmt.Println("Added")
     //spew.Dump(roots[depth])
   }
 }

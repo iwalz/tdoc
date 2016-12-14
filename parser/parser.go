@@ -6,7 +6,6 @@ import __yyfmt__ "fmt"
 //line parser/tdoc.y:3
 import (
 	"fmt"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/iwalz/tdoc/elements"
 )
 
@@ -14,9 +13,9 @@ var program elements.Element
 var roots []elements.Element
 var depth int
 
-const debug = true
+const debug = false
 
-//line parser/tdoc.y:24
+//line parser/tdoc.y:23
 type TdocSymType struct {
 	yys     int
 	val     string
@@ -52,7 +51,7 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:124
+//line parser/tdoc.y:121
 
 /* Start of the program */
 
@@ -459,12 +458,11 @@ Tdocdefault:
 
 	case 1:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:36
+		//line parser/tdoc.y:35
 		{
 			if debug {
 				fmt.Println("program")
 			}
-			spew.Dump(roots)
 
 			for i, v := range roots {
 				if i > 0 {
@@ -478,7 +476,7 @@ Tdocdefault:
 		}
 	case 2:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:54
+		//line parser/tdoc.y:52
 		{
 			if debug {
 				fmt.Println("statement_list single", depth)
@@ -491,7 +489,7 @@ Tdocdefault:
 		}
 	case 3:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:66
+		//line parser/tdoc.y:64
 		{
 			if debug {
 				fmt.Println("statement_list multi", depth)
@@ -499,13 +497,12 @@ Tdocdefault:
 			if TdocDollar[2].element != nil && !TdocDollar[2].element.IsAdded() {
 				TdocDollar[2].element.Added(true)
 				roots[depth].Add(TdocDollar[2].element)
-				fmt.Println("Added")
 				//spew.Dump(roots[depth])
 			}
 		}
 	case 4:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:79
+		//line parser/tdoc.y:76
 		{
 			if debug {
 				fmt.Println("Scope in")
@@ -515,7 +512,7 @@ Tdocdefault:
 		}
 	case 5:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:87
+		//line parser/tdoc.y:84
 		{
 			if debug {
 				fmt.Println("Scope out")
@@ -524,7 +521,7 @@ Tdocdefault:
 		}
 	case 7:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:98
+		//line parser/tdoc.y:95
 		{
 			if debug {
 				fmt.Println("Component", TdocDollar[1].val, TdocDollar[2].val)
@@ -539,7 +536,7 @@ Tdocdefault:
 		}
 	case 8:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:111
+		//line parser/tdoc.y:108
 		{
 			if debug {
 				fmt.Println("alias")
