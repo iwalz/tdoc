@@ -15,14 +15,15 @@ var depth int
 
 const debug = false
 
-//line parser/tdoc.y:23
+//line parser/tdoc.y:24
 type TdocSymType struct {
-	yys     int
-	val     string
-	pos     int
-	line    int
-	token   int
-	element elements.Element
+	yys      int
+	val      string
+	pos      int
+	line     int
+	token    int
+	element  elements.Element
+	relation elements.Relation
 }
 
 const SCOPEIN = 57346
@@ -32,6 +33,13 @@ const TEXT = 57349
 const ERROR = 57350
 const IDENTIFIER = 57351
 const ALIAS = 57352
+const DIRECTION = 57353
+const RELKIND = 57354
+const RELARROW = 57355
+const RRELATION = 57356
+const LRELATION = 57357
+const URELATION = 57358
+const DRELATION = 57359
 
 var TdocToknames = [...]string{
 	"$end",
@@ -44,6 +52,13 @@ var TdocToknames = [...]string{
 	"ERROR",
 	"IDENTIFIER",
 	"ALIAS",
+	"DIRECTION",
+	"RELKIND",
+	"RELARROW",
+	"RRELATION",
+	"LRELATION",
+	"URELATION",
+	"DRELATION",
 }
 var TdocStatenames = [...]string{}
 
@@ -51,7 +66,7 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:121
+//line parser/tdoc.y:123
 
 /* Start of the program */
 
@@ -113,7 +128,8 @@ var TdocTok1 = [...]int{
 }
 var TdocTok2 = [...]int{
 
-	2, 3, 4, 5, 6, 7, 8, 9, 10,
+	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+	12, 13, 14, 15, 16, 17,
 }
 var TdocTok3 = [...]int{
 	0,
@@ -458,7 +474,7 @@ Tdocdefault:
 
 	case 1:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:35
+		//line parser/tdoc.y:37
 		{
 			if debug {
 				fmt.Println("program")
@@ -476,7 +492,7 @@ Tdocdefault:
 		}
 	case 2:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:52
+		//line parser/tdoc.y:54
 		{
 			if debug {
 				fmt.Println("statement_list single", depth)
@@ -489,7 +505,7 @@ Tdocdefault:
 		}
 	case 3:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:64
+		//line parser/tdoc.y:66
 		{
 			if debug {
 				fmt.Println("statement_list multi", depth)
@@ -502,7 +518,7 @@ Tdocdefault:
 		}
 	case 4:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:76
+		//line parser/tdoc.y:78
 		{
 			if debug {
 				fmt.Println("Scope in")
@@ -512,7 +528,7 @@ Tdocdefault:
 		}
 	case 5:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:84
+		//line parser/tdoc.y:86
 		{
 			if debug {
 				fmt.Println("Scope out")
@@ -521,7 +537,7 @@ Tdocdefault:
 		}
 	case 7:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:95
+		//line parser/tdoc.y:97
 		{
 			if debug {
 				fmt.Println("Component", TdocDollar[1].val, TdocDollar[2].val)
@@ -536,7 +552,7 @@ Tdocdefault:
 		}
 	case 8:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:108
+		//line parser/tdoc.y:110
 		{
 			if debug {
 				fmt.Println("alias")

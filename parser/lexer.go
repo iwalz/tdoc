@@ -6,6 +6,8 @@ import (
 	"log"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/iwalz/tdoc/elements"
 )
 
 const eof = -1
@@ -167,6 +169,88 @@ func (l *Lexer) isScope() bool {
 	return false
 }
 
+func lexDirection(l *Lexer) stateFn {
+	l.stripWhitespaces()
+	firstChar := l.peek()
+
+	// Shows direction
+	if firstChar == 'u' || firstChar == 'd' || firstChar == 'l' || firstChar == 'r' {
+		l.next()
+		l.emit(DIRECTION)
+	}
+
+	return lexText
+}
+
+// Check for relation
+func (l *Lexer) isRelation() (elements.Relation, bool) {
+	direction := ""
+	if l.start >= l.pos {
+		return nil, false
+	}
+
+	c := l.input[l.start:l.pos]
+	firstChar := c[0]
+
+	// First char shows direction
+	if firstChar == 'u' || firstChar == 'd' || firstChar == 'l' || firstChar == 'r' {
+		direction = string(firstChar)
+		firstChar = c[1]
+	}
+
+	// First char shows the relation type here
+	if firstChar == ' ' || firstChar == '-' || firstChar == '.' {
+		return nil, true
+	}
+
+	//lastChar := c[len(c)]
+	if direction == "l" {
+
+	}
+
+	return nil, false
+}
+
+// we already know its a relation
+func lexRelation(l *Lexer) stateFn {
+
+	relType := ""
+	firstChar := l.peek()
+
+	if firstChar == 'u' || firstChar == 'd' || firstChar == 'l' || firstChar == 'r' {
+		l.next()
+		fmt.Println(firstChar)
+		l.emit(DIRECTION)
+	}
+
+	secondChar := l.peek()
+	if secondChar == ' ' || secondChar == '.' || secondChar == '-' {
+		relType = string(secondChar)
+	}
+
+	//l.emit(DIRECTION)
+
+	for {
+		c := l.next()
+		fmt.Println(c)
+		if string(c) != relType {
+			l.backup()
+			break
+		}
+	}
+
+	l.emit(RELKIND)
+
+	lastChar := l.peek()
+	if lastChar == '>' || lastChar == '<' {
+		fmt.Println(lastChar)
+		l.next()
+		l.emit(RELARROW)
+	}
+
+	return lexText
+}
+
 // Check for keywords
 func (l *Lexer) isKeyword() bool {
 	if _, ok := keywords[l.input[l.start:l.pos]]; ok {
@@ -271,6 +355,10 @@ func lexText(l *Lexer) stateFn {
 			}
 			if l.isKeyword() {
 				return lexKeyword
+			}
+			_, isRel := l.isRelation()
+			if isRel {
+				return lexRelation
 			}
 			if l.pos > l.start {
 				l.emit(TEXT)

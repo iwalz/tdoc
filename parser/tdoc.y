@@ -16,7 +16,8 @@ const debug = false
 %}
 
 %token <token> SCOPEIN SCOPEOUT
-%token <val> COMPONENT TEXT ERROR IDENTIFIER ALIAS
+%token <val> COMPONENT TEXT ERROR IDENTIFIER ALIAS DIRECTION RELKIND RELARROW
+%token <relation> RRELATION LRELATION URELATION DRELATION
 %type <element> statement_list statement declaration
 %type <element> program
 
@@ -26,6 +27,7 @@ const debug = false
   line int
   token int
   element elements.Element
+  relation elements.Relation
 }
 
 %%
