@@ -51,7 +51,7 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:121
+//line parser/tdoc.y:122
 
 /* Start of the program */
 
@@ -508,11 +508,12 @@ Tdocdefault:
 				fmt.Println("Scope in")
 			}
 			depth = depth + 1
+			TdocDollar[1].element.Added(true)
 			roots = append(roots, TdocDollar[1].element)
 		}
 	case 5:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:84
+		//line parser/tdoc.y:85
 		{
 			if debug {
 				fmt.Println("Scope out")
@@ -521,7 +522,7 @@ Tdocdefault:
 		}
 	case 7:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:95
+		//line parser/tdoc.y:96
 		{
 			if debug {
 				fmt.Println("Component", TdocDollar[1].val, TdocDollar[2].val)
@@ -536,7 +537,7 @@ Tdocdefault:
 		}
 	case 8:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:108
+		//line parser/tdoc.y:109
 		{
 			if debug {
 				fmt.Println("alias")

@@ -39,8 +39,8 @@ program: statement_list
 
   for i, v := range roots {
     if i > 0 {
-      v.Added(true)
-      roots[i-1].Add(v)
+        v.Added(true)
+        roots[i-1].Add(v)
     }
   }
   $$ = roots[0]
@@ -78,6 +78,7 @@ statement: statement SCOPEIN
     fmt.Println("Scope in")
   }
   depth = depth + 1
+  $1.Added(true)
   roots = append(roots, $1)
 }
 statement: SCOPEOUT

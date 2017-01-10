@@ -142,11 +142,11 @@ func TestAliasScopedComponent(t *testing.T) {
 
 func TestMultiNestedComponent(t *testing.T) {
 	p := &TdocParserImpl{}
-	p.Parse(NewLexer("cloud foo as bar{actor blubb as baz{node foo as quo     }}", ""))
+	p.Parse(NewLexer("cloud foo as bar{   actor blubb as baz    {node foo as quo}}", ""))
 	ast := p.AST()
 
 	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
-	/*c := ast.Next()
+	c := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
 	assert.Equal(t, "foo", c.(*elements.Component).Identifier)
 	assert.Equal(t, "cloud", c.(*elements.Component).Typ)
@@ -162,5 +162,63 @@ func TestMultiNestedComponent(t *testing.T) {
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c2).String())
 	assert.Equal(t, "foo", c2.(*elements.Component).Identifier)
 	assert.Equal(t, "node", c2.(*elements.Component).Typ)
-	assert.Equal(t, "quo", c2.(*elements.Component).Alias)*/
+	assert.Equal(t, "quo", c2.(*elements.Component).Alias)
+}
+
+func TestComplexMultiNestedComponent(t *testing.T) {
+	p := &TdocParserImpl{}
+	p.Parse(NewLexer(`
+		cloud foo as bar1
+		cloud foo as bar2 {
+			cloud blubb as baz1
+			actor blubb as baz2 {
+				node foo as quo
+				node blubb as quo1
+				node blubb as quo2
+			}
+		}`, ""))
+	ast := p.AST()
+
+	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	c := ast.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
+	assert.Equal(t, "foo", c.(*elements.Component).Identifier)
+	assert.Equal(t, "cloud", c.(*elements.Component).Typ)
+	assert.Equal(t, "bar1", c.(*elements.Component).Alias)
+
+	c1 := ast.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c1).String())
+	assert.Equal(t, "foo", c1.(*elements.Component).Identifier)
+	assert.Equal(t, "cloud", c1.(*elements.Component).Typ)
+	assert.Equal(t, "bar2", c1.(*elements.Component).Alias)
+
+	c2 := c1.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c2).String())
+	assert.Equal(t, "blubb", c2.(*elements.Component).Identifier)
+	assert.Equal(t, "cloud", c2.(*elements.Component).Typ)
+	assert.Equal(t, "baz1", c2.(*elements.Component).Alias)
+
+	c3 := c1.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c3).String())
+	assert.Equal(t, "blubb", c3.(*elements.Component).Identifier)
+	assert.Equal(t, "actor", c3.(*elements.Component).Typ)
+	assert.Equal(t, "baz2", c3.(*elements.Component).Alias)
+
+	c4 := c3.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c4).String())
+	assert.Equal(t, "foo", c4.(*elements.Component).Identifier)
+	assert.Equal(t, "node", c4.(*elements.Component).Typ)
+	assert.Equal(t, "quo", c4.(*elements.Component).Alias)
+
+	c5 := c3.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c5).String())
+	assert.Equal(t, "blubb", c5.(*elements.Component).Identifier)
+	assert.Equal(t, "node", c5.(*elements.Component).Typ)
+	assert.Equal(t, "quo1", c5.(*elements.Component).Alias)
+
+	c6 := c3.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c6).String())
+	assert.Equal(t, "blubb", c6.(*elements.Component).Identifier)
+	assert.Equal(t, "node", c6.(*elements.Component).Typ)
+	assert.Equal(t, "quo2", c6.(*elements.Component).Alias)
 }
