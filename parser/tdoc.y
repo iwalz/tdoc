@@ -10,6 +10,7 @@ import (
 var program elements.Element
 var roots []elements.Element
 var depth int
+var registry *elements.Registry
 
 const debug = false
 
@@ -104,6 +105,11 @@ declaration: COMPONENT IDENTIFIER
     program = elements.NewMatrix(nil)
     roots = append(roots, program)
   }
+
+  if registry == nil {
+    registry = elements.NewRegistry()
+  }
+  registry.Add($$)
 }
 | COMPONENT IDENTIFIER ALIAS TEXT
 {
@@ -111,11 +117,17 @@ declaration: COMPONENT IDENTIFIER
     fmt.Println("alias")
   }
   $$ = elements.NewComponent($1, $2, $4)
+
   if roots == nil {
     roots = make([]elements.Element, 0)
     program = elements.NewMatrix(nil)
     roots = append(roots, program)
   }
+
+  if registry == nil {
+    registry = elements.NewRegistry()
+  }
+  registry.Add($$)
 }
 ;
 

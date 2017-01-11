@@ -12,10 +12,11 @@ import (
 var program elements.Element
 var roots []elements.Element
 var depth int
+var registry *elements.Registry
 
 const debug = false
 
-//line parser/tdoc.y:23
+//line parser/tdoc.y:24
 type TdocSymType struct {
 	yys     int
 	val     string
@@ -51,7 +52,7 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:122
+//line parser/tdoc.y:134
 
 /* Start of the program */
 
@@ -458,7 +459,7 @@ Tdocdefault:
 
 	case 1:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:35
+		//line parser/tdoc.y:36
 		{
 			if debug {
 				fmt.Println("program")
@@ -476,7 +477,7 @@ Tdocdefault:
 		}
 	case 2:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:52
+		//line parser/tdoc.y:53
 		{
 			if debug {
 				fmt.Println("statement_list single", depth)
@@ -489,7 +490,7 @@ Tdocdefault:
 		}
 	case 3:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:64
+		//line parser/tdoc.y:65
 		{
 			if debug {
 				fmt.Println("statement_list multi", depth)
@@ -502,7 +503,7 @@ Tdocdefault:
 		}
 	case 4:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:76
+		//line parser/tdoc.y:77
 		{
 			if debug {
 				fmt.Println("Scope in")
@@ -513,7 +514,7 @@ Tdocdefault:
 		}
 	case 5:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:85
+		//line parser/tdoc.y:86
 		{
 			if debug {
 				fmt.Println("Scope out")
@@ -522,7 +523,7 @@ Tdocdefault:
 		}
 	case 7:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:96
+		//line parser/tdoc.y:97
 		{
 			if debug {
 				fmt.Println("Component", TdocDollar[1].val, TdocDollar[2].val)
@@ -534,20 +535,31 @@ Tdocdefault:
 				program = elements.NewMatrix(nil)
 				roots = append(roots, program)
 			}
+
+			if registry == nil {
+				registry = elements.NewRegistry()
+			}
+			registry.Add(TdocVAL.element)
 		}
 	case 8:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:109
+		//line parser/tdoc.y:115
 		{
 			if debug {
 				fmt.Println("alias")
 			}
 			TdocVAL.element = elements.NewComponent(TdocDollar[1].val, TdocDollar[2].val, TdocDollar[4].val)
+
 			if roots == nil {
 				roots = make([]elements.Element, 0)
 				program = elements.NewMatrix(nil)
 				roots = append(roots, program)
 			}
+
+			if registry == nil {
+				registry = elements.NewRegistry()
+			}
+			registry.Add(TdocVAL.element)
 		}
 	}
 	goto Tdocstack /* stack new state and value */
