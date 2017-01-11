@@ -31,7 +31,6 @@ type Element interface {
 	Relations() []Relation
 	Next() Element
 	Parent(Element)
-	Root() Element
 	HasChilds() bool
 	Reset()
 	SetX(int)
@@ -94,10 +93,6 @@ func (d *DefaultElement) Parent(p Element) {
 
 func (d *DefaultElement) Reset() {
 	d.index = 0
-}
-
-func (d *DefaultElement) Root() Element {
-	return d.root
 }
 
 func (d *DefaultElement) Next() Element {
