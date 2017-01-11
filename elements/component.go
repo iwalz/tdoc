@@ -4,8 +4,31 @@ type Stackable interface {
 	Add(*Component)
 }
 
+type Relation interface {
+	To(Element)
+}
+
+type BaseRelation struct {
+	element Element
+}
+
+type DashedRelation struct {
+}
+
+type DottedRelation struct {
+}
+
+type EmptyRelation struct {
+}
+
+func (b *BaseRelation) To(e Element) {
+	b.element = e
+}
+
 type Element interface {
 	Add(Element)
+	AddRelation(Relation)
+	Relations() []Relation
 	Next() Element
 	Parent(Element)
 	Root() Element
@@ -20,12 +43,21 @@ type Element interface {
 }
 
 type DefaultElement struct {
-	index int
-	stack []Element
-	root  Element
-	x     int
-	y     int
-	added bool
+	index     int
+	stack     []Element
+	root      Element
+	relations []Relation
+	x         int
+	y         int
+	added     bool
+}
+
+func (d *DefaultElement) AddRelation(r Relation) {
+	d.relations = append(d.relations, r)
+}
+
+func (d *DefaultElement) Relations() []Relation {
+	return d.relations
 }
 
 func (d *DefaultElement) SetX(x int) {
@@ -90,6 +122,7 @@ func (d *DefaultElement) HasChilds() bool {
 func NewDefaultElement() DefaultElement {
 	d := DefaultElement{}
 	d.stack = make([]Element, 0)
+	d.relations = make([]Relation, 0)
 	return d
 }
 
@@ -100,15 +133,8 @@ type Component struct {
 	Alias      string
 }
 
-func NewComponent(l, r Element, typ, identifier, alias string) Element {
+func NewComponent(typ, identifier, alias string) Element {
 	d := NewDefaultElement()
-	if l != nil {
-		d.Add(l)
-	}
-	if r != nil {
-		d.Add(r)
-	}
-
 	c := &Component{
 		DefaultElement: d,
 		Typ:            typ,

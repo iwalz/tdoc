@@ -97,7 +97,7 @@ declaration: COMPONENT IDENTIFIER
   if debug {
     fmt.Println("Component", $1, $2)
   }
-  $$ = elements.NewComponent(nil, nil, $1, $2, "")
+  $$ = elements.NewComponent($1, $2, "")
 
   if roots == nil {
     roots = make([]elements.Element, 0)
@@ -110,7 +110,7 @@ declaration: COMPONENT IDENTIFIER
   if debug {
     fmt.Println("alias")
   }
-  $$ = elements.NewComponent(nil, nil, $1, $2, $4)
+  $$ = elements.NewComponent($1, $2, $4)
   if roots == nil {
     roots = make([]elements.Element, 0)
     program = elements.NewMatrix(nil)

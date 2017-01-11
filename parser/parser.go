@@ -527,7 +527,7 @@ Tdocdefault:
 			if debug {
 				fmt.Println("Component", TdocDollar[1].val, TdocDollar[2].val)
 			}
-			TdocVAL.element = elements.NewComponent(nil, nil, TdocDollar[1].val, TdocDollar[2].val, "")
+			TdocVAL.element = elements.NewComponent(TdocDollar[1].val, TdocDollar[2].val, "")
 
 			if roots == nil {
 				roots = make([]elements.Element, 0)
@@ -542,7 +542,7 @@ Tdocdefault:
 			if debug {
 				fmt.Println("alias")
 			}
-			TdocVAL.element = elements.NewComponent(nil, nil, TdocDollar[1].val, TdocDollar[2].val, TdocDollar[4].val)
+			TdocVAL.element = elements.NewComponent(TdocDollar[1].val, TdocDollar[2].val, TdocDollar[4].val)
 			if roots == nil {
 				roots = make([]elements.Element, 0)
 				program = elements.NewMatrix(nil)
