@@ -10,7 +10,6 @@ type Element interface {
 	Relations() []Relation
 	Next() Element
 	Parent(Element)
-	Root() Element
 	HasChilds() bool
 	Reset()
 	SetX(int)
@@ -75,10 +74,6 @@ func (d *DefaultElement) Reset() {
 	d.index = 0
 }
 
-func (d *DefaultElement) Root() Element {
-	return d.root
-}
-
 func (d *DefaultElement) Next() Element {
 	index := d.index
 
@@ -112,15 +107,8 @@ type Component struct {
 	Alias      string
 }
 
-func NewComponent(l, r Element, typ, identifier, alias string) Element {
+func NewComponent(typ, identifier, alias string) Element {
 	d := NewDefaultElement()
-	if l != nil {
-		d.Add(l)
-	}
-	if r != nil {
-		d.Add(r)
-	}
-
 	c := &Component{
 		DefaultElement: d,
 		Typ:            typ,

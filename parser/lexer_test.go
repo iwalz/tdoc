@@ -401,9 +401,7 @@ func TestSimpleRelationToken(t *testing.T) {
 	}{
 		{COMPONENT, "node"},
 		{IDENTIFIER, "foo"},
-		{DIRECTION, "u"},
-		{RELKIND, "--"},
-		{RELARROW, ">"},
+		{RELATION, "u-->"},
 		{COMPONENT, "node"},
 		{IDENTIFIER, "bar"},
 	}

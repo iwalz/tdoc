@@ -5,6 +5,6 @@ import (
 )
 
 func TestAddRelation(t *testing.T) {
-	c1 := NewComponent(nil, nil, "cloud", "foo", "bar")
-	c2 := NewComponent(nil, nil, "cloud", "blubb", "baz")
+	c1 := NewComponent("cloud", "foo", "bar")
+	c2 := NewComponent("cloud", "blubb", "baz")
 }

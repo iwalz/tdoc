@@ -11,7 +11,7 @@ func TestAddSingleComponent(t *testing.T) {
 	b := &BaseMatrix{rows: 1, columns: 1}
 	m := elements.NewMatrix(nil)
 
-	m.Add(elements.NewComponent(nil, nil, "node", "foo", "bar"))
+	m.Add(elements.NewComponent("node", "foo", "bar"))
 
 	b.scan(m)
 	assert.Equal(t, 1, b.rows)
@@ -26,9 +26,9 @@ func TestThreeComponents(t *testing.T) {
 	b := &BaseMatrix{rows: 1, columns: 1}
 	m := elements.NewMatrix(nil)
 
-	m.Add(elements.NewComponent(nil, nil, "node", "foo", "bar"))
-	m.Add(elements.NewComponent(nil, nil, "node", "foo1", "bar1"))
-	m.Add(elements.NewComponent(nil, nil, "node", "foo2", "bar2"))
+	m.Add(elements.NewComponent("node", "foo", "bar"))
+	m.Add(elements.NewComponent("node", "foo1", "bar1"))
+	m.Add(elements.NewComponent("node", "foo2", "bar2"))
 
 	assert.Equal(t, true, m.HasChilds())
 
@@ -51,14 +51,14 @@ func TestNestedComponents(t *testing.T) {
 	b := &BaseMatrix{rows: 1, columns: 1}
 	m := elements.NewMatrix(nil)
 
-	e1 := elements.NewComponent(nil, nil, "node", "foo1", "bar1")
-	e2 := elements.NewComponent(nil, nil, "node", "foo2", "bar2")
+	e1 := elements.NewComponent("node", "foo1", "bar1")
+	e2 := elements.NewComponent("node", "foo2", "bar2")
 
-	e1.Add(elements.NewComponent(nil, nil, "cloud", "foo1", "bar1"))
-	e1.Add(elements.NewComponent(nil, nil, "cloud", "foo2", "bar2"))
+	e1.Add(elements.NewComponent("cloud", "foo1", "bar1"))
+	e1.Add(elements.NewComponent("cloud", "foo2", "bar2"))
 
-	e2.Add(elements.NewComponent(nil, nil, "actor", "foo1", "bar1"))
-	e2.Add(elements.NewComponent(nil, nil, "actor", "foo2", "bar2"))
+	e2.Add(elements.NewComponent("actor", "foo1", "bar1"))
+	e2.Add(elements.NewComponent("actor", "foo2", "bar2"))
 
 	m.Add(e1)
 	m.Add(e2)
@@ -92,16 +92,16 @@ func TestMultiNestedComponents(t *testing.T) {
 	b := &BaseMatrix{rows: 1, columns: 1}
 	m := elements.NewMatrix(nil)
 
-	e1 := elements.NewComponent(nil, nil, "node", "foo1", "bar1")
-	e2 := elements.NewComponent(nil, nil, "node", "foo2", "bar2")
-	c1 := elements.NewComponent(nil, nil, "cloud", "foo1", "bar1")
-	c1.Add(elements.NewComponent(nil, nil, "cloud", "foo2", "bar2"))
-	c1.Add(elements.NewComponent(nil, nil, "cloud", "foo3", "bar3"))
-	c1.Add(elements.NewComponent(nil, nil, "cloud", "foo4", "bar4"))
+	e1 := elements.NewComponent("node", "foo1", "bar1")
+	e2 := elements.NewComponent("node", "foo2", "bar2")
+	c1 := elements.NewComponent("cloud", "foo1", "bar1")
+	c1.Add(elements.NewComponent("cloud", "foo2", "bar2"))
+	c1.Add(elements.NewComponent("cloud", "foo3", "bar3"))
+	c1.Add(elements.NewComponent("cloud", "foo4", "bar4"))
 	e1.Add(c1)
 
-	e2.Add(elements.NewComponent(nil, nil, "actor", "foo1", "bar1"))
-	e2.Add(elements.NewComponent(nil, nil, "actor", "foo2", "bar2"))
+	e2.Add(elements.NewComponent("actor", "foo1", "bar1"))
+	e2.Add(elements.NewComponent("actor", "foo2", "bar2"))
 
 	m.Add(e1)
 	m.Add(e2)

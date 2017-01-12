@@ -12,6 +12,7 @@ import (
 var program elements.Element
 var roots []elements.Element
 var depth int
+var registry *elements.Registry
 
 const debug = false
 
@@ -33,13 +34,7 @@ const TEXT = 57349
 const ERROR = 57350
 const IDENTIFIER = 57351
 const ALIAS = 57352
-const DIRECTION = 57353
-const RELKIND = 57354
-const RELARROW = 57355
-const RRELATION = 57356
-const LRELATION = 57357
-const URELATION = 57358
-const DRELATION = 57359
+const RELATION = 57353
 
 var TdocToknames = [...]string{
 	"$end",
@@ -52,13 +47,7 @@ var TdocToknames = [...]string{
 	"ERROR",
 	"IDENTIFIER",
 	"ALIAS",
-	"DIRECTION",
-	"RELKIND",
-	"RELARROW",
-	"RRELATION",
-	"LRELATION",
-	"URELATION",
-	"DRELATION",
+	"RELATION",
 }
 var TdocStatenames = [...]string{}
 
@@ -66,7 +55,7 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:123
+//line parser/tdoc.y:135
 
 /* Start of the program */
 
@@ -129,7 +118,6 @@ var TdocTok1 = [...]int{
 var TdocTok2 = [...]int{
 
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-	12, 13, 14, 15, 16, 17,
 }
 var TdocTok3 = [...]int{
 	0,
@@ -524,11 +512,12 @@ Tdocdefault:
 				fmt.Println("Scope in")
 			}
 			depth = depth + 1
+			TdocDollar[1].element.Added(true)
 			roots = append(roots, TdocDollar[1].element)
 		}
 	case 5:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:86
+		//line parser/tdoc.y:87
 		{
 			if debug {
 				fmt.Println("Scope out")
@@ -537,32 +526,43 @@ Tdocdefault:
 		}
 	case 7:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:97
+		//line parser/tdoc.y:98
 		{
 			if debug {
 				fmt.Println("Component", TdocDollar[1].val, TdocDollar[2].val)
 			}
-			TdocVAL.element = elements.NewComponent(nil, nil, TdocDollar[1].val, TdocDollar[2].val, "")
+			TdocVAL.element = elements.NewComponent(TdocDollar[1].val, TdocDollar[2].val, "")
 
 			if roots == nil {
 				roots = make([]elements.Element, 0)
 				program = elements.NewMatrix(nil)
 				roots = append(roots, program)
 			}
+
+			if registry == nil {
+				registry = elements.NewRegistry()
+			}
+			registry.Add(TdocVAL.element)
 		}
 	case 8:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:110
+		//line parser/tdoc.y:116
 		{
 			if debug {
 				fmt.Println("alias")
 			}
-			TdocVAL.element = elements.NewComponent(nil, nil, TdocDollar[1].val, TdocDollar[2].val, TdocDollar[4].val)
+			TdocVAL.element = elements.NewComponent(TdocDollar[1].val, TdocDollar[2].val, TdocDollar[4].val)
+
 			if roots == nil {
 				roots = make([]elements.Element, 0)
 				program = elements.NewMatrix(nil)
 				roots = append(roots, program)
 			}
+
+			if registry == nil {
+				registry = elements.NewRegistry()
+			}
+			registry.Add(TdocVAL.element)
 		}
 	}
 	goto Tdocstack /* stack new state and value */

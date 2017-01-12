@@ -10,14 +10,14 @@ import (
 var program elements.Element
 var roots []elements.Element
 var depth int
+var registry *elements.Registry
 
 const debug = false
 
 %}
 
 %token <token> SCOPEIN SCOPEOUT
-%token <val> COMPONENT TEXT ERROR IDENTIFIER ALIAS DIRECTION RELKIND RELARROW
-%token <relation> RRELATION LRELATION URELATION DRELATION
+%token <val> COMPONENT TEXT ERROR IDENTIFIER ALIAS RELATION
 %type <element> statement_list statement declaration
 %type <element> program
 
@@ -41,8 +41,8 @@ program: statement_list
 
   for i, v := range roots {
     if i > 0 {
-      v.Added(true)
-      roots[i-1].Add(v)
+        v.Added(true)
+        roots[i-1].Add(v)
     }
   }
   $$ = roots[0]
@@ -80,6 +80,7 @@ statement: statement SCOPEIN
     fmt.Println("Scope in")
   }
   depth = depth + 1
+  $1.Added(true)
   roots = append(roots, $1)
 }
 statement: SCOPEOUT
@@ -98,25 +99,36 @@ declaration: COMPONENT IDENTIFIER
   if debug {
     fmt.Println("Component", $1, $2)
   }
-  $$ = elements.NewComponent(nil, nil, $1, $2, "")
+  $$ = elements.NewComponent($1, $2, "")
 
   if roots == nil {
     roots = make([]elements.Element, 0)
     program = elements.NewMatrix(nil)
     roots = append(roots, program)
   }
+
+  if registry == nil {
+    registry = elements.NewRegistry()
+  }
+  registry.Add($$)
 }
 | COMPONENT IDENTIFIER ALIAS TEXT
 {
   if debug {
     fmt.Println("alias")
   }
-  $$ = elements.NewComponent(nil, nil, $1, $2, $4)
+  $$ = elements.NewComponent($1, $2, $4)
+
   if roots == nil {
     roots = make([]elements.Element, 0)
     program = elements.NewMatrix(nil)
     roots = append(roots, program)
   }
+
+  if registry == nil {
+    registry = elements.NewRegistry()
+  }
+  registry.Add($$)
 }
 ;
 

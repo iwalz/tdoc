@@ -3,36 +3,54 @@ package elements
 const (
 	Dashed = iota
 	Dotted
+	Thick
 	Empty
 )
 
-type Relation interface {
-	To(Element)
-	Kind(int)
-	Size(int)
+const (
+	Right = iota
+	Left
+	Up
+	Down
+)
+
+const (
+	Regular = iota
+	Both
+)
+
+type Relation struct {
+	element   Element
+	kind      int
+	direction int
+	size      int
+	arrow     int
+	text      string
 }
 
-type BaseRelation struct {
-	element Element
-	kind    int
-	size    int
+func NewRelation(r string) Relation {
+	return IsRelation(r)
 }
 
-// Right relation
-type RRelation struct {
-	BaseRelation
+func IsRelation(r string) Relation {
+	bytes := []byte(r)
+	relation := Relation{}
+
+	for k, v := range bytes {
+		if k == 0 && v == 'u' {
+			relation.direction = Up
+		}
+		if k == 0 && v == 'r' {
+			relation.direction = Right
+		}
+		if k == 0 && v == 'l' {
+			relation.direction = Left
+		}
+	}
+
+	return relation
 }
 
-// Left relation
-type LRelation struct {
-	BaseRelation
-}
-
-// Down relation
-type DRelation struct {
-	BaseRelation
-}
-
-func (b *BaseRelation) To(e Element) {
+func (b *Relation) To(e Element) {
 	b.element = e
 }
