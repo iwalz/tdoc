@@ -1,6 +1,7 @@
 package elements
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -189,4 +190,20 @@ func TestRelationWithoutArrows(t *testing.T) {
 	r5, ok := IsRelation("u[abc]==|v")
 	assert.Equal(t, false, ok)
 	assert.Nil(t, r5)
+}
+
+func TestNewRelation(t *testing.T) {
+	r, err := NewRelation("<u--[Test]---|>")
+	assert.NotNil(t, r)
+	assert.Nil(t, err)
+	assert.Equal(t, Up, r.direction)
+	assert.Equal(t, Both, r.arrowLocation)
+	assert.Equal(t, Regular, r.arrowTypeLeft)
+	assert.Equal(t, Filled, r.arrowTypeRight)
+	assert.Equal(t, 5, r.size)
+	assert.Equal(t, "Test", r.text)
+
+	r1, err := NewRelation("<u-l-[Test]---|>")
+	assert.Nil(t, r1)
+	assert.Equal(t, err, errors.New("<u-l-[Test]---|> is not a valid relation"))
 }
