@@ -3,16 +3,13 @@ package elements
 import "errors"
 
 type Registry struct {
-	alias      map[string]Element
 	identifier map[string]Element
 }
 
 func NewRegistry() *Registry {
-	a := make(map[string]Element)
 	i := make(map[string]Element)
 	registry := &Registry{
-		alias:      a,
-		identifier: i,
+		i,
 	}
 
 	return registry
@@ -25,12 +22,12 @@ func (r *Registry) Add(e Element) error {
 
 	c := e.(*Component)
 	if c.Alias != "" {
-		_, ok := r.alias[c.Alias]
+		_, ok := r.identifier[c.Alias]
 		if ok {
 			return errors.New("Alias " + c.Alias + " already exists")
 		}
 
-		r.alias[c.Alias] = c
+		r.identifier[c.Alias] = c
 		return nil
 	}
 
@@ -47,10 +44,6 @@ func (r *Registry) Add(e Element) error {
 	return errors.New("Neither alias nor identifier set")
 }
 
-func GetByAlias(r *Registry, a string) Element {
-	return r.alias[a]
-}
-
-func GetByIdentifier(r *Registry, i string) Element {
+func Get(r *Registry, i string) Element {
 	return r.identifier[i]
 }

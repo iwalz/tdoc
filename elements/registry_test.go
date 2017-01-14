@@ -12,7 +12,7 @@ func TestRegistryAddId(t *testing.T) {
 	c := NewComponent("cloud", "foo", "")
 
 	r.Add(c)
-	c1 := GetByIdentifier(r, "foo")
+	c1 := Get(r, "foo")
 	assert.Equal(t, c, c1)
 }
 
@@ -21,10 +21,10 @@ func TestRegistryAddAlias(t *testing.T) {
 	c := NewComponent("cloud", "foo", "bar")
 
 	r.Add(c)
-	c1 := GetByAlias(r, "bar")
+	c1 := Get(r, "bar")
 	assert.Equal(t, c, c1)
 
-	c2 := GetByIdentifier(r, "foo")
+	c2 := Get(r, "foo")
 	assert.Equal(t, nil, c2)
 }
 
