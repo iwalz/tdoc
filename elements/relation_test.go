@@ -142,11 +142,11 @@ func TestSingleRelations(t *testing.T) {
 }
 
 func TestRelationWithoutArrows(t *testing.T) {
-	r1, ok := IsRelation("u[Foo ✓ Bar]---")
+	r1, ok := IsRelation("u-[Foo ✓ Bar]---")
 	assert.Equal(t, true, ok)
 	assert.NotNil(t, r1)
 	assert.Equal(t, "Foo ✓ Bar", r1.text)
-	assert.Equal(t, 3, r1.size)
+	assert.Equal(t, 4, r1.size)
 	assert.Equal(t, Up, r1.direction)
 	assert.Equal(t, 0, r1.arrowLocation)
 	assert.Equal(t, 0, r1.arrowTypeLeft)
