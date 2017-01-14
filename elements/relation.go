@@ -231,3 +231,7 @@ func IsRelation(r string) (*Relation, bool) {
 func (b *Relation) To(e Element) {
 	b.element = e
 }
+
+func (b *Relation) Element() Element {
+	return b.element
+}
