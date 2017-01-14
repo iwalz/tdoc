@@ -6,6 +6,8 @@ import (
 	"log"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/iwalz/tdoc/elements"
 )
 
 const eof = -1
@@ -167,6 +169,21 @@ func (l *Lexer) isScope() bool {
 	return false
 }
 
+// Check for relation
+func (l *Lexer) isRelation() bool {
+	c := l.input[l.start:l.pos]
+	_, ok := elements.IsRelation(c)
+	return ok
+}
+
+// we already know its a relation
+func lexRelation(l *Lexer) stateFn {
+
+	l.emit(RELATION)
+
+	return lexText
+}
+
 // Check for keywords
 func (l *Lexer) isKeyword() bool {
 	if _, ok := keywords[l.input[l.start:l.pos]]; ok {
@@ -271,6 +288,10 @@ func lexText(l *Lexer) stateFn {
 			}
 			if l.isKeyword() {
 				return lexKeyword
+			}
+			isRel := l.isRelation()
+			if isRel {
+				return lexRelation
 			}
 			if l.pos > l.start {
 				l.emit(TEXT)

@@ -391,3 +391,26 @@ func TestNestedScopeToken(t *testing.T) {
 		assert.Equal(t, tt.expectedLiteral, lval.val)
 	}
 }
+
+func TestSimpleRelationToken(t *testing.T) {
+	input := "node foo u--> node bar"
+
+	tests := []struct {
+		expectedType    int
+		expectedLiteral string
+	}{
+		{COMPONENT, "node"},
+		{IDENTIFIER, "foo"},
+		{RELATION, "u-->"},
+		{COMPONENT, "node"},
+		{IDENTIFIER, "bar"},
+	}
+
+	l := NewLexer(input, "")
+	for _, tt := range tests {
+		lval := &TdocSymType{}
+		tok := l.Lex(lval)
+		assert.Equal(t, tt.expectedType, tok)
+		assert.Equal(t, tt.expectedLiteral, lval.val)
+	}
+}

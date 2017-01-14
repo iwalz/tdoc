@@ -4,27 +4,6 @@ type Stackable interface {
 	Add(*Component)
 }
 
-type Relation interface {
-	To(Element)
-}
-
-type BaseRelation struct {
-	element Element
-}
-
-type DashedRelation struct {
-}
-
-type DottedRelation struct {
-}
-
-type EmptyRelation struct {
-}
-
-func (b *BaseRelation) To(e Element) {
-	b.element = e
-}
-
 type Element interface {
 	Add(Element)
 	AddRelation(Relation)
