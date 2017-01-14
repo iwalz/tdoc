@@ -5,6 +5,7 @@ package parser
 import (
   "fmt"
   "github.com/iwalz/tdoc/elements"
+  //"github.com/davecgh/go-spew/spew"
 )
 
 var program elements.Element
@@ -99,6 +100,34 @@ relation_assignment: TEXT RELATION TEXT
   rel, _ := elements.NewRelation($2)
   rel.To(elements.Get(registry, $3))
   elements.Get(registry, $1).AddRelation(rel)
+}
+|
+declaration RELATION declaration
+{
+  if debug {
+    fmt.Println("declaration RELATION declaration")
+  }
+  rel, _ := elements.NewRelation($2)
+  rel.To($3)
+  $1.Added(true)
+  roots[depth].Add($1)
+  $3.Added(true)
+  roots[depth].Add($3)
+  $1.AddRelation(rel)
+  $$ = $1
+}
+|
+relation_assignment RELATION declaration
+{
+  if debug {
+    fmt.Println("relation_assignment RELATION declaration")
+  }
+  rel, _ := elements.NewRelation($2)
+  rel.To($3)
+  $3.Added(true)
+  roots[depth].Add($3)
+  $1.Relations()[0].Element().AddRelation(rel)
+  $$ = $1
 }
 
 declaration: COMPONENT IDENTIFIER

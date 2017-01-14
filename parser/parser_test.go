@@ -266,3 +266,58 @@ func TestSimpleRelationAlias(t *testing.T) {
 	assert.Equal(t, "a2", c1.(*elements.Component).Alias)
 	assert.Equal(t, "cloud", c1.(*elements.Component).Typ)
 }
+
+func TestSimpleRelationDeclaration(t *testing.T) {
+	p := &TdocParserImpl{}
+
+	p.Parse(NewLexer(`cloud foo as a1 --> cloud bar as a2`, ""))
+	ast := p.AST()
+	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	c := ast.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
+	assert.Equal(t, "a1", c.(*elements.Component).Alias)
+	assert.Equal(t, "cloud", c.(*elements.Component).Typ)
+	relations := c.Relations()
+	r := relations[0]
+	assert.NotNil(t, r)
+
+	c1 := ast.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
+	assert.Equal(t, "a2", c1.(*elements.Component).Alias)
+	assert.Equal(t, "cloud", c1.(*elements.Component).Typ)
+
+	assert.Equal(t, c1, r.Element())
+}
+
+func TestMultiRelationDeclaration(t *testing.T) {
+	p := &TdocParserImpl{}
+
+	p.Parse(NewLexer(`cloud foo as a1 --> cloud bar as a2 --> actor baz as a3`, ""))
+	ast := p.AST()
+	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	c := ast.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
+	assert.Equal(t, "a1", c.(*elements.Component).Alias)
+	assert.Equal(t, "cloud", c.(*elements.Component).Typ)
+	relations := c.Relations()
+	r := relations[0]
+	assert.NotNil(t, r)
+
+	c1 := ast.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c1).String())
+	assert.Equal(t, "a2", c1.(*elements.Component).Alias)
+	assert.Equal(t, "cloud", c1.(*elements.Component).Typ)
+
+	assert.Equal(t, c1, r.Element())
+
+	relations = c1.Relations()
+	r = relations[0]
+	assert.NotNil(t, r)
+
+	c2 := ast.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c2).String())
+	assert.Equal(t, "a3", c2.(*elements.Component).Alias)
+	assert.Equal(t, "actor", c2.(*elements.Component).Typ)
+
+	assert.Equal(t, c2, r.Element())
+}

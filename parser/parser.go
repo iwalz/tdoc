@@ -7,6 +7,7 @@ import __yyfmt__ "fmt"
 import (
 	"fmt"
 	"github.com/iwalz/tdoc/elements"
+	//"github.com/davecgh/go-spew/spew"
 )
 
 var program elements.Element
@@ -16,7 +17,7 @@ var registry *elements.Registry
 
 const debug = false
 
-//line parser/tdoc.y:24
+//line parser/tdoc.y:25
 type TdocSymType struct {
 	yys      int
 	val      string
@@ -55,7 +56,7 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:142
+//line parser/tdoc.y:171
 
 /* Start of the program */
 
@@ -72,47 +73,47 @@ var TdocExca = [...]int{
 	-2, 0,
 }
 
-const TdocNprod = 11
+const TdocNprod = 13
 const TdocPrivate = 57344
 
 var TdocTokenNames []string
 var TdocStates []string
 
-const TdocLast = 15
+const TdocLast = 20
 
 var TdocAct = [...]int{
 
-	12, 13, 11, 4, 7, 8, 15, 14, 10, 3,
-	1, 6, 9, 5, 2,
+	5, 14, 12, 11, 17, 13, 4, 7, 8, 19,
+	18, 7, 15, 16, 10, 3, 1, 6, 9, 2,
 }
 var TdocPact = [...]int{
 
-	-2, -1000, -2, 4, -1000, -1000, -1000, -7, -11, 4,
-	-1000, -9, 0, -1, -1000, -1000,
+	1, -1000, 1, 10, -1000, -8, -9, -4, -10, 10,
+	-1000, 5, 5, -6, 3, -1000, -1000, 2, -1000, -1000,
 }
 var TdocPgo = [...]int{
 
-	0, 14, 9, 13, 11, 10,
+	0, 19, 15, 0, 17, 16,
 }
 var TdocR1 = [...]int{
 
-	0, 5, 1, 1, 2, 2, 2, 2, 4, 3,
-	3,
+	0, 5, 1, 1, 2, 2, 2, 2, 4, 4,
+	4, 3, 3,
 }
 var TdocR2 = [...]int{
 
-	0, 1, 1, 2, 2, 1, 1, 1, 3, 2,
-	4,
+	0, 1, 1, 2, 2, 1, 1, 1, 3, 3,
+	3, 2, 4,
 }
 var TdocChk = [...]int{
 
 	-1000, -5, -1, -2, 5, -3, -4, 6, 7, -2,
-	4, 9, 11, 10, 7, 7,
+	4, 11, 11, 9, 11, -3, -3, 10, 7, 7,
 }
 var TdocDef = [...]int{
 
 	0, -2, 1, 2, 5, 6, 7, 0, 0, 3,
-	4, 9, 0, 0, 8, 10,
+	4, 0, 0, 11, 0, 9, 10, 0, 8, 12,
 }
 var TdocTok1 = [...]int{
 
@@ -465,7 +466,7 @@ Tdocdefault:
 
 	case 1:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:37
+		//line parser/tdoc.y:38
 		{
 			if debug {
 				fmt.Println("program")
@@ -483,7 +484,7 @@ Tdocdefault:
 		}
 	case 2:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:54
+		//line parser/tdoc.y:55
 		{
 			if debug {
 				fmt.Println("statement_list single", depth)
@@ -496,7 +497,7 @@ Tdocdefault:
 		}
 	case 3:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:66
+		//line parser/tdoc.y:67
 		{
 			if debug {
 				fmt.Println("statement_list multi", depth)
@@ -509,7 +510,7 @@ Tdocdefault:
 		}
 	case 4:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:78
+		//line parser/tdoc.y:79
 		{
 			if debug {
 				fmt.Println("Scope in")
@@ -520,7 +521,7 @@ Tdocdefault:
 		}
 	case 5:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:87
+		//line parser/tdoc.y:88
 		{
 			if debug {
 				fmt.Println("Scope out")
@@ -529,15 +530,45 @@ Tdocdefault:
 		}
 	case 8:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:98
+		//line parser/tdoc.y:99
 		{
 			rel, _ := elements.NewRelation(TdocDollar[2].val)
 			rel.To(elements.Get(registry, TdocDollar[3].val))
 			elements.Get(registry, TdocDollar[1].val).AddRelation(rel)
 		}
 	case 9:
+		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
+		//line parser/tdoc.y:106
+		{
+			if debug {
+				fmt.Println("declaration RELATION declaration")
+			}
+			rel, _ := elements.NewRelation(TdocDollar[2].val)
+			rel.To(TdocDollar[3].element)
+			TdocDollar[1].element.Added(true)
+			roots[depth].Add(TdocDollar[1].element)
+			TdocDollar[3].element.Added(true)
+			roots[depth].Add(TdocDollar[3].element)
+			TdocDollar[1].element.AddRelation(rel)
+			TdocVAL.element = TdocDollar[1].element
+		}
+	case 10:
+		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
+		//line parser/tdoc.y:121
+		{
+			if debug {
+				fmt.Println("relation_assignment RELATION declaration")
+			}
+			rel, _ := elements.NewRelation(TdocDollar[2].val)
+			rel.To(TdocDollar[3].element)
+			TdocDollar[3].element.Added(true)
+			roots[depth].Add(TdocDollar[3].element)
+			TdocDollar[1].element.Relations()[0].Element().AddRelation(rel)
+			TdocVAL.element = TdocDollar[1].element
+		}
+	case 11:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:105
+		//line parser/tdoc.y:134
 		{
 			if debug {
 				fmt.Println("Component", TdocDollar[1].val, TdocDollar[2].val)
@@ -555,9 +586,9 @@ Tdocdefault:
 			}
 			registry.Add(TdocVAL.element)
 		}
-	case 10:
+	case 12:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:123
+		//line parser/tdoc.y:152
 		{
 			if debug {
 				fmt.Println("alias")
