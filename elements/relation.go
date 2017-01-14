@@ -2,10 +2,7 @@ package elements
 
 import (
 	"errors"
-	"fmt"
 	"strings"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 // kind
@@ -51,32 +48,84 @@ func NewRelation(r string) (*Relation, error) {
 	return relation, nil
 }
 
-func IsRelation(r string) (*Relation, bool) {
-	firstChar := r[0]
-	relation := &Relation{}
-	relationString := ""
-	var relationChar byte
-	var nextChar byte
-	index := 0
-	fmt.Println("Index first:", index)
-	fmt.Println("r:", r)
-	fmt.Println("First char:", string(firstChar))
-	fmt.Println("Last char:", string(r[len(r)-1]))
-	// Both relations set
-	if firstChar == '<' && r[len(r)-1] == '>' {
+func (relation *Relation) extractText(s string) string {
+	if relation.text != "" {
+		return s
+	}
 
-		fmt.Println("Both matched")
+	var relationString string
+	openIndex := strings.Index(s, "[")
+	if openIndex != -1 {
+		closeIndex := strings.LastIndex(s, "]")
+		if closeIndex == -1 {
+			return s
+		}
+		relationString = s[0:openIndex]
+		relationString = relationString + s[closeIndex+1:len(s)]
+		relation.text = s[openIndex+1 : closeIndex]
+	}
+
+	return relationString
+}
+
+func (relation *Relation) checkKind(b byte) byte {
+	var relationChar byte
+	if b == ' ' {
+		relation.kind = Empty
+		relationChar = ' '
+	}
+	if b == '.' {
+		relation.kind = Dotted
+		relationChar = '.'
+	}
+	if b == '=' {
+		relation.kind = Thick
+		relationChar = '='
+	}
+	if b == '-' {
+		relation.kind = Dashed
+		relationChar = '-'
+	}
+
+	return relationChar
+}
+
+func (relation *Relation) setDirection(b byte, index int) int {
+	if b == 'u' {
+		relation.direction = Up
+		index = index + 1
+	}
+	if b == 'd' {
+		relation.direction = Down
+		index = index + 1
+	}
+	if b == 'l' {
+		relation.direction = Left
+		index = index + 1
+	}
+	if b == 'r' {
+		relation.direction = Right
+		index = index + 1
+	}
+	if relation.direction == 0 {
+		relation.direction = Right
+	}
+
+	return index
+}
+
+func (relation *Relation) setArrows(r string, index int) int {
+	// Both relations set
+	firstChar := r[0]
+	if firstChar == '<' && r[len(r)-1] == '>' {
 		relation.arrowLocation = Both
 
 		if strings.HasPrefix(r, "<|") {
-			fmt.Println("Fillede arrpw")
 			relation.arrowTypeLeft = Filled
 			index = index + 2
-			nextChar = r[index]
 		} else {
 			relation.arrowTypeLeft = Regular
 			index = index + 1
-			nextChar = r[index]
 		}
 
 		if strings.HasSuffix(r, "|>") {
@@ -91,11 +140,9 @@ func IsRelation(r string) (*Relation, bool) {
 		relation.arrowLocation = Left
 		if strings.HasPrefix(r, "<|") {
 			index = index + 2
-			nextChar = r[index]
 			relation.arrowTypeLeft = Filled
 		} else {
 			index = index + 1
-			nextChar = r[index]
 			relation.arrowTypeLeft = Regular
 		}
 		relation.direction = Left
@@ -103,7 +150,6 @@ func IsRelation(r string) (*Relation, bool) {
 	// Right relation set
 	if firstChar != '<' && r[len(r)-1] == '>' {
 		relation.arrowLocation = Right
-		fmt.Println("Right matched")
 		if strings.HasSuffix(r, "|>") {
 			relation.arrowTypeRight = Filled
 		} else {
@@ -111,67 +157,33 @@ func IsRelation(r string) (*Relation, bool) {
 		}
 		relation.direction = Right
 	}
+
+	return index
+}
+
+func IsRelation(r string) (*Relation, bool) {
+	relation := &Relation{}
+	relationString := ""
+	var relationChar byte
+	var nextChar byte
+
+	index := relation.setArrows(r, 0)
 	nextChar = r[index]
-	fmt.Println("Next char", string(nextChar))
-	fmt.Println(index)
+
 	// Set direction
-	if nextChar == 'u' {
-		relation.direction = Up
-		index = index + 1
-	}
-	if nextChar == 'd' {
-		relation.direction = Down
-		index = index + 1
-	}
-	if nextChar == 'l' {
-		relation.direction = Left
-		index = index + 1
-	}
-	if nextChar == 'r' {
-		relation.direction = Right
-		index = index + 1
-	}
-
-	if relation.direction == 0 {
-		relation.direction = Right
-	}
+	index = relation.setDirection(nextChar, index)
 	nextChar = r[index]
 
-	// Default to right, but don't use next character
-	/*if relation.direction == 0 {
-		relation.direction = Right
-	}*/
-	fmt.Println("Next char", string(nextChar))
 	// Set line type
-	if nextChar == ' ' {
-		relation.kind = Empty
-		relationChar = ' '
+	if nextChar == '[' {
+		r = relation.extractText(r)
+		relationString = r
+		nextChar = r[index]
+		relationChar = nextChar
 	}
-	if nextChar == '.' {
-		relation.kind = Dotted
-		relationChar = '.'
-	}
-	if nextChar == '=' {
-		relation.kind = Thick
-		relationChar = '='
-	}
-	if nextChar == '-' {
-		relation.kind = Dashed
-		relationChar = '-'
-	}
+	relationChar = relation.checkKind(nextChar)
 
-	openIndex := strings.Index(r, "[")
-	if openIndex != -1 {
-		closeIndex := strings.LastIndex(r, "]")
-		if closeIndex == -1 {
-			fmt.Println("False in close index")
-			return nil, false
-		}
-		relationString = r[0:openIndex]
-		relationString = relationString + r[closeIndex+1:len(r)]
-		relation.text = r[openIndex+1 : closeIndex]
-	}
-	fmt.Println("Index", index)
+	relationString = relation.extractText(r)
 	if relationString == "" {
 		relationString = r[index:]
 	} else {
@@ -186,14 +198,8 @@ func IsRelation(r string) (*Relation, bool) {
 
 		return relation, true
 	}
-	fmt.Println("Foo", string(nextChar))
-	if nextChar == '[' {
-		relationChar = relationString[index]
-	} else {
-		nextChar = r[index]
-	}
 
-	if (nextChar == '|' && checkValidSuffix(r)) || relationString == "|>" {
+	if (nextChar == '|' && strings.HasSuffix(r, ">")) || relationString == "|>" {
 		relation.kind = Dashed
 		relation.size = 1
 		relation.arrowLocation = Right
@@ -202,22 +208,13 @@ func IsRelation(r string) (*Relation, bool) {
 		return relation, true
 	}
 
-	if relation.kind == 0 && !checkValidSuffix(r) {
-		fmt.Println("False in kind and prefix")
-		return nil, false
-	}
-
 	// Allowed characters at this point are:
 	// The kind character & >, <, |
 	for i := 0; i < len(relationString); i++ {
 		if relationString[i] != relationChar && relationString[i] != '>' && relationString[i] != '<' && relationString[i] != '|' {
-			fmt.Println(string(relationChar))
-			spew.Dump(relationString)
-			fmt.Println("False in character check")
 			return nil, false
 		}
 	}
-	fmt.Println("Count", relationString)
 	count := strings.Count(relationString, string(relationChar))
 	if count <= 0 {
 		relation.size = 1
@@ -226,30 +223,6 @@ func IsRelation(r string) (*Relation, bool) {
 	}
 
 	return relation, true
-}
-
-func checkValidSuffix(s string) bool {
-	if strings.HasSuffix(s, ">") {
-		return true
-	}
-
-	if strings.HasSuffix(s, "-") {
-		return true
-	}
-
-	if strings.HasSuffix(s, " ") {
-		return true
-	}
-
-	if strings.HasSuffix(s, ".") {
-		return true
-	}
-
-	if strings.HasSuffix(s, "|>") {
-		return true
-	}
-
-	return false
 }
 
 func (b *Relation) To(e Element) {
