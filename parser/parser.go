@@ -19,13 +19,14 @@ const debug = false
 
 //line parser/tdoc.y:25
 type TdocSymType struct {
-	yys      int
-	val      string
-	pos      int
-	line     int
-	token    int
-	element  elements.Element
-	relation elements.Relation
+	yys       int
+	val       string
+	pos       int
+	line      int
+	token     int
+	element   elements.Element
+	component *elements.Component
+	relation  elements.Relation
 }
 
 const SCOPEIN = 57346
@@ -56,7 +57,7 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:171
+//line parser/tdoc.y:172
 
 /* Start of the program */
 
@@ -84,7 +85,7 @@ const TdocLast = 20
 var TdocAct = [...]int{
 
 	5, 14, 12, 11, 17, 13, 4, 7, 8, 19,
-	18, 7, 15, 16, 10, 3, 1, 6, 9, 2,
+	18, 7, 15, 16, 10, 3, 1, 2, 9, 6,
 }
 var TdocPact = [...]int{
 
@@ -93,12 +94,12 @@ var TdocPact = [...]int{
 }
 var TdocPgo = [...]int{
 
-	0, 19, 15, 0, 17, 16,
+	0, 0, 19, 15, 17, 16,
 }
 var TdocR1 = [...]int{
 
-	0, 5, 1, 1, 2, 2, 2, 2, 4, 4,
-	4, 3, 3,
+	0, 5, 4, 4, 3, 3, 3, 3, 2, 2,
+	2, 1, 1,
 }
 var TdocR2 = [...]int{
 
@@ -107,13 +108,13 @@ var TdocR2 = [...]int{
 }
 var TdocChk = [...]int{
 
-	-1000, -5, -1, -2, 5, -3, -4, 6, 7, -2,
-	4, 11, 11, 9, 11, -3, -3, 10, 7, 7,
+	-1000, -5, -4, -3, 5, -1, -2, 6, 7, -3,
+	4, 11, 11, 9, 11, -1, -1, 10, 7, 7,
 }
 var TdocDef = [...]int{
 
 	0, -2, 1, 2, 5, 6, 7, 0, 0, 3,
-	4, 0, 0, 11, 0, 9, 10, 0, 8, 12,
+	4, 0, 0, 11, 0, 10, 9, 0, 8, 12,
 }
 var TdocTok1 = [...]int{
 
@@ -466,7 +467,7 @@ Tdocdefault:
 
 	case 1:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:38
+		//line parser/tdoc.y:39
 		{
 			if debug {
 				fmt.Println("program")
@@ -484,44 +485,44 @@ Tdocdefault:
 		}
 	case 2:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:55
+		//line parser/tdoc.y:56
 		{
 			if debug {
 				fmt.Println("statement_list single", depth)
 			}
-			if depth == 0 && !TdocDollar[1].element.IsAdded() {
-				TdocDollar[1].element.Added(true)
-				roots[depth].Add(TdocDollar[1].element)
+			if depth == 0 && !TdocDollar[1].component.IsAdded() {
+				TdocDollar[1].component.Added(true)
+				roots[depth].Add(TdocDollar[1].component)
 			}
 			//spew.Dump(roots[depth])
 		}
 	case 3:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:67
+		//line parser/tdoc.y:68
 		{
 			if debug {
 				fmt.Println("statement_list multi", depth)
 			}
-			if TdocDollar[2].element != nil && !TdocDollar[2].element.IsAdded() {
-				TdocDollar[2].element.Added(true)
-				roots[depth].Add(TdocDollar[2].element)
+			if TdocDollar[2].component != nil && !TdocDollar[2].component.IsAdded() {
+				TdocDollar[2].component.Added(true)
+				roots[depth].Add(TdocDollar[2].component)
 				//spew.Dump(roots[depth])
 			}
 		}
 	case 4:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:79
+		//line parser/tdoc.y:80
 		{
 			if debug {
 				fmt.Println("Scope in")
 			}
 			depth = depth + 1
-			TdocDollar[1].element.Added(true)
-			roots = append(roots, TdocDollar[1].element)
+			TdocDollar[1].component.Added(true)
+			roots = append(roots, TdocDollar[1].component)
 		}
 	case 5:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:88
+		//line parser/tdoc.y:89
 		{
 			if debug {
 				fmt.Println("Scope out")
@@ -530,7 +531,7 @@ Tdocdefault:
 		}
 	case 8:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:99
+		//line parser/tdoc.y:100
 		{
 			rel, _ := elements.NewRelation(TdocDollar[2].val)
 			rel.To(elements.Get(registry, TdocDollar[3].val))
@@ -538,42 +539,42 @@ Tdocdefault:
 		}
 	case 9:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:106
+		//line parser/tdoc.y:107
 		{
 			if debug {
-				fmt.Println("declaration RELATION declaration")
+				fmt.Println("relation_assignment RELATION declaration", TdocDollar[1].component, TdocDollar[3].component)
 			}
 			rel, _ := elements.NewRelation(TdocDollar[2].val)
-			rel.To(TdocDollar[3].element)
-			TdocDollar[1].element.Added(true)
-			roots[depth].Add(TdocDollar[1].element)
-			TdocDollar[3].element.Added(true)
-			roots[depth].Add(TdocDollar[3].element)
-			TdocDollar[1].element.AddRelation(rel)
-			TdocVAL.element = TdocDollar[1].element
+			rel.To(TdocDollar[3].component)
+			TdocDollar[3].component.Added(true)
+			roots[depth].Add(TdocDollar[3].component)
+			TdocDollar[1].component.AddRelation(rel)
+			TdocVAL.component = TdocDollar[3].component
 		}
 	case 10:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:121
+		//line parser/tdoc.y:120
 		{
 			if debug {
-				fmt.Println("relation_assignment RELATION declaration")
+				fmt.Println("declaration RELATION declaration", TdocDollar[1].component, TdocDollar[3].component)
 			}
 			rel, _ := elements.NewRelation(TdocDollar[2].val)
-			rel.To(TdocDollar[3].element)
-			TdocDollar[3].element.Added(true)
-			roots[depth].Add(TdocDollar[3].element)
-			TdocDollar[1].element.Relations()[0].Element().AddRelation(rel)
-			TdocVAL.element = TdocDollar[1].element
+			rel.To(TdocDollar[3].component)
+			TdocDollar[1].component.Added(true)
+			roots[depth].Add(TdocDollar[1].component)
+			TdocDollar[3].component.Added(true)
+			roots[depth].Add(TdocDollar[3].component)
+			TdocDollar[1].component.AddRelation(rel)
+			TdocVAL.component = TdocDollar[3].component
 		}
 	case 11:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:134
+		//line parser/tdoc.y:135
 		{
 			if debug {
 				fmt.Println("Component", TdocDollar[1].val, TdocDollar[2].val)
 			}
-			TdocVAL.element = elements.NewComponent(TdocDollar[1].val, TdocDollar[2].val, "")
+			TdocVAL.component = elements.NewComponent(TdocDollar[1].val, TdocDollar[2].val, "")
 
 			if roots == nil {
 				roots = make([]elements.Element, 0)
@@ -584,16 +585,16 @@ Tdocdefault:
 			if registry == nil {
 				registry = elements.NewRegistry()
 			}
-			registry.Add(TdocVAL.element)
+			registry.Add(TdocVAL.component)
 		}
 	case 12:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:152
+		//line parser/tdoc.y:153
 		{
 			if debug {
 				fmt.Println("alias")
 			}
-			TdocVAL.element = elements.NewComponent(TdocDollar[1].val, TdocDollar[2].val, TdocDollar[4].val)
+			TdocVAL.component = elements.NewComponent(TdocDollar[1].val, TdocDollar[2].val, TdocDollar[4].val)
 
 			if roots == nil {
 				roots = make([]elements.Element, 0)
@@ -604,7 +605,7 @@ Tdocdefault:
 			if registry == nil {
 				registry = elements.NewRegistry()
 			}
-			registry.Add(TdocVAL.element)
+			registry.Add(TdocVAL.component)
 		}
 	}
 	goto Tdocstack /* stack new state and value */

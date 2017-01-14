@@ -292,7 +292,7 @@ func TestSimpleRelationDeclaration(t *testing.T) {
 func TestMultiRelationDeclaration(t *testing.T) {
 	p := &TdocParserImpl{}
 
-	p.Parse(NewLexer(`cloud foo as a1 --> cloud bar as a2 --> actor baz as a3`, ""))
+	p.Parse(NewLexer(`cloud foo as a1 --> cloud bar as a2 --> actor baz as a3 --> node blubb as a4`, ""))
 	ast := p.AST()
 	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
 	c := ast.Next()
@@ -320,4 +320,17 @@ func TestMultiRelationDeclaration(t *testing.T) {
 	assert.Equal(t, "actor", c2.(*elements.Component).Typ)
 
 	assert.Equal(t, c2, r.Element())
+	relations = c2.Relations()
+	r = relations[0]
+	assert.NotNil(t, r)
+
+	c3 := ast.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c3).String())
+	assert.Equal(t, "a4", c3.(*elements.Component).Alias)
+	assert.Equal(t, "node", c3.(*elements.Component).Typ)
+
+	assert.Equal(t, c3, r.Element())
+
+	c4 := ast.Next()
+	assert.Nil(t, c4)
 }

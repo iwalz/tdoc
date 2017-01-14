@@ -19,8 +19,8 @@ const debug = false
 
 %token <token> SCOPEIN SCOPEOUT
 %token <val> COMPONENT TEXT ERROR IDENTIFIER ALIAS RELATION
-%type <element> statement_list statement declaration relation_assignment
-%type <element> program
+%type <component> declaration relation_assignment statement
+%type <element> statement_list program
 
 %union{
   val string
@@ -28,6 +28,7 @@ const debug = false
   line int
   token int
   element elements.Element
+  component *elements.Component
   relation elements.Relation
 }
 
@@ -102,10 +103,23 @@ relation_assignment: TEXT RELATION TEXT
   elements.Get(registry, $1).AddRelation(rel)
 }
 |
+relation_assignment RELATION declaration
+{
+  if debug {
+    fmt.Println("relation_assignment RELATION declaration", $1, $3)
+  }
+  rel, _ := elements.NewRelation($2)
+  rel.To($3)
+  $3.Added(true)
+  roots[depth].Add($3)
+  $1.AddRelation(rel)
+  $$ = $3
+}
+|
 declaration RELATION declaration
 {
   if debug {
-    fmt.Println("declaration RELATION declaration")
+    fmt.Println("declaration RELATION declaration", $1, $3)
   }
   rel, _ := elements.NewRelation($2)
   rel.To($3)
@@ -114,20 +128,7 @@ declaration RELATION declaration
   $3.Added(true)
   roots[depth].Add($3)
   $1.AddRelation(rel)
-  $$ = $1
-}
-|
-relation_assignment RELATION declaration
-{
-  if debug {
-    fmt.Println("relation_assignment RELATION declaration")
-  }
-  rel, _ := elements.NewRelation($2)
-  rel.To($3)
-  $3.Added(true)
-  roots[depth].Add($3)
-  $1.Relations()[0].Element().AddRelation(rel)
-  $$ = $1
+  $$ = $3
 }
 
 declaration: COMPONENT IDENTIFIER
