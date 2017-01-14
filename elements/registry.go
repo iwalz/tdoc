@@ -1,13 +1,16 @@
 package elements
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type Registry struct {
-	identifier map[string]Element
+	identifier map[string]*Component
 }
 
 func NewRegistry() *Registry {
-	i := make(map[string]Element)
+	i := make(map[string]*Component)
 	registry := &Registry{
 		i,
 	}
@@ -15,12 +18,11 @@ func NewRegistry() *Registry {
 	return registry
 }
 
-func (r *Registry) Add(e Element) error {
-	if e == nil {
+func (r *Registry) Add(c *Component) error {
+	if c == nil {
 		return errors.New("Nil given")
 	}
 
-	c := e.(*Component)
 	if c.Alias != "" {
 		_, ok := r.identifier[c.Alias]
 		if ok {
@@ -44,6 +46,12 @@ func (r *Registry) Add(e Element) error {
 	return errors.New("Neither alias nor identifier set")
 }
 
-func Get(r *Registry, i string) Element {
-	return r.identifier[i]
+func Get(r *Registry, i string) *Component {
+	c, ok := r.identifier[i]
+	fmt.Println(ok)
+	if ok {
+		return c
+	}
+
+	return nil
 }

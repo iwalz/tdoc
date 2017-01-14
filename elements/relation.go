@@ -30,7 +30,7 @@ const (
 )
 
 type Relation struct {
-	element        Element
+	component      *Component
 	kind           int
 	direction      int
 	size           int
@@ -228,10 +228,10 @@ func IsRelation(r string) (*Relation, bool) {
 	return relation, true
 }
 
-func (b *Relation) To(e Element) {
-	b.element = e
+func (b *Relation) To(c *Component) {
+	b.component = c
 }
 
-func (b *Relation) Element() Element {
-	return b.element
+func (b *Relation) Element() *Component {
+	return b.component
 }

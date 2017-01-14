@@ -25,7 +25,7 @@ func TestRegistryAddAlias(t *testing.T) {
 	assert.Equal(t, c, c1)
 
 	c2 := Get(r, "foo")
-	assert.Equal(t, nil, c2)
+	assert.Nil(t, c2)
 }
 
 func TestErrors(t *testing.T) {

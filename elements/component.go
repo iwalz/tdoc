@@ -107,7 +107,7 @@ type Component struct {
 	Alias      string
 }
 
-func NewComponent(typ, identifier, alias string) Element {
+func NewComponent(typ, identifier, alias string) *Component {
 	d := NewDefaultElement()
 	c := &Component{
 		DefaultElement: d,
