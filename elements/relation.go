@@ -166,6 +166,9 @@ func IsRelation(r string) (*Relation, bool) {
 	relationString := ""
 	var relationChar byte
 	var nextChar byte
+	if r == "" {
+		return nil, false
+	}
 
 	index := relation.setArrows(r, 0)
 	nextChar = r[index]

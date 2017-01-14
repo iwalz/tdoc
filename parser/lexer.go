@@ -6,6 +6,8 @@ import (
 	"log"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/iwalz/tdoc/elements"
 )
 
 const eof = -1
@@ -169,69 +171,15 @@ func (l *Lexer) isScope() bool {
 
 // Check for relation
 func (l *Lexer) isRelation() bool {
-	direction := ""
-	if l.start >= l.pos {
-		return false
-	}
-
 	c := l.input[l.start:l.pos]
-	firstChar := c[0]
-
-	// First char shows direction
-	if firstChar == 'u' || firstChar == 'd' || firstChar == 'l' || firstChar == 'r' {
-		direction = string(firstChar)
-		firstChar = c[1]
-	}
-
-	// First char shows the relation type here
-	if firstChar == ' ' || firstChar == '-' || firstChar == '.' {
-		return true
-	}
-
-	//lastChar := c[len(c)]
-	if direction == "l" {
-
-	}
-
-	return false
+	_, ok := elements.IsRelation(c)
+	return ok
 }
 
 // we already know its a relation
 func lexRelation(l *Lexer) stateFn {
 
-	relType := ""
-	firstChar := l.peek()
-
-	if firstChar == 'u' || firstChar == 'd' || firstChar == 'l' || firstChar == 'r' {
-		l.next()
-		fmt.Println(firstChar)
-		l.emit(RELATION)
-	}
-
-	secondChar := l.peek()
-	if secondChar == ' ' || secondChar == '.' || secondChar == '-' {
-		relType = string(secondChar)
-	}
-
-	//l.emit(DIRECTION)
-
-	for {
-		c := l.next()
-		fmt.Println(c)
-		if string(c) != relType {
-			l.backup()
-			break
-		}
-	}
-
-	//l.emit(RELKIND)
-
-	lastChar := l.peek()
-	if lastChar == '>' || lastChar == '<' {
-		fmt.Println(lastChar)
-		l.next()
-		//l.emit(RELARROW)
-	}
+	l.emit(RELATION)
 
 	return lexText
 }
