@@ -1,9 +1,6 @@
 package elements
 
-import (
-	"errors"
-	"fmt"
-)
+import "errors"
 
 type Registry struct {
 	identifier map[string]*Component
@@ -48,7 +45,6 @@ func (r *Registry) Add(c *Component) error {
 
 func Get(r *Registry, i string) *Component {
 	c, ok := r.identifier[i]
-	fmt.Println(ok)
 	if ok {
 		return c
 	}
