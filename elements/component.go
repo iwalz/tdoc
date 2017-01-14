@@ -6,8 +6,8 @@ type Stackable interface {
 
 type Element interface {
 	Add(Element)
-	AddRelation(Relation)
-	Relations() []Relation
+	AddRelation(*Relation)
+	Relations() []*Relation
 	Next() Element
 	Parent(Element)
 	HasChilds() bool
@@ -24,17 +24,17 @@ type DefaultElement struct {
 	index     int
 	stack     []Element
 	root      Element
-	relations []Relation
+	relations []*Relation
 	x         int
 	y         int
 	added     bool
 }
 
-func (d *DefaultElement) AddRelation(r Relation) {
+func (d *DefaultElement) AddRelation(r *Relation) {
 	d.relations = append(d.relations, r)
 }
 
-func (d *DefaultElement) Relations() []Relation {
+func (d *DefaultElement) Relations() []*Relation {
 	return d.relations
 }
 
@@ -96,7 +96,7 @@ func (d *DefaultElement) HasChilds() bool {
 func NewDefaultElement() DefaultElement {
 	d := DefaultElement{}
 	d.stack = make([]Element, 0)
-	d.relations = make([]Relation, 0)
+	d.relations = make([]*Relation, 0)
 	return d
 }
 

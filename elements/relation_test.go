@@ -8,6 +8,14 @@ import (
 )
 
 func TestStandardRelations(t *testing.T) {
+	r, ok := IsRelation("-->")
+	assert.Equal(t, true, ok)
+	assert.NotNil(t, r)
+	assert.Equal(t, Right, r.direction)
+	assert.Equal(t, 2, r.size)
+	assert.Equal(t, Regular, r.arrowTypeRight)
+	assert.Equal(t, 0, r.arrowTypeLeft)
+
 	r1, ok := IsRelation("l-->")
 	assert.Equal(t, true, ok)
 	assert.NotNil(t, r1)

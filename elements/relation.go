@@ -43,7 +43,7 @@ type Relation struct {
 func NewRelation(r string) (*Relation, error) {
 	relation, ok := IsRelation(r)
 	if !ok {
-		return nil, errors.New(r + " is not a relation")
+		return nil, errors.New(r + " is not a valid relation")
 	}
 	return relation, nil
 }
