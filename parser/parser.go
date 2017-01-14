@@ -55,12 +55,13 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:135
+//line parser/tdoc.y:142
 
 /* Start of the program */
 
 func (p *TdocParserImpl) AST() elements.Element {
 	roots = nil
+	registry = nil
 	return program
 }
 
@@ -71,45 +72,47 @@ var TdocExca = [...]int{
 	-2, 0,
 }
 
-const TdocNprod = 9
+const TdocNprod = 11
 const TdocPrivate = 57344
 
 var TdocTokenNames []string
 var TdocStates []string
 
-const TdocLast = 11
+const TdocLast = 15
 
 var TdocAct = [...]int{
 
-	10, 9, 11, 4, 6, 8, 3, 1, 5, 7,
-	2,
+	12, 13, 11, 4, 7, 8, 15, 14, 10, 3,
+	1, 6, 9, 5, 2,
 }
 var TdocPact = [...]int{
 
-	-2, -1000, -2, 1, -1000, -1000, -8, 1, -1000, -10,
-	-5, -1000,
+	-2, -1000, -2, 4, -1000, -1000, -1000, -7, -11, 4,
+	-1000, -9, 0, -1, -1000, -1000,
 }
 var TdocPgo = [...]int{
 
-	0, 10, 6, 8, 7,
+	0, 14, 9, 13, 11, 10,
 }
 var TdocR1 = [...]int{
 
-	0, 4, 1, 1, 2, 2, 2, 3, 3,
+	0, 5, 1, 1, 2, 2, 2, 2, 4, 3,
+	3,
 }
 var TdocR2 = [...]int{
 
-	0, 1, 1, 2, 2, 1, 1, 2, 4,
+	0, 1, 1, 2, 2, 1, 1, 1, 3, 2,
+	4,
 }
 var TdocChk = [...]int{
 
-	-1000, -4, -1, -2, 5, -3, 6, -2, 4, 9,
-	10, 7,
+	-1000, -5, -1, -2, 5, -3, -4, 6, 7, -2,
+	4, 9, 11, 10, 7, 7,
 }
 var TdocDef = [...]int{
 
-	0, -2, 1, 2, 5, 6, 0, 3, 4, 7,
-	0, 8,
+	0, -2, 1, 2, 5, 6, 7, 0, 0, 3,
+	4, 9, 0, 0, 8, 10,
 }
 var TdocTok1 = [...]int{
 
@@ -524,9 +527,17 @@ Tdocdefault:
 			}
 			depth = depth - 1
 		}
-	case 7:
-		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
+	case 8:
+		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
 		//line parser/tdoc.y:98
+		{
+			rel, _ := elements.NewRelation(TdocDollar[2].val)
+			rel.To(elements.Get(registry, TdocDollar[3].val))
+			elements.Get(registry, TdocDollar[1].val).AddRelation(rel)
+		}
+	case 9:
+		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
+		//line parser/tdoc.y:105
 		{
 			if debug {
 				fmt.Println("Component", TdocDollar[1].val, TdocDollar[2].val)
@@ -544,9 +555,9 @@ Tdocdefault:
 			}
 			registry.Add(TdocVAL.element)
 		}
-	case 8:
+	case 10:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:116
+		//line parser/tdoc.y:123
 		{
 			if debug {
 				fmt.Println("alias")

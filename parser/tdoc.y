@@ -18,7 +18,7 @@ const debug = false
 
 %token <token> SCOPEIN SCOPEOUT
 %token <val> COMPONENT TEXT ERROR IDENTIFIER ALIAS RELATION
-%type <element> statement_list statement declaration
+%type <element> statement_list statement declaration relation_assignment
 %type <element> program
 
 %union{
@@ -92,7 +92,14 @@ statement: SCOPEOUT
 }
 ;
 
-statement: declaration
+statement: declaration | relation_assignment
+
+relation_assignment: TEXT RELATION TEXT
+{
+  rel, _ := elements.NewRelation($2)
+  rel.To(elements.Get(registry, $3))
+  elements.Get(registry, $1).AddRelation(rel)
+}
 
 declaration: COMPONENT IDENTIFIER
 {
@@ -136,5 +143,6 @@ declaration: COMPONENT IDENTIFIER
 
 func (p *TdocParserImpl) AST() elements.Element {
   roots = nil
+  registry = nil
   return program
 }
