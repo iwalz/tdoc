@@ -438,6 +438,37 @@ func TestSimpleRelationToken(t *testing.T) {
 	}
 }
 
+func TestToString(t *testing.T) {
+	tok := &token{}
+	tok.typ = 0
+	tok.line = 0
+	tok.pos = 13
+	assert.Equal(t, "EOF", tok.String())
+
+	tok = &token{}
+	tok.typ = ERROR
+	tok.line = 0
+	tok.pos = 13
+	tok.val = "FOO"
+	assert.Equal(t, "FOO", tok.String())
+
+	tok = &token{}
+	tok.typ = SCOPEIN
+	tok.line = 0
+	tok.pos = 13
+	tok.val = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	assert.Equal(t, "\"ABCDEFGHIJ\"...", tok.String())
+
+	tok = &token{}
+	tok.typ = SCOPEIN
+	tok.line = 0
+	tok.pos = 13
+	tok.val = "ABCDE"
+	assert.Equal(t, "\"ABCDE\"", tok.String())
+
+	assert.Equal(t, Pos(13), tok.pos.Position())
+}
+
 func TestSimpleIDRelationToken(t *testing.T) {
 	input := `node foo
 	node bar
