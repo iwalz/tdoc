@@ -9,7 +9,7 @@ import (
 
 func TestAddSingleComponent(t *testing.T) {
 	b := &BaseMatrix{rows: 1, columns: 1}
-	m := elements.NewMatrix(nil)
+	m := elements.NewComponent("", "", "")
 
 	m.Add(elements.NewComponent("node", "foo", "bar"))
 
@@ -24,7 +24,7 @@ func TestAddSingleComponent(t *testing.T) {
 
 func TestThreeComponents(t *testing.T) {
 	b := &BaseMatrix{rows: 1, columns: 1}
-	m := elements.NewMatrix(nil)
+	m := elements.NewComponent("", "", "")
 
 	m.Add(elements.NewComponent("node", "foo", "bar"))
 	m.Add(elements.NewComponent("node", "foo1", "bar1"))
@@ -49,7 +49,7 @@ func TestThreeComponents(t *testing.T) {
 
 func TestNestedComponents(t *testing.T) {
 	b := &BaseMatrix{rows: 1, columns: 1}
-	m := elements.NewMatrix(nil)
+	m := elements.NewComponent("", "", "")
 
 	e1 := elements.NewComponent("node", "foo1", "bar1")
 	e2 := elements.NewComponent("node", "foo2", "bar2")
@@ -90,7 +90,7 @@ func TestNestedComponents(t *testing.T) {
 
 func TestMultiNestedComponents(t *testing.T) {
 	b := &BaseMatrix{rows: 1, columns: 1}
-	m := elements.NewMatrix(nil)
+	m := elements.NewComponent("", "", "")
 
 	e1 := elements.NewComponent("node", "foo1", "bar1")
 	e2 := elements.NewComponent("node", "foo2", "bar2")

@@ -12,7 +12,7 @@ func TestSimpleComponent(t *testing.T) {
 	p := &TdocParserImpl{}
 	p.Parse(NewLexer("cloud abc", ""))
 	ast := p.AST()
-	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
 	assert.Equal(t, "abc", c.(*elements.Component).Identifier)
@@ -23,7 +23,7 @@ func TestManyComponents(t *testing.T) {
 	p := &TdocParserImpl{}
 	p.Parse(NewLexer("cloud foo1 as bar1 cloud foo2 as bar2 cloud foo3 as bar3 cloud foo4 as bar4", ""))
 	ast := p.AST()
-	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c1 := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c1).String())
 	assert.Equal(t, "foo1", c1.(*elements.Component).Identifier)
@@ -53,7 +53,7 @@ func TestAliasComponent(t *testing.T) {
 	p := &TdocParserImpl{}
 	p.Parse(NewLexer("cloud foo as bar", ""))
 	ast := p.AST()
-	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
 	assert.Equal(t, "foo", c.(*elements.Component).Identifier)
 	assert.Equal(t, "cloud", c.(*elements.Component).Typ)
@@ -64,7 +64,7 @@ func TestRecursiveAliasComponent(t *testing.T) {
 	p := &TdocParserImpl{}
 	p.Parse(NewLexer("cloud foo as bar node blubb as baz", ""))
 	ast := p.AST()
-	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 
 	c := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
@@ -87,7 +87,7 @@ func TestNewlineScopedComponent(t *testing.T) {
 	}
 	`, ""))
 	ast := p.AST()
-	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
 	assert.Equal(t, "foo", c.(*elements.Component).Identifier)
@@ -107,7 +107,7 @@ func TestScopedComponent(t *testing.T) {
 	p.Parse(NewLexer("cloud foo as bar { actor blubb as baz }", ""))
 	ast := p.AST()
 
-	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
 	c.Reset()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
@@ -125,7 +125,7 @@ func TestAliasScopedComponent(t *testing.T) {
 	p.Parse(NewLexer("cloud foo as bar { actor blubb as baz }", ""))
 	ast := p.AST()
 
-	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
 	c.Reset()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
@@ -145,7 +145,7 @@ func TestMultiNestedComponent(t *testing.T) {
 	p.Parse(NewLexer("cloud foo as bar{   actor blubb as baz    {node foo as quo}}", ""))
 	ast := p.AST()
 
-	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
 	assert.Equal(t, "foo", c.(*elements.Component).Identifier)
@@ -179,7 +179,7 @@ func TestComplexMultiNestedComponent(t *testing.T) {
 		}`, ""))
 	ast := p.AST()
 
-	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
 	assert.Equal(t, "foo", c.(*elements.Component).Identifier)
@@ -230,7 +230,7 @@ func TestSimpleRelation(t *testing.T) {
 		cloud bar
 		foo --> bar`, ""))
 	ast := p.AST()
-	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
 	assert.Equal(t, "foo", c.(*elements.Component).Identifier)
@@ -252,7 +252,7 @@ func TestSimpleRelationAlias(t *testing.T) {
 		cloud bar as a2
 		a1 --> a2`, ""))
 	ast := p.AST()
-	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
 	assert.Equal(t, "a1", c.(*elements.Component).Alias)
@@ -272,7 +272,7 @@ func TestSimpleRelationDeclaration(t *testing.T) {
 
 	p.Parse(NewLexer(`cloud foo as a1 --> cloud bar as a2`, ""))
 	ast := p.AST()
-	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
 	assert.Equal(t, "a1", c.(*elements.Component).Alias)
@@ -294,7 +294,7 @@ func TestMultiRelationDeclaration(t *testing.T) {
 
 	p.Parse(NewLexer(`cloud foo as a1 --> cloud bar as a2 --> actor baz as a3 --> node blubb as a4`, ""))
 	ast := p.AST()
-	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
 	assert.Equal(t, "a1", c.(*elements.Component).Alias)
@@ -341,7 +341,7 @@ func TestAliasRelationDeclaration(t *testing.T) {
 	p.Parse(NewLexer(`cloud foo as a1
 		a1 --> cloud bar as a2`, ""))
 	ast := p.AST()
-	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
 	assert.Equal(t, "a1", c.(*elements.Component).Alias)
@@ -366,7 +366,7 @@ func TestComplexAliasRelationDeclaration(t *testing.T) {
 			actor bar as a3
 		} --> node baz`, ""))
 	ast := p.AST()
-	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 
 	c := ast.Next()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())

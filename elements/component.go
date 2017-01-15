@@ -9,7 +9,6 @@ type Element interface {
 	AddRelation(*Relation)
 	Relations() []*Relation
 	Next() Element
-	Parent(Element)
 	HasChilds() bool
 	Reset()
 	SetX(int)
@@ -23,7 +22,6 @@ type Element interface {
 type DefaultElement struct {
 	index     int
 	stack     []Element
-	root      Element
 	relations []*Relation
 	x         int
 	y         int
@@ -64,10 +62,6 @@ func (d *DefaultElement) Y() int {
 
 func (d *DefaultElement) Add(e Element) {
 	d.stack = append(d.stack, e)
-}
-
-func (d *DefaultElement) Parent(p Element) {
-	d.root = p
 }
 
 func (d *DefaultElement) Reset() {
@@ -117,21 +111,4 @@ func NewComponent(typ, identifier, alias string) *Component {
 	}
 
 	return c
-}
-
-type Matrix struct {
-	DefaultElement
-}
-
-func NewMatrix(e1 Element) Element {
-	d := NewDefaultElement()
-	if e1 != nil {
-		d.Add(e1)
-	}
-
-	m := &Matrix{
-		DefaultElement: d,
-	}
-
-	return m
 }

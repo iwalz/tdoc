@@ -8,8 +8,8 @@ import (
   //"github.com/davecgh/go-spew/spew"
 )
 
-var program elements.Element
-var roots []elements.Element
+var program *elements.Component
+var roots []*elements.Component
 var depth int
 var registry *elements.Registry
 
@@ -19,15 +19,13 @@ const debug = false
 
 %token <token> SCOPEIN SCOPEOUT
 %token <val> COMPONENT TEXT ERROR IDENTIFIER ALIAS RELATION
-%type <component> declaration relation_assignment statement statement_list
-%type <element> program
+%type <component> declaration relation_assignment statement statement_list program
 
 %union{
   val string
   pos int
   line int
   token int
-  element elements.Element
   component *elements.Component
   relation elements.Relation
 }
@@ -152,8 +150,8 @@ declaration: COMPONENT IDENTIFIER
   $$ = elements.NewComponent($1, $2, "")
 
   if roots == nil {
-    roots = make([]elements.Element, 0)
-    program = elements.NewMatrix(nil)
+    roots = make([]*elements.Component, 0)
+    program = elements.NewComponent("", "", "")
     roots = append(roots, program)
   }
 
@@ -170,8 +168,8 @@ declaration: COMPONENT IDENTIFIER
   $$ = elements.NewComponent($1, $2, $4)
 
   if roots == nil {
-    roots = make([]elements.Element, 0)
-    program = elements.NewMatrix(nil)
+    roots = make([]*elements.Component, 0)
+    program = elements.NewComponent("", "", "")
     roots = append(roots, program)
   }
 
@@ -198,7 +196,7 @@ SCOPEOUT
   if debug {
     fmt.Println("Scope out")
   }
-  $$ = roots[depth].(*elements.Component)
+  $$ = roots[depth]
   depth = depth - 1
 }
 ;
@@ -206,7 +204,7 @@ SCOPEOUT
 
 %% /* Start of the program */
 
-func (p *TdocParserImpl) AST() elements.Element {
+func (p *TdocParserImpl) AST() *elements.Component {
   roots = nil
   registry = nil
   return program
