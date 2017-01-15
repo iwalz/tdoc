@@ -1,5 +1,8 @@
 language: go
-script: make test
+script:
+  - make test
+  - gover
+  - $HOME/gopath/bin/goveralls -coverprofile=gover.coverprofile
 install:
   - go get github.com/stretchr/testify/assert
   - go get github.com/davecgh/go-spew/spew
@@ -7,3 +10,6 @@ install:
   - go get github.com/ajstarks/svgo
 before_install:
   - make yacc
+  - go get github.com/mattn/goveralls
+  - go get golang.org/x/tools/cmd/cover
+  - go get github.com/modocache/gover
