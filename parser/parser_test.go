@@ -334,3 +334,73 @@ func TestMultiRelationDeclaration(t *testing.T) {
 	c4 := ast.Next()
 	assert.Nil(t, c4)
 }
+
+func TestAliasRelationDeclaration(t *testing.T) {
+	p := &TdocParserImpl{}
+
+	p.Parse(NewLexer(`cloud foo as a1
+		a1 --> cloud bar as a2`, ""))
+	ast := p.AST()
+	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+	c := ast.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
+	assert.Equal(t, "a1", c.(*elements.Component).Alias)
+	assert.Equal(t, "cloud", c.(*elements.Component).Typ)
+	relations := c.Relations()
+	r := relations[0]
+	assert.NotNil(t, r)
+
+	c1 := ast.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c1).String())
+	assert.Equal(t, "a2", c1.(*elements.Component).Alias)
+	assert.Equal(t, "cloud", c1.(*elements.Component).Typ)
+
+	assert.Equal(t, c1, r.Element())
+}
+
+func TestComplexAliasRelationDeclaration(t *testing.T) {
+	p := &TdocParserImpl{}
+
+	p.Parse(NewLexer(`cloud foo as a1
+		a1 --> cloud bar as a2 {
+			actor bar as a3
+		} --> node baz`, ""))
+	ast := p.AST()
+	assert.Equal(t, "*elements.Matrix", reflect.TypeOf(ast).String())
+
+	c := ast.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
+	assert.Equal(t, "a1", c.(*elements.Component).Alias)
+	assert.Equal(t, "cloud", c.(*elements.Component).Typ)
+	relations := c.Relations()
+	r := relations[0]
+	assert.NotNil(t, r)
+
+	c1 := ast.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c1).String())
+	assert.Equal(t, "a2", c1.(*elements.Component).Alias)
+	assert.Equal(t, "cloud", c1.(*elements.Component).Typ)
+
+	assert.Equal(t, c1, r.Element())
+	relations = c1.Relations()
+	r = relations[0]
+	assert.NotNil(t, r)
+
+	c2 := ast.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c2).String())
+	assert.Equal(t, "baz", c2.(*elements.Component).Identifier)
+	assert.Equal(t, "node", c2.(*elements.Component).Typ)
+	assert.Equal(t, c2, r.Element())
+
+	a := c1.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(a).String())
+	assert.Equal(t, "a3", a.(*elements.Component).Alias)
+	assert.Equal(t, "actor", a.(*elements.Component).Typ)
+
+	a2 := c2.Next()
+	assert.Nil(t, a2)
+
+	c3 := ast.Next()
+	assert.Nil(t, c3)
+
+}

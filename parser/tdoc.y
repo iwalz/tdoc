@@ -19,8 +19,8 @@ const debug = false
 
 %token <token> SCOPEIN SCOPEOUT
 %token <val> COMPONENT TEXT ERROR IDENTIFIER ALIAS RELATION
-%type <component> declaration relation_assignment statement
-%type <element> statement_list program
+%type <component> declaration relation_assignment statement statement_list
+%type <element> program
 
 %union{
   val string
@@ -41,12 +41,6 @@ program: statement_list
     fmt.Println("program")
   }
 
-  for i, v := range roots {
-    if i > 0 {
-        v.Added(true)
-        roots[i-1].Add(v)
-    }
-  }
   $$ = roots[0]
   program = $$
   //spew.Dump(program)
@@ -55,7 +49,7 @@ program: statement_list
 statement_list: statement
 {
   if debug {
-    fmt.Println("statement_list single", depth)
+    fmt.Println("statement_list single", depth, $1)
   }
   if depth == 0 && !$1.IsAdded() {
     $1.Added(true)
@@ -67,30 +61,13 @@ statement_list: statement
 statement_list statement
 {
   if debug {
-    fmt.Println("statement_list multi", depth)
+    fmt.Println("statement_list multi", depth, $1, $2)
   }
   if $2 != nil && !$2.IsAdded() {
     $2.Added(true)
     roots[depth].Add($2)
     //spew.Dump(roots[depth])
   }
-}
-;
-statement: statement SCOPEIN
-{
-  if debug {
-    fmt.Println("Scope in")
-  }
-  depth = depth + 1
-  $1.Added(true)
-  roots = append(roots, $1)
-}
-statement: SCOPEOUT
-{
-  if debug {
-    fmt.Println("Scope out")
-  }
-  depth = depth - 1
 }
 ;
 
@@ -103,6 +80,34 @@ relation_assignment: TEXT RELATION TEXT
   elements.Get(registry, $1).AddRelation(rel)
 }
 |
+TEXT RELATION declaration
+{
+  if debug {
+    fmt.Println("TEXT RELATION declaration", $1, $2, $3)
+  }
+  rel, _ := elements.NewRelation($2)
+  rel.To($3)
+  elements.Get(registry, $1).AddRelation(rel)
+  if !$3.IsAdded() {
+    $3.Added(true)
+    roots[depth].Add($3)
+  }
+  $$ = $3
+}
+|
+declaration RELATION TEXT
+{
+  c := elements.Get(registry, $3)
+  rel, _ := elements.NewRelation($2)
+  rel.To(c)
+  $1.AddRelation(rel)
+  if !c.IsAdded() {
+    c.Added(true)
+    roots[depth].Add(c)
+  }
+  $$ = c
+}
+|
 relation_assignment RELATION declaration
 {
   if debug {
@@ -110,8 +115,10 @@ relation_assignment RELATION declaration
   }
   rel, _ := elements.NewRelation($2)
   rel.To($3)
-  $3.Added(true)
-  roots[depth].Add($3)
+  if !$3.IsAdded() {
+    $3.Added(true)
+    roots[depth].Add($3)
+  }
   $1.AddRelation(rel)
   $$ = $3
 }
@@ -123,10 +130,16 @@ declaration RELATION declaration
   }
   rel, _ := elements.NewRelation($2)
   rel.To($3)
-  $1.Added(true)
-  roots[depth].Add($1)
-  $3.Added(true)
-  roots[depth].Add($3)
+  if !$1.IsAdded() {
+    $1.Added(true)
+    roots[depth].Add($1)
+  }
+
+  if !$3.IsAdded() {
+    $3.Added(true)
+    roots[depth].Add($3)
+  }
+
   $1.AddRelation(rel)
   $$ = $3
 }
@@ -167,6 +180,28 @@ declaration: COMPONENT IDENTIFIER
   }
   registry.Add($$)
 }
+|
+declaration SCOPEIN
+{
+  if debug {
+    fmt.Println("Scope in")
+  }
+  roots[depth].Add($1)
+  depth = depth + 1
+  $1.Added(true)
+  roots = append(roots, $1)
+  //roots[depth].Add($1)
+}
+|
+SCOPEOUT
+{
+  if debug {
+    fmt.Println("Scope out")
+  }
+  $$ = roots[depth].(*elements.Component)
+  depth = depth - 1
+}
+;
 ;
 
 %% /* Start of the program */
