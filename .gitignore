@@ -1,4 +1,4 @@
 y.go
 y.output
 coverage.out
-gover.coverprofile
+*.coverprofile
