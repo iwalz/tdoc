@@ -315,12 +315,12 @@ func (l *Lexer) Lex(lval *TdocSymType) int {
 
 	for {
 		select {
-		case token := <-l.tokens:
-			lval.line = token.line
-			lval.pos = int(token.pos)
-			lval.token = int(token.typ)
-			lval.val = token.val
-			return int(token.typ)
+		case t := <-l.tokens:
+			lval.line = t.line
+			lval.pos = int(t.pos)
+			lval.token = int(t.typ)
+			lval.val = t.val
+			return int(t.typ)
 		default:
 			l.state = l.state(l)
 		}
