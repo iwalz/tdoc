@@ -46,12 +46,14 @@ func (t *Table) increaseTo(x int, y int) {
 			t.cells = append(t.cells, make([]tableAbstract, 1))
 		}
 	}
+	t.rows = x
 
 	if len(t.cells[x-1]) < y {
 		for i := len(t.cells[x-1]); i < y; i++ {
 			t.cells[x-1] = append(t.cells[x-1], nil)
 		}
 	}
+	t.columns = y
 }
 
 func (t *Table) AddTo(x int, y int, c *elements.Component) error {
@@ -77,4 +79,16 @@ func (t *Table) GetFrom(x int, y int) (tableAbstract, error) {
 	}
 
 	return t.cells[x-1][y-1], nil
+}
+
+func (t *Table) findFreeSlot() (int, int) {
+	for x, vx := range t.cells {
+		for y, vy := range vx {
+			if vy == nil {
+				return x + 1, y + 1
+			}
+		}
+	}
+
+	return 0, 0
 }

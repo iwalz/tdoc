@@ -47,3 +47,45 @@ func TestHigherAddTo(t *testing.T) {
 
 	assert.Equal(t, 10, len(table.cells[9]))
 }
+
+func TestFindFreeSlot(t *testing.T) {
+	table := NewTable()
+	c := elements.NewComponent("node", "foo", "bar")
+	table.AddTo(2, 2, c)
+	c1, err := table.GetFrom(2, 2)
+	assert.Nil(t, err)
+	assert.Equal(t, c, c1)
+
+	assert.Equal(t, 2, len(table.cells[1]))
+	x, y := table.findFreeSlot()
+	assert.Equal(t, 1, x)
+	assert.Equal(t, 1, y)
+}
+
+func TestComplexFindFreeSlot(t *testing.T) {
+	table := NewTable()
+	c := elements.NewComponent("node", "foo", "bar")
+	table.AddTo(1, 1, c)
+	c1, err := table.GetFrom(1, 1)
+	assert.Nil(t, err)
+	assert.Equal(t, c, c1)
+
+	x, y := table.findFreeSlot()
+	assert.Equal(t, 0, x)
+	assert.Equal(t, 0, y)
+
+	table.increaseTo(2, 2)
+	x, y = table.findFreeSlot()
+	assert.Equal(t, 2, x)
+	assert.Equal(t, 1, y)
+
+	table.AddTo(1, 2, c)
+	x, y = table.findFreeSlot()
+	assert.Equal(t, 2, x)
+	assert.Equal(t, 1, y)
+
+	table.AddTo(2, 1, c)
+	x, y = table.findFreeSlot()
+	assert.Equal(t, 2, x)
+	assert.Equal(t, 2, y)
+}
