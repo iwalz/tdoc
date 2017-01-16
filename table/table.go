@@ -6,6 +6,14 @@ import (
 	"github.com/iwalz/tdoc/elements"
 )
 
+const BORDERHEIGHT = 40
+
+const (
+	_ = iota // skip 0
+	BORDER
+	DASHED_BORDER
+)
+
 // interface for table and cell (a cell can contain a table)
 type tableAbstract interface {
 	Component() *elements.Component
@@ -21,9 +29,12 @@ var ErrIndexOutOfBounds = errors.New("Index out of bounds")
 
 // Table representation
 type Table struct {
-	cells [][]tableAbstract
-	x     int
-	y     int
+	cells   [][]tableAbstract
+	x       int
+	y       int
+	border  int
+	image   string
+	caption string
 }
 
 // Satisfy tableAbstract interface
@@ -31,14 +42,39 @@ func (t *Table) Component() *elements.Component {
 	return nil
 }
 
+// Set Border for table
+func (t *Table) SetBorder(b int) {
+	t.border = b
+}
+
+// Set image
+func (t *Table) SetImage(i string) {
+	t.image = i
+}
+
+// Set caption
+func (t *Table) SetCaption(c string) {
+	t.caption = c
+}
+
 // Get width
 func (t *Table) Width() int {
-	return t.Columns() * 100
+	w := t.Columns() * 100
+	if t.border > 0 {
+		w = w + BORDERHEIGHT
+	}
+
+	return w
 }
 
 // Get height
 func (t *Table) Height() int {
-	return t.Rows() * 100
+	h := t.Columns() * 100
+	if t.border > 0 {
+		h = h + BORDERHEIGHT
+	}
+
+	return h
 }
 
 // Get rows
