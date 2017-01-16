@@ -5,7 +5,7 @@ test:
 	@for pkg in `go list ./...`; do \
 		sub_pkg=$$(echo "$$pkg" | cut -d '/' -f 4) ; \
 		if [ $$sub_pkg ]; then \
-			go test -v $$pkg -coverprofile="$$sub_pkg".coverprofile ; \
+			richgo test -v $$pkg -coverprofile="$$sub_pkg".coverprofile ; \
 		fi \
 	done
 
