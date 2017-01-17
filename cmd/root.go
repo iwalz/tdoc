@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/dnephin/cobra"
 	"github.com/iwalz/tdoc/parser"
@@ -28,7 +28,8 @@ var RootCmd = &cobra.Command{
 		p := &parser.TdocParserImpl{}
 		l := parser.NewLexer(string(content), SvgDir)
 		p.Parse(l)
-		spew.Dump(p.AST())
+
+		spew.Dump(args)
 
 		return nil
 	},
@@ -38,7 +39,7 @@ var RootCmd = &cobra.Command{
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		os.Exit(-1)
 	}
 }
@@ -51,6 +52,8 @@ func init() {
 	// will be global for your application.
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.tdoc.yaml)")
 	RootCmd.PersistentFlags().StringVar(&SvgDir, "svgdir", "/home/ingo/svg", "Source directory for components. foo.svg will make component foo available")
+	RootCmd.PersistentFlags().BoolP("verbose", "v", false, "Enables verbose mode")
+	RootCmd.PersistentFlags().BoolP("debug", "d", false, "Enables debug mode")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -65,6 +68,6 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		log.Info("Using config file:", viper.ConfigFileUsed())
 	}
 }

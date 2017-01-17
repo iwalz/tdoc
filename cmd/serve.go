@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"io/ioutil"
-	"log"
 	"net/http"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/dnephin/cobra"
 	"github.com/iwalz/tdoc/parser"
 	"github.com/iwalz/tdoc/renderer"
