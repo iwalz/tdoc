@@ -402,5 +402,98 @@ func TestComplexAliasRelationDeclaration(t *testing.T) {
 
 	c3 := ast.Next()
 	assert.Nil(t, c3)
+}
 
+func TestNestingOnRootLevel(t *testing.T) {
+	p := &TdocParserImpl{}
+
+	p.Parse(NewLexer(`cloud foo as a1 {
+		actor foo as a2
+	}
+	cloud bar as a3 {
+		actor bar as a4
+	}`, ""))
+	ast := p.AST()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
+	c := ast.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
+	assert.Equal(t, "a1", c.(*elements.Component).Alias)
+	assert.Equal(t, "cloud", c.(*elements.Component).Typ)
+	/*relations := c.Relations()
+	r := relations[0]
+	assert.NotNil(t, r)*/
+
+	c1 := ast.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c1).String())
+	assert.Equal(t, "a3", c1.(*elements.Component).Alias)
+	assert.Equal(t, "cloud", c1.(*elements.Component).Typ)
+
+	a := c.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(a).String())
+	assert.Equal(t, "a2", a.(*elements.Component).Alias)
+	assert.Equal(t, "actor", a.(*elements.Component).Typ)
+
+	a1 := c.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(a1).String())
+	assert.Equal(t, "a4", a1.(*elements.Component).Alias)
+	assert.Equal(t, "actor", a1.(*elements.Component).Typ)
+
+	//assert.Equal(t, c1, r.Element())
+}
+
+func TestNestingOnSameLevel(t *testing.T) {
+	p := &TdocParserImpl{}
+
+	p.Parse(NewLexer(`cloud foo as a1 {
+		actor foo as b2 {
+		  node bar as c3
+			node bar as c4
+	  }
+		actor foo as b3 {
+		  node bar as c6
+			node bar as c7
+	  }
+	}
+	cloud bar as a3 {
+		actor bar as a4
+	}`, ""))
+	ast := p.AST()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
+	c := ast.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c).String())
+	assert.Equal(t, "a1", c.(*elements.Component).Alias)
+	assert.Equal(t, "cloud", c.(*elements.Component).Typ)
+	c1 := ast.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(c1).String())
+	assert.Equal(t, "a3", c1.(*elements.Component).Alias)
+	assert.Equal(t, "cloud", c1.(*elements.Component).Typ)
+
+	a := c.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(a).String())
+	assert.Equal(t, "b2", a.(*elements.Component).Alias)
+	assert.Equal(t, "actor", a.(*elements.Component).Typ)
+
+	n := a.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(n).String())
+	assert.Equal(t, "c3", n.(*elements.Component).Alias)
+	assert.Equal(t, "node", n.(*elements.Component).Typ)
+
+	n1 := a.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(n1).String())
+	assert.Equal(t, "c4", n1.(*elements.Component).Alias)
+	assert.Equal(t, "node", n1.(*elements.Component).Typ)
+
+	q := a.Next()
+	assert.Nil(t, q)
+
+	a1 := c.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(a1).String())
+	assert.Equal(t, "b3", a1.(*elements.Component).Alias)
+	assert.Equal(t, "actor", a1.(*elements.Component).Typ)
+
+	n2 := a1.Next()
+	assert.Equal(t, "*elements.Component", reflect.TypeOf(n2).String())
+	assert.Equal(t, "c6", n2.(*elements.Component).Alias)
+	assert.Equal(t, "node", n2.(*elements.Component).Typ)
+	//assert.Equal(t, c1, r.Element())
 }
