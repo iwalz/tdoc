@@ -5,13 +5,18 @@ package parser
 import (
   "fmt"
   "github.com/iwalz/tdoc/elements"
+<<<<<<< 56cefbd47bfdca72c90bf01fe368371a8960a24b
   log "github.com/Sirupsen/logrus"
   //"github.com/davecgh/go-spew/spew"
+=======
+  "github.com/davecgh/go-spew/spew"
+>>>>>>> First buggy rewrite sketch
 )
 
 var program *elements.Component
-var roots []*elements.Component
+var roots [][]*elements.Component
 var depth int
+var depths []int
 var registry *elements.Registry
 
 const debug = false
@@ -38,7 +43,7 @@ program: statement_list
 {
   log.Info("program: statement_list")
 
-  $$ = roots[0]
+  $$ = roots[0][0]
   program = $$
   //spew.Dump(program)
 }
@@ -51,7 +56,8 @@ statement_list: statement
 
   if depth == 0 && !$1.IsAdded() {
     $1.Added(true)
-    roots[depth].Add($1)
+    sub_depth := depths[depth]
+    roots[depth][sub_depth].Add($1)
   }
   //spew.Dump(roots[depth])
 }
@@ -65,7 +71,8 @@ statement_list statement
 
   if $2 != nil && !$2.IsAdded() {
     $2.Added(true)
-    roots[depth].Add($2)
+    sub_depth := depths[depth]
+    roots[depth][sub_depth].Add($2)
     //spew.Dump(roots[depth])
   }
 }
@@ -97,7 +104,8 @@ TEXT RELATION declaration
   elements.Get(registry, $1).AddRelation(rel)
   if !$3.IsAdded() {
     $3.Added(true)
-    roots[depth].Add($3)
+    sub_depth := depths[depth]
+    roots[depth][sub_depth].Add($3)
   }
   $$ = $3
 }
@@ -115,7 +123,8 @@ declaration RELATION TEXT
   $1.AddRelation(rel)
   if !c.IsAdded() {
     c.Added(true)
-    roots[depth].Add(c)
+    sub_depth := depths[depth]
+    roots[depth][sub_depth].Add(c)
   }
   $$ = c
 }
@@ -131,7 +140,8 @@ relation_assignment RELATION declaration
   rel.To($3)
   if !$3.IsAdded() {
     $3.Added(true)
-    roots[depth].Add($3)
+    sub_depth := depths[depth]
+    roots[depth][sub_depth].Add($3)
   }
   $1.AddRelation(rel)
   $$ = $3
@@ -151,12 +161,14 @@ declaration RELATION declaration
   rel.To($3)
   if !$1.IsAdded() {
     $1.Added(true)
-    roots[depth].Add($1)
+    sub_depth := depths[depth]
+    roots[depth][sub_depth].Add($1)
   }
 
   if !$3.IsAdded() {
     $3.Added(true)
-    roots[depth].Add($3)
+    sub_depth := depths[depth]
+    roots[depth][sub_depth].Add($3)
   }
 
   $1.AddRelation(rel)
@@ -171,9 +183,15 @@ declaration: COMPONENT IDENTIFIER
   $$ = elements.NewComponent($1, $2, "")
 
   if roots == nil {
-    roots = make([]*elements.Component, 0)
     program = elements.NewComponent("", "", "")
-    roots = append(roots, program)
+    roots = make([][]*elements.Component, 0)
+    sub := make([]*elements.Component, 0)
+    sub = append(sub, program)
+    roots = append(roots, sub)
+  }
+
+  if depths == nil {
+    depths = make([]int, 1)
   }
 
   if registry == nil {
@@ -191,9 +209,15 @@ declaration: COMPONENT IDENTIFIER
   $$ = elements.NewComponent($1, $2, $4)
 
   if roots == nil {
-    roots = make([]*elements.Component, 0)
     program = elements.NewComponent("", "", "")
-    roots = append(roots, program)
+    roots = make([][]*elements.Component, 0)
+    sub := make([]*elements.Component, 0)
+    sub = append(sub, program)
+    roots = append(roots, sub)
+  }
+
+  if depths == nil {
+    depths = make([]int, 1)
   }
 
   if registry == nil {
@@ -206,17 +230,31 @@ declaration SCOPEIN
 {
   log.Info("declaration SCOPEIN")
   log.Debug($1)
-  roots[depth].Add($1)
+
   depth = depth + 1
+  sub := make([]*elements.Component, 0)
+  sub = append(sub, $1)
+  roots = append(roots, sub)
+
+  sub_depth := depths[depth]
+  fmt.Println("Scope in")
+  depths = append(depths, 0)
+  fmt.Println("Depth: ", depth)
+  fmt.Println("Index: ", depths[depth])
+  roots[depth] = append(roots[depth], $1)
+  roots[depth][sub_depth].Add($1)
+
   $1.Added(true)
-  roots = append(roots, $1)
-  //roots[depth].Add($1)
+  spew.Dump(roots)
+
+  depths[depth] = depths[depth] + 1
+  depth = depth + 1
 }
 |
 SCOPEOUT
 {
   log.Info("SCOPEOUT")
-  $$ = roots[depth]
+  $$ = roots[depth][depths[depth]]
   depth = depth - 1
 }
 ;
@@ -227,5 +265,6 @@ SCOPEOUT
 func (p *TdocParserImpl) AST() *elements.Component {
   roots = nil
   registry = nil
+  depths = nil
   return program
 }

@@ -1,32 +1,39 @@
+
 //line parser/tdoc.y:2
+
 package parser
-
 import __yyfmt__ "fmt"
-
 //line parser/tdoc.y:3
+		
 import (
-	"fmt"
-	log "github.com/Sirupsen/logrus"
-	"github.com/iwalz/tdoc/elements"
-	//"github.com/davecgh/go-spew/spew"
+  "fmt"
+  "github.com/iwalz/tdoc/elements"
+<<<<<<< 56cefbd47bfdca72c90bf01fe368371a8960a24b
+  log "github.com/Sirupsen/logrus"
+  //"github.com/davecgh/go-spew/spew"
+=======
+  "github.com/davecgh/go-spew/spew"
+>>>>>>> First buggy rewrite sketch
 )
 
 var program *elements.Component
-var roots []*elements.Component
+var roots [][]*elements.Component
 var depth int
+var depths []int
 var registry *elements.Registry
 
 const debug = false
 
-//line parser/tdoc.y:25
-type TdocSymType struct {
-	yys       int
-	val       string
-	pos       int
-	line      int
-	token     int
-	component *elements.Component
-	relation  elements.Relation
+
+//line parser/tdoc.y:30
+type TdocSymType struct{
+	yys int
+  val string
+  pos int
+  line int
+  token int
+  component *elements.Component
+  relation elements.Relation
 }
 
 const SCOPEIN = 57346
@@ -57,14 +64,14 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:225
-
-/* Start of the program */
+//line parser/tdoc.y:263
+ /* Start of the program */
 
 func (p *TdocParserImpl) AST() *elements.Component {
-	roots = nil
-	registry = nil
-	return program
+  roots = nil
+  registry = nil
+  depths = nil
+  return program
 }
 
 //line yacctab:1
@@ -136,7 +143,8 @@ var TdocErrorMessages = [...]struct {
 	state int
 	token int
 	msg   string
-}{}
+}{
+}
 
 //line yaccpar:1
 
@@ -470,201 +478,234 @@ Tdocdefault:
 	switch Tdocnt {
 
 	case 1:
-		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:38
+		TdocDollar = TdocS[Tdocpt-1:Tdocpt+1]
+		//line parser/tdoc.y:43
 		{
-			log.Info("program: statement_list")
-
-			TdocVAL.component = roots[0]
-			program = TdocVAL.component
-			//spew.Dump(program)
-		}
+	  log.Info("program: statement_list")
+	
+	  TdocVAL.component = roots[0][0]
+	  program = TdocVAL.component
+	  //spew.Dump(program)
+}
 	case 2:
-		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:47
+		TdocDollar = TdocS[Tdocpt-1:Tdocpt+1]
+		//line parser/tdoc.y:52
 		{
-			log.Info("statement_list: statement")
-			log.Debug("Depth", depth)
-			log.Debug(TdocDollar[1].component)
-
-			if depth == 0 && !TdocDollar[1].component.IsAdded() {
-				TdocDollar[1].component.Added(true)
-				roots[depth].Add(TdocDollar[1].component)
-			}
-			//spew.Dump(roots[depth])
-		}
+	  log.Info("statement_list: statement")
+	  log.Debug("Depth", depth)
+	  log.Debug(TdocDollar[1].component)
+	
+	  if depth == 0 && !TdocDollar[1].component.IsAdded() {
+	    TdocDollar[1].component.Added(true)
+	    sub_depth := depths[depth]
+	    roots[depth][sub_depth].Add(TdocDollar[1].component)
+	  }
+	  //spew.Dump(roots[depth])
+}
 	case 3:
-		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:60
+		TdocDollar = TdocS[Tdocpt-2:Tdocpt+1]
+		//line parser/tdoc.y:66
 		{
-			log.Info("statement_list statement")
-			log.Debug("Depth", depth)
-			log.Debug(TdocDollar[1].component)
-			log.Debug(TdocDollar[2].component)
-
-			if TdocDollar[2].component != nil && !TdocDollar[2].component.IsAdded() {
-				TdocDollar[2].component.Added(true)
-				roots[depth].Add(TdocDollar[2].component)
-				//spew.Dump(roots[depth])
-			}
-		}
+	  log.Info("statement_list statement")
+	  log.Debug("Depth", depth)
+	  log.Debug(TdocDollar[1].component)
+	  log.Debug(TdocDollar[2].component)
+	
+	  if TdocDollar[2].component != nil && !TdocDollar[2].component.IsAdded() {
+	    TdocDollar[2].component.Added(true)
+	    sub_depth := depths[depth]
+	    roots[depth][sub_depth].Add(TdocDollar[2].component)
+	    //spew.Dump(roots[depth])
+  }
+	}
 	case 6:
-		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:77
+		TdocDollar = TdocS[Tdocpt-3:Tdocpt+1]
+		//line parser/tdoc.y:84
 		{
-			log.Info("relation_assignment: TEXT RELATION TEXT")
-			log.Debug(TdocDollar[1].val)
-			log.Debug(TdocDollar[2].val)
-			log.Debug(TdocDollar[3].val)
-
-			rel, _ := elements.NewRelation(TdocDollar[2].val)
-			rel.To(elements.Get(registry, TdocDollar[3].val))
-			elements.Get(registry, TdocDollar[1].val).AddRelation(rel)
-		}
+	  log.Info("relation_assignment: TEXT RELATION TEXT")
+	  log.Debug(TdocDollar[1].val)
+	  log.Debug(TdocDollar[2].val)
+	  log.Debug(TdocDollar[3].val)
+	
+	  rel, _ := elements.NewRelation(TdocDollar[2].val)
+	  rel.To(elements.Get(registry, TdocDollar[3].val))
+	  elements.Get(registry, TdocDollar[1].val).AddRelation(rel)
+	}
 	case 7:
-		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:89
+		TdocDollar = TdocS[Tdocpt-3:Tdocpt+1]
+		//line parser/tdoc.y:96
 		{
-			log.Info("TEXT RELATION declaration")
-			log.Debug(TdocDollar[1].val)
-			log.Debug(TdocDollar[2].val)
-			log.Debug(TdocDollar[3].component)
-
-			rel, _ := elements.NewRelation(TdocDollar[2].val)
-			rel.To(TdocDollar[3].component)
-			elements.Get(registry, TdocDollar[1].val).AddRelation(rel)
-			if !TdocDollar[3].component.IsAdded() {
-				TdocDollar[3].component.Added(true)
-				roots[depth].Add(TdocDollar[3].component)
-			}
-			TdocVAL.component = TdocDollar[3].component
-		}
+	  log.Info("TEXT RELATION declaration")
+	  log.Debug(TdocDollar[1].val)
+	  log.Debug(TdocDollar[2].val)
+	  log.Debug(TdocDollar[3].component)
+	
+	  rel, _ := elements.NewRelation(TdocDollar[2].val)
+	  rel.To(TdocDollar[3].component)
+	  elements.Get(registry, TdocDollar[1].val).AddRelation(rel)
+	  if !TdocDollar[3].component.IsAdded() {
+	    TdocDollar[3].component.Added(true)
+	    sub_depth := depths[depth]
+	    roots[depth][sub_depth].Add(TdocDollar[3].component)
+	  }
+	  TdocVAL.component = TdocDollar[3].component
+	}
 	case 8:
-		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:106
+		TdocDollar = TdocS[Tdocpt-3:Tdocpt+1]
+		//line parser/tdoc.y:114
 		{
-			log.Info("declaration RELATION TEXT")
-			log.Debug(TdocDollar[1].component)
-			log.Debug(TdocDollar[2].val)
-			log.Debug(TdocDollar[3].val)
-
-			c := elements.Get(registry, TdocDollar[3].val)
-			rel, _ := elements.NewRelation(TdocDollar[2].val)
-			rel.To(c)
-			TdocDollar[1].component.AddRelation(rel)
-			if !c.IsAdded() {
-				c.Added(true)
-				roots[depth].Add(c)
-			}
-			TdocVAL.component = c
-		}
+	  log.Info("declaration RELATION TEXT")
+	  log.Debug(TdocDollar[1].component)
+	  log.Debug(TdocDollar[2].val)
+	  log.Debug(TdocDollar[3].val)
+	
+	  c := elements.Get(registry, TdocDollar[3].val)
+	  rel, _ := elements.NewRelation(TdocDollar[2].val)
+	  rel.To(c)
+	  TdocDollar[1].component.AddRelation(rel)
+	  if !c.IsAdded() {
+	    c.Added(true)
+	    sub_depth := depths[depth]
+	    roots[depth][sub_depth].Add(c)
+	  }
+	  TdocVAL.component = c
+	}
 	case 9:
-		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:124
+		TdocDollar = TdocS[Tdocpt-3:Tdocpt+1]
+		//line parser/tdoc.y:133
 		{
-			log.Info("relation_assignment RELATION declaration")
-			log.Debug(TdocDollar[1].component)
-			log.Debug(TdocDollar[2].val)
-			log.Debug(TdocDollar[3].component)
-
-			rel, _ := elements.NewRelation(TdocDollar[2].val)
-			rel.To(TdocDollar[3].component)
-			if !TdocDollar[3].component.IsAdded() {
-				TdocDollar[3].component.Added(true)
-				roots[depth].Add(TdocDollar[3].component)
-			}
-			TdocDollar[1].component.AddRelation(rel)
-			TdocVAL.component = TdocDollar[3].component
-		}
+	  log.Info("relation_assignment RELATION declaration")
+	  log.Debug(TdocDollar[1].component)
+	  log.Debug(TdocDollar[2].val)
+	  log.Debug(TdocDollar[3].component)
+	
+	  rel, _ := elements.NewRelation(TdocDollar[2].val)
+	  rel.To(TdocDollar[3].component)
+	  if !TdocDollar[3].component.IsAdded() {
+	    TdocDollar[3].component.Added(true)
+	    sub_depth := depths[depth]
+	    roots[depth][sub_depth].Add(TdocDollar[3].component)
+	  }
+	  TdocDollar[1].component.AddRelation(rel)
+	  TdocVAL.component = TdocDollar[3].component
+	}
 	case 10:
-		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:141
+		TdocDollar = TdocS[Tdocpt-3:Tdocpt+1]
+		//line parser/tdoc.y:151
 		{
-			log.Info("declaration RELATION declaration")
-			log.Debug(TdocDollar[1].component)
-			log.Debug(TdocDollar[2].val)
-			log.Debug(TdocDollar[3].component)
-
-			if debug {
-				fmt.Println("declaration RELATION declaration", TdocDollar[1].component, TdocDollar[3].component)
-			}
-			rel, _ := elements.NewRelation(TdocDollar[2].val)
-			rel.To(TdocDollar[3].component)
-			if !TdocDollar[1].component.IsAdded() {
-				TdocDollar[1].component.Added(true)
-				roots[depth].Add(TdocDollar[1].component)
-			}
-
-			if !TdocDollar[3].component.IsAdded() {
-				TdocDollar[3].component.Added(true)
-				roots[depth].Add(TdocDollar[3].component)
-			}
-
-			TdocDollar[1].component.AddRelation(rel)
-			TdocVAL.component = TdocDollar[3].component
-		}
+	  log.Info("declaration RELATION declaration")
+	  log.Debug(TdocDollar[1].component)
+	  log.Debug(TdocDollar[2].val)
+	  log.Debug(TdocDollar[3].component)
+	
+	  if debug {
+	    fmt.Println("declaration RELATION declaration", TdocDollar[1].component, TdocDollar[3].component)
+	  }
+	  rel, _ := elements.NewRelation(TdocDollar[2].val)
+	  rel.To(TdocDollar[3].component)
+	  if !TdocDollar[1].component.IsAdded() {
+	    TdocDollar[1].component.Added(true)
+	    sub_depth := depths[depth]
+	    roots[depth][sub_depth].Add(TdocDollar[1].component)
+	  }
+	
+	  if !TdocDollar[3].component.IsAdded() {
+	    TdocDollar[3].component.Added(true)
+	    sub_depth := depths[depth]
+	    roots[depth][sub_depth].Add(TdocDollar[3].component)
+	  }
+	
+	  TdocDollar[1].component.AddRelation(rel)
+	  TdocVAL.component = TdocDollar[3].component
+	}
 	case 11:
-		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:167
+		TdocDollar = TdocS[Tdocpt-2:Tdocpt+1]
+		//line parser/tdoc.y:179
 		{
-			log.Info("declaration: COMPONENT IDENTIFIER")
-			log.Debug(TdocDollar[1].val)
-			log.Debug(TdocDollar[2].val)
-			TdocVAL.component = elements.NewComponent(TdocDollar[1].val, TdocDollar[2].val, "")
-
-			if roots == nil {
-				roots = make([]*elements.Component, 0)
-				program = elements.NewComponent("", "", "")
-				roots = append(roots, program)
-			}
-
-			if registry == nil {
-				registry = elements.NewRegistry()
-			}
-			registry.Add(TdocVAL.component)
-		}
+	  log.Info("declaration: COMPONENT IDENTIFIER")
+	  log.Debug(TdocDollar[1].val)
+	  log.Debug(TdocDollar[2].val)
+	  TdocVAL.component = elements.NewComponent(TdocDollar[1].val, TdocDollar[2].val, "")
+	
+	  if roots == nil {
+	    program = elements.NewComponent("", "", "")
+	    roots = make([][]*elements.Component, 0)
+	    sub := make([]*elements.Component, 0)
+	    sub = append(sub, program)
+	    roots = append(roots, sub)
+	  }
+	
+	  if depths == nil {
+	    depths = make([]int, 1)
+	  }
+	
+	  if registry == nil {
+	    registry = elements.NewRegistry()
+	  }
+	  registry.Add(TdocVAL.component)
+	}
 	case 12:
-		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:185
+		TdocDollar = TdocS[Tdocpt-4:Tdocpt+1]
+		//line parser/tdoc.y:203
 		{
-			log.Info("COMPONENT IDENTIFIER ALIAS TEXT")
-			log.Debug(TdocDollar[1].val)
-			log.Debug(TdocDollar[2].val)
-			log.Debug(TdocDollar[3].val)
-			log.Debug(TdocDollar[4].val)
-			TdocVAL.component = elements.NewComponent(TdocDollar[1].val, TdocDollar[2].val, TdocDollar[4].val)
-
-			if roots == nil {
-				roots = make([]*elements.Component, 0)
-				program = elements.NewComponent("", "", "")
-				roots = append(roots, program)
-			}
-
-			if registry == nil {
-				registry = elements.NewRegistry()
-			}
-			registry.Add(TdocVAL.component)
-		}
+	  log.Info("COMPONENT IDENTIFIER ALIAS TEXT")
+	  log.Debug(TdocDollar[1].val)
+	  log.Debug(TdocDollar[2].val)
+	  log.Debug(TdocDollar[3].val)
+	  log.Debug(TdocDollar[4].val)
+	  TdocVAL.component = elements.NewComponent(TdocDollar[1].val, TdocDollar[2].val, TdocDollar[4].val)
+	
+	  if roots == nil {
+	    program = elements.NewComponent("", "", "")
+	    roots = make([][]*elements.Component, 0)
+	    sub := make([]*elements.Component, 0)
+	    sub = append(sub, program)
+	    roots = append(roots, sub)
+	  }
+	
+	  if depths == nil {
+	    depths = make([]int, 1)
+	  }
+	
+	  if registry == nil {
+	    registry = elements.NewRegistry()
+	  }
+	  registry.Add(TdocVAL.component)
+	}
 	case 13:
-		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:206
+		TdocDollar = TdocS[Tdocpt-2:Tdocpt+1]
+		//line parser/tdoc.y:230
 		{
-			log.Info("declaration SCOPEIN")
-			log.Debug(TdocDollar[1].component)
-			roots[depth].Add(TdocDollar[1].component)
-			depth = depth + 1
-			TdocDollar[1].component.Added(true)
-			roots = append(roots, TdocDollar[1].component)
-			//roots[depth].Add($1)
-		}
+	  log.Info("declaration SCOPEIN")
+	  log.Debug(TdocDollar[1].component)
+	
+	  depth = depth + 1
+	  sub := make([]*elements.Component, 0)
+	  sub = append(sub, TdocDollar[1].component)
+	  roots = append(roots, sub)
+	
+	  sub_depth := depths[depth]
+	  fmt.Println("Scope in")
+	  depths = append(depths, 0)
+	  fmt.Println("Depth: ", depth)
+	  fmt.Println("Index: ", depths[depth])
+	  roots[depth] = append(roots[depth], TdocDollar[1].component)
+	  roots[depth][sub_depth].Add(TdocDollar[1].component)
+	
+	  TdocDollar[1].component.Added(true)
+	  spew.Dump(roots)
+	
+	  depths[depth] = depths[depth] + 1
+	  depth = depth + 1
+	}
 	case 14:
-		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:217
+		TdocDollar = TdocS[Tdocpt-1:Tdocpt+1]
+		//line parser/tdoc.y:255
 		{
-			log.Info("SCOPEOUT")
-			TdocVAL.component = roots[depth]
-			depth = depth - 1
-		}
+	  log.Info("SCOPEOUT")
+	  TdocVAL.component = roots[depth][depths[depth]]
+	  depth = depth - 1
+	}
 	}
 	goto Tdocstack /* stack new state and value */
 }
