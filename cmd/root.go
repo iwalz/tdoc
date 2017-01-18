@@ -8,6 +8,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/dnephin/cobra"
 	"github.com/iwalz/tdoc/parser"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
 
@@ -25,7 +26,6 @@ var RootCmd = &cobra.Command{
 	Long:  `Long description`,
 	Args:  CheckFile,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		spew.Dump(verbose)
 		if verbose {
 			log.SetLevel(log.InfoLevel)
 		}
@@ -41,7 +41,7 @@ var RootCmd = &cobra.Command{
 		l := parser.NewLexer(string(content), SvgDir)
 		p.Parse(l)
 
-		spew.Dump(args)
+		spew.Dump(p.AST())
 
 		return nil
 	},
@@ -59,11 +59,12 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
+	defaultDir, _ := homedir.Expand("~/svg")
 	// Here you will define your flags and configuration settings.
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.tdoc.yaml)")
-	RootCmd.PersistentFlags().StringVar(&SvgDir, "svgdir", "/home/ingo/svg", "Source directory for components. foo.svg will make component foo available")
+	RootCmd.PersistentFlags().StringVar(&SvgDir, "svgdir", defaultDir, "Source directory for components. foo.svg will make component foo available")
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enables verbose mode")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Enables debug mode")
 }

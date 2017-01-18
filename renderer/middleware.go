@@ -96,7 +96,10 @@ type BaseMatrix struct {
 	matrix       map[int]map[int]bool
 }
 
-func NewMiddleware(e elements.Element) *Middleware {
+var dir string
+
+func NewMiddleware(e elements.Element, d string) *Middleware {
+	dir = d
 	return &Middleware{
 		matrix: e,
 	}
@@ -183,7 +186,7 @@ func (m *Middleware) Render(w http.ResponseWriter, req *http.Request) error {
 	for _, v := range b.components {
 		c, ok := v.(*elements.Component)
 		if ok {
-			file := "/home/ingo/svg/" + c.Typ + ".svg"
+			file := dir + "/" + c.Typ + ".svg"
 			posy := (c.Y()*height - height) + b.heightoffset
 			posx := (c.X()*width - width) + b.widthoffset
 			placepic(posx, posy, file)

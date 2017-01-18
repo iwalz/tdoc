@@ -9,7 +9,7 @@ install:
   - go get github.com/dnephin/cobra/cobra
   - go get github.com/ajstarks/svgo
   - go get github.com/kyoh86/richgo
-  - go get github.com/Sirupsen/logrus
+  - go get github.com/mitchellh/go-homedir
 before_install:
   - make yacc
   - go get github.com/mattn/goveralls
