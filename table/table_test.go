@@ -162,3 +162,13 @@ func TestAdd(t *testing.T) {
 
 	assert.Nil(t, table.Component())
 }
+
+func TestBorderCalculation(t *testing.T) {
+	table := NewTable()
+	table.SetBorder(BORDER)
+	table.SetCaption("Foo")
+	table.SetImage("bar")
+
+	assert.Equal(t, 140, table.Width())
+	assert.Equal(t, 140, table.Height())
+}

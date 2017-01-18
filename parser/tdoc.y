@@ -5,6 +5,7 @@ package parser
 import (
   "fmt"
   "github.com/iwalz/tdoc/elements"
+  log "github.com/Sirupsen/logrus"
   //"github.com/davecgh/go-spew/spew"
 )
 
@@ -35,9 +36,7 @@ const debug = false
 // Statement declaration, only do add here
 program: statement_list
 {
-  if debug {
-    fmt.Println("program")
-  }
+  log.Info("program: statement_list")
 
   $$ = roots[0]
   program = $$
@@ -46,9 +45,10 @@ program: statement_list
 ;
 statement_list: statement
 {
-  if debug {
-    fmt.Println("statement_list single", depth, $1)
-  }
+  log.Info("statement_list: statement")
+  log.Debug("Depth", depth)
+  log.Debug($1)
+
   if depth == 0 && !$1.IsAdded() {
     $1.Added(true)
     roots[depth].Add($1)
@@ -58,9 +58,11 @@ statement_list: statement
 |
 statement_list statement
 {
-  if debug {
-    fmt.Println("statement_list multi", depth, $1, $2)
-  }
+  log.Info("statement_list statement")
+  log.Debug("Depth", depth)
+  log.Debug($1)
+  log.Debug($2)
+
   if $2 != nil && !$2.IsAdded() {
     $2.Added(true)
     roots[depth].Add($2)
@@ -73,6 +75,11 @@ statement: declaration | relation_assignment
 
 relation_assignment: TEXT RELATION TEXT
 {
+  log.Info("relation_assignment: TEXT RELATION TEXT")
+  log.Debug($1)
+  log.Debug($2)
+  log.Debug($3)
+
   rel, _ := elements.NewRelation($2)
   rel.To(elements.Get(registry, $3))
   elements.Get(registry, $1).AddRelation(rel)
@@ -80,9 +87,11 @@ relation_assignment: TEXT RELATION TEXT
 |
 TEXT RELATION declaration
 {
-  if debug {
-    fmt.Println("TEXT RELATION declaration", $1, $2, $3)
-  }
+  log.Info("TEXT RELATION declaration")
+  log.Debug($1)
+  log.Debug($2)
+  log.Debug($3)
+
   rel, _ := elements.NewRelation($2)
   rel.To($3)
   elements.Get(registry, $1).AddRelation(rel)
@@ -95,6 +104,11 @@ TEXT RELATION declaration
 |
 declaration RELATION TEXT
 {
+  log.Info("declaration RELATION TEXT")
+  log.Debug($1)
+  log.Debug($2)
+  log.Debug($3)
+
   c := elements.Get(registry, $3)
   rel, _ := elements.NewRelation($2)
   rel.To(c)
@@ -108,9 +122,11 @@ declaration RELATION TEXT
 |
 relation_assignment RELATION declaration
 {
-  if debug {
-    fmt.Println("relation_assignment RELATION declaration", $1, $3)
-  }
+  log.Info("relation_assignment RELATION declaration")
+  log.Debug($1)
+  log.Debug($2)
+  log.Debug($3)
+
   rel, _ := elements.NewRelation($2)
   rel.To($3)
   if !$3.IsAdded() {
@@ -123,6 +139,11 @@ relation_assignment RELATION declaration
 |
 declaration RELATION declaration
 {
+  log.Info("declaration RELATION declaration")
+  log.Debug($1)
+  log.Debug($2)
+  log.Debug($3)
+
   if debug {
     fmt.Println("declaration RELATION declaration", $1, $3)
   }
@@ -144,9 +165,9 @@ declaration RELATION declaration
 
 declaration: COMPONENT IDENTIFIER
 {
-  if debug {
-    fmt.Println("Component", $1, $2)
-  }
+  log.Info("declaration: COMPONENT IDENTIFIER")
+  log.Debug($1)
+  log.Debug($2)
   $$ = elements.NewComponent($1, $2, "")
 
   if roots == nil {
@@ -162,9 +183,11 @@ declaration: COMPONENT IDENTIFIER
 }
 | COMPONENT IDENTIFIER ALIAS TEXT
 {
-  if debug {
-    fmt.Println("alias")
-  }
+  log.Info("COMPONENT IDENTIFIER ALIAS TEXT")
+  log.Debug($1)
+  log.Debug($2)
+  log.Debug($3)
+  log.Debug($4)
   $$ = elements.NewComponent($1, $2, $4)
 
   if roots == nil {
@@ -181,9 +204,8 @@ declaration: COMPONENT IDENTIFIER
 |
 declaration SCOPEIN
 {
-  if debug {
-    fmt.Println("Scope in")
-  }
+  log.Info("declaration SCOPEIN")
+  log.Debug($1)
   roots[depth].Add($1)
   depth = depth + 1
   $1.Added(true)
@@ -193,9 +215,7 @@ declaration SCOPEIN
 |
 SCOPEOUT
 {
-  if debug {
-    fmt.Println("Scope out")
-  }
+  log.Info("SCOPEOUT")
   $$ = roots[depth]
   depth = depth - 1
 }
