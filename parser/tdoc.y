@@ -5,12 +5,8 @@ package parser
 import (
   "fmt"
   "github.com/iwalz/tdoc/elements"
-<<<<<<< 56cefbd47bfdca72c90bf01fe368371a8960a24b
   log "github.com/Sirupsen/logrus"
-  //"github.com/davecgh/go-spew/spew"
-=======
   "github.com/davecgh/go-spew/spew"
->>>>>>> First buggy rewrite sketch
 )
 
 var program *elements.Component
