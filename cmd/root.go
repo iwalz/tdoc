@@ -11,8 +11,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
-var SvgDir string
+var (
+	cfgFile string
+	SvgDir  string
+	verbose bool
+	debug   bool
+)
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -21,6 +25,14 @@ var RootCmd = &cobra.Command{
 	Long:  `Long description`,
 	Args:  CheckFile,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		spew.Dump(verbose)
+		if verbose {
+			log.SetLevel(log.InfoLevel)
+		}
+		if debug {
+			log.SetLevel(log.DebugLevel)
+		}
+
 		content, err := ioutil.ReadFile(args[0])
 		if err != nil {
 			return err
@@ -52,8 +64,8 @@ func init() {
 	// will be global for your application.
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.tdoc.yaml)")
 	RootCmd.PersistentFlags().StringVar(&SvgDir, "svgdir", "/home/ingo/svg", "Source directory for components. foo.svg will make component foo available")
-	RootCmd.PersistentFlags().BoolP("verbose", "v", false, "Enables verbose mode")
-	RootCmd.PersistentFlags().BoolP("debug", "d", false, "Enables debug mode")
+	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enables verbose mode")
+	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Enables debug mode")
 }
 
 // initConfig reads in config file and ENV variables if set.
