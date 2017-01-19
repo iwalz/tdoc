@@ -7,6 +7,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/dnephin/cobra"
+	"github.com/iwalz/tdoc/elements"
 	"github.com/iwalz/tdoc/parser"
 	"github.com/spf13/viper"
 )
@@ -38,7 +39,7 @@ var RootCmd = &cobra.Command{
 			return err
 		}
 		p := &parser.TdocParserImpl{}
-		l := parser.NewLexer(string(content), SvgDir)
+		l := parser.NewLexer(string(content), elements.NewComponentsList(SvgDir))
 		p.Parse(l)
 
 		spew.Dump(args)

@@ -2,9 +2,6 @@ package parser
 
 import (
 	"fmt"
-	"io/ioutil"
-	"log"
-	"strings"
 	"unicode/utf8"
 
 	"github.com/iwalz/tdoc/elements"
@@ -15,6 +12,8 @@ const eof = -1
 type Pos int
 type stateFn func(*Lexer) stateFn
 type TokenType int
+
+var componentsList *elements.ComponentsList
 
 type Lexer struct {
 	input  string // input to scan
@@ -51,26 +50,15 @@ func (l *Lexer) Error(s string) {
 	fmt.Println("syntax error: ", s, l.pos)
 }
 
-func NewLexer(input, source string) *Lexer {
+func NewLexer(input string, cl *elements.ComponentsList) *Lexer {
 	l := &Lexer{
 		input:  input,
 		state:  lexText,
 		tokens: make(chan token, 2),
 	}
 
-	if source != "" {
-		files, err := ioutil.ReadDir(source)
-		if err != nil {
-			log.Println("Error while reading components", err)
-		}
-
-		for _, v := range files {
-			if strings.HasSuffix(v.Name(), ".svg") {
-				name := strings.Replace(v.Name(), ".svg", "", 1)
-				components[name] = COMPONENT
-			}
-		}
-	}
+	componentsList = cl
+	componentsList.Parse()
 
 	return l
 }
@@ -154,11 +142,7 @@ var keywords = map[string]TokenType{
 
 // Check for components
 func (l *Lexer) isComponent() bool {
-	if _, ok := components[l.input[l.start:l.pos]]; ok {
-		return true
-	}
-
-	return false
+	return componentsList.Exists(l.input[l.start:l.pos])
 }
 
 func (l *Lexer) isScope() bool {

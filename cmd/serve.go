@@ -6,6 +6,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/dnephin/cobra"
+	"github.com/iwalz/tdoc/elements"
 	"github.com/iwalz/tdoc/parser"
 	"github.com/iwalz/tdoc/renderer"
 )
@@ -32,7 +33,7 @@ var serveCmd = &cobra.Command{
 				log.Error("Could not open file ", args[0])
 			}
 			p := &parser.TdocParserImpl{}
-			l := parser.NewLexer(string(content), SvgDir)
+			l := parser.NewLexer(string(content), elements.NewComponentsList(SvgDir))
 			p.Parse(l)
 			m := renderer.NewMiddleware(p.AST())
 

@@ -3,6 +3,7 @@ package parser
 import (
 	"testing"
 
+	"github.com/iwalz/tdoc/elements"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,7 +18,7 @@ func TestSimpleTextNextToken(t *testing.T) {
 		{TEXT, "foo"},
 	}
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	for _, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -29,7 +30,7 @@ func TestSimpleTextNextToken(t *testing.T) {
 func TestEmptyInput(t *testing.T) {
 	input := ``
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	lval := &TdocSymType{}
 	tok := l.Lex(lval)
 	assert.Equal(t, 0, tok)
@@ -55,7 +56,7 @@ func TestComplexTextNextToken(t *testing.T) {
 		{TEXT, "le"},
 	}
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	for _, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -76,7 +77,7 @@ func TestSimpleComponentNextToken(t *testing.T) {
 		{COMPONENT, "node"},
 	}
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	for _, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -100,7 +101,7 @@ func TestSimpleMixNextToken(t *testing.T) {
 		{IDENTIFIER, "duck"},
 	}
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	for _, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -120,7 +121,7 @@ func TestSingleQuoteIdentifier(t *testing.T) {
 		{IDENTIFIER, "test foo"},
 	}
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	for _, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -140,7 +141,7 @@ func TestDoubleQuoteIdentifier(t *testing.T) {
 		{IDENTIFIER, "test foo"},
 	}
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	for _, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -161,7 +162,7 @@ foo"`
 		{IDENTIFIER, "test\nfoo"},
 	}
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	for _, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -184,7 +185,7 @@ foo" as foo`
 		{TEXT, "foo"},
 	}
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	for _, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -206,7 +207,7 @@ func TestSimpleAliasDeclaration(t *testing.T) {
 		{TEXT, "foo"},
 	}
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	for _, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -228,7 +229,7 @@ func TestDigitContainingAndUnicodeAliasDeclaration(t *testing.T) {
 		{TEXT, "fo12☂o"},
 	}
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	for _, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -250,7 +251,7 @@ func TestAliasAsIdentifierDeclaration(t *testing.T) {
 		{ERROR, "Aliases are not allowed to be quoted"},
 	}
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	for _, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -273,7 +274,7 @@ func TestUnicodeMixNextToken(t *testing.T) {
 		{COMPONENT, "node"},
 	}
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	for _, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -299,7 +300,7 @@ func TestDeclarationCombination(t *testing.T) {
 		{TEXT, "bar☂"},
 	}
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	for _, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -325,7 +326,7 @@ func TestMultipleNonAliasedMixedTokens(t *testing.T) {
 		{IDENTIFIER, "baz"},
 	}
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	for _, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -349,7 +350,7 @@ func TestScopeToken(t *testing.T) {
 		{SCOPEOUT, "}"},
 	}
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	for _, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -383,7 +384,7 @@ func TestNestedScopeToken(t *testing.T) {
 		{SCOPEOUT, "}"},
 	}
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	for _, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -406,7 +407,7 @@ func TestIsRelation(t *testing.T) {
 		{IDENTIFIER, "bar"},
 	}
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	for _, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -429,7 +430,7 @@ func TestSimpleRelationToken(t *testing.T) {
 		{IDENTIFIER, "bar"},
 	}
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	for _, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
@@ -487,7 +488,7 @@ func TestSimpleIDRelationToken(t *testing.T) {
 		{TEXT, "bar"},
 	}
 
-	l := NewLexer(input, "")
+	l := NewLexer(input, elements.NewComponentsList(""))
 	for _, tt := range tests {
 		lval := &TdocSymType{}
 		tok := l.Lex(lval)
