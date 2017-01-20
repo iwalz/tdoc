@@ -70,3 +70,23 @@ func TestThemedComponentsList(t *testing.T) {
 	assert.False(t, cl.Exists("baz"))
 	assert.False(t, cl.Exists("aws_foo"))
 }
+
+func TestErrorsComponentsList(t *testing.T) {
+	cl := NewComponentsList("/foo")
+
+	mfs := afero.NewMemMapFs()
+	cl.fs = mfs
+	err := cl.Parse()
+
+	assert.EqualError(t, err, "open /foo: file does not exist")
+
+	cl1 := NewComponentsList("/foo")
+
+	mfs1 := afero.NewMemMapFs()
+	mfs1.Mkdir("/foo", 0644)
+	mfs1.Mkdir("/foo/bar", 0000)
+	cl1.fs = mfs1
+	err1 := cl1.Parse()
+
+	assert.Nil(t, err1)
+}

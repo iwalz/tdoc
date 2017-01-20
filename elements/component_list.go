@@ -3,7 +3,6 @@ package elements
 import (
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/afero"
 )
 
@@ -24,8 +23,8 @@ func NewComponentsList(s string) *ComponentsList {
 	return cl
 }
 
-func (cl *ComponentsList) Parse() {
-	cl.readDir("")
+func (cl *ComponentsList) Parse() error {
+	return cl.readDir()
 }
 
 func (cl *ComponentsList) Exists(s string) bool {
@@ -36,19 +35,16 @@ func (cl *ComponentsList) Exists(s string) bool {
 	return false
 }
 
-func (cl *ComponentsList) readDir(prefix string) {
+func (cl *ComponentsList) readDir() error {
 	if cl.dir != "" {
 		files, err := afero.ReadDir(cl.fs, cl.dir)
 		if err != nil {
-			log.Error("Error while reading components", err)
+			return err
 		}
 
 		for _, v := range files {
 			if v.IsDir() {
-				f, err := afero.ReadDir(cl.fs, cl.dir+"/"+v.Name())
-				if err != nil {
-					log.Error("Error while reading components", err)
-				}
+				f, _ := afero.ReadDir(cl.fs, cl.dir+"/"+v.Name())
 
 				for _, file := range f {
 					name := strings.Replace(file.Name(), ".svg", "", 1)
@@ -61,4 +57,6 @@ func (cl *ComponentsList) readDir(prefix string) {
 			}
 		}
 	}
+
+	return nil
 }
