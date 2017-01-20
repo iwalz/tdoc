@@ -25,7 +25,7 @@ func NewComponentsList(s string) *ComponentsList {
 }
 
 func (cl *ComponentsList) Parse() {
-	cl.readDir()
+	cl.readDir("")
 }
 
 func (cl *ComponentsList) Exists(s string) bool {
@@ -36,7 +36,7 @@ func (cl *ComponentsList) Exists(s string) bool {
 	return false
 }
 
-func (cl *ComponentsList) readDir() {
+func (cl *ComponentsList) readDir(prefix string) {
 	if cl.dir != "" {
 		files, err := afero.ReadDir(cl.fs, cl.dir)
 		if err != nil {
@@ -44,6 +44,17 @@ func (cl *ComponentsList) readDir() {
 		}
 
 		for _, v := range files {
+			if v.IsDir() {
+				f, err := afero.ReadDir(cl.fs, cl.dir+"/"+v.Name())
+				if err != nil {
+					log.Error("Error while reading components", err)
+				}
+
+				for _, file := range f {
+					name := strings.Replace(file.Name(), ".svg", "", 1)
+					cl.components[v.Name()+"_"+name] = cl.dir + "/" + file.Name()
+				}
+			}
 			if strings.HasSuffix(v.Name(), ".svg") {
 				name := strings.Replace(v.Name(), ".svg", "", 1)
 				cl.components[name] = cl.dir + "/" + v.Name()
