@@ -17,6 +17,9 @@ func TestNestedComponents(t *testing.T) {
 	assert.Nil(t, c1.Next())
 	c1.Reset()
 	assert.Equal(t, c2, c1.Next())
+
+	c1.Added(true)
+	assert.True(t, c1.IsAdded())
 }
 
 func TestRelationsComponent(t *testing.T) {
