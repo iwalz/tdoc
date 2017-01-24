@@ -143,6 +143,7 @@ func (t *Table) increaseTo(x int, y int) {
 // Add finds the next free slot and adds a component there.
 // Increases the table if no free slot is available
 func (t *Table) Add(c *elements.Component) {
+
 	rowCount := t.Rows()
 	columnCount := t.Columns()
 	x, y := t.findFreeSlot()

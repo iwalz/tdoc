@@ -76,7 +76,8 @@ type cell struct {
 
 // Correctly initialize a cell
 func NewCell(c *elements.Component, cl elements.ComponentsList) *cell {
-	return &cell{component: c, width: 100, height: 100, rowspan: 1, colspan: 1, cl: cl}
+	fs := afero.NewOsFs()
+	return &cell{component: c, width: 100, height: 100, rowspan: 1, colspan: 1, cl: cl, fs: fs}
 }
 
 // Set with

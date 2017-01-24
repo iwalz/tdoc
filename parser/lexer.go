@@ -13,7 +13,7 @@ type Pos int
 type stateFn func(*Lexer) stateFn
 type TokenType int
 
-var componentsList *elements.ComponentsList
+var componentsList elements.ComponentsList
 
 type Lexer struct {
 	input  string // input to scan
@@ -50,7 +50,7 @@ func (l *Lexer) Error(s string) {
 	fmt.Println("syntax error: ", s, l.pos)
 }
 
-func NewLexer(input string, cl *elements.ComponentsList) *Lexer {
+func NewLexer(input string, cl elements.ComponentsList) *Lexer {
 	l := &Lexer{
 		input:  input,
 		state:  lexText,
