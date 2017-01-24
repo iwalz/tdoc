@@ -113,4 +113,7 @@ func TestGetFilenameByType(t *testing.T) {
 
 	c2 := NewComponent("aws_ec2_instance", "bar", "blubb")
 	assert.Equal(t, "/foo/aws/ec2_instance.svg", cl.GetFilenameByType(c2))
+
+	c3 := NewComponent("", "bar", "blubb")
+	assert.Equal(t, "", cl.GetFilenameByType(c3))
 }
