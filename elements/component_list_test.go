@@ -90,3 +90,27 @@ func TestErrorsComponentsList(t *testing.T) {
 
 	assert.Nil(t, err1)
 }
+
+func TestGetFilenameByType(t *testing.T) {
+	cl := NewComponentsList("/foo")
+
+	mfs := afero.NewMemMapFs()
+	mfs.MkdirAll("/foo", 0655)
+	mfs.Create("/foo/foo.svg")
+	mfs.Create("/foo/bar.svg")
+	mfs.Create("/foo/blubb.svg")
+	mfs.Create("/foo/aws/lambda.svg")
+	mfs.Create("/foo/aws/ec2_instance.svg")
+	mfs.Create("/foo/aws/sns.svg")
+
+	cl.fs = mfs
+	cl.Parse()
+	c := NewComponent("foo", "bar", "blubb")
+	assert.Equal(t, "/foo/foo.svg", cl.GetFilenameByType(c))
+
+	c1 := NewComponent("blubb", "bar", "blubb")
+	assert.Equal(t, "/foo/blubb.svg", cl.GetFilenameByType(c1))
+
+	c2 := NewComponent("aws_ec2_instance", "bar", "blubb")
+	assert.Equal(t, "/foo/aws/ec2_instance.svg", cl.GetFilenameByType(c2))
+}

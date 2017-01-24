@@ -8,7 +8,8 @@ import (
 )
 
 func TestAddTo(t *testing.T) {
-	table := NewTable()
+	cl := elements.NewComponentsList("")
+	table := NewTable(cl)
 	c := elements.NewComponent("node", "foo", "bar")
 	table.AddTo(1, 1, c)
 	c1, err := table.GetFrom(1, 1)
@@ -29,7 +30,8 @@ func TestAddTo(t *testing.T) {
 }
 
 func TestHigherAddTo(t *testing.T) {
-	table := NewTable()
+	cl := elements.NewComponentsList("")
+	table := NewTable(cl)
 	c := elements.NewComponent("node", "foo", "bar")
 	table.AddTo(10, 10, c)
 	c1, err := table.GetFrom(10, 10)
@@ -40,7 +42,8 @@ func TestHigherAddTo(t *testing.T) {
 }
 
 func TestFindFreeSlot(t *testing.T) {
-	table := NewTable()
+	cl := elements.NewComponentsList("")
+	table := NewTable(cl)
 	c := elements.NewComponent("node", "foo", "bar")
 	table.AddTo(2, 2, c)
 	c1, err := table.GetFrom(2, 2)
@@ -54,7 +57,8 @@ func TestFindFreeSlot(t *testing.T) {
 }
 
 func TestMoreDimensionFindFreeSlot(t *testing.T) {
-	table := NewTable()
+	cl := elements.NewComponentsList("")
+	table := NewTable(cl)
 	c := elements.NewComponent("node", "foo", "bar")
 	table.AddTo(1, 1, c)
 	c1, err := table.GetFrom(1, 1)
@@ -114,7 +118,8 @@ func TestMoreDimensionFindFreeSlot(t *testing.T) {
 }
 
 func TestAdd(t *testing.T) {
-	table := NewTable()
+	cl := elements.NewComponentsList("")
+	table := NewTable(cl)
 	c := elements.NewComponent("node", "foo", "bar")
 
 	// Add first on row 1 and col 1
@@ -164,7 +169,8 @@ func TestAdd(t *testing.T) {
 }
 
 func TestBorderCalculation(t *testing.T) {
-	table := NewTable()
+	cl := elements.NewComponentsList("")
+	table := NewTable(cl)
 	table.SetBorder(BORDER)
 	table.SetCaption("Foo")
 	table.SetImage("bar")

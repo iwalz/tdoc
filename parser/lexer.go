@@ -58,7 +58,6 @@ func NewLexer(input string, cl *elements.ComponentsList) *Lexer {
 	}
 
 	componentsList = cl
-	componentsList.Parse()
 
 	return l
 }

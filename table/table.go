@@ -3,6 +3,7 @@ package table
 import (
 	"errors"
 
+	svg "github.com/ajstarks/svgo"
 	"github.com/iwalz/tdoc/elements"
 )
 
@@ -21,6 +22,9 @@ type tableAbstract interface {
 	Width() int
 	X() int
 	Y() int
+	SetX(int)
+	SetY(int)
+	Render(*svg.SVG) error
 }
 
 // Errors
@@ -35,11 +39,20 @@ type Table struct {
 	border  int
 	image   string
 	caption string
+	cl      *elements.ComponentsList
 }
 
 // Satisfy tableAbstract interface
 func (t *Table) Component() *elements.Component {
 	return nil
+}
+
+func (t *Table) SetX(x int) {
+	t.x = x
+}
+
+func (t *Table) SetY(y int) {
+	t.y = y
 }
 
 // Set Border for table
@@ -88,9 +101,9 @@ func (t *Table) Columns() int {
 }
 
 // Returns and initializes and empty table
-func NewTable() *Table {
+func NewTable(cl *elements.ComponentsList) *Table {
 	cells := make([][]tableAbstract, 1)
-	t := &Table{cells: cells}
+	t := &Table{cells: cells, cl: cl}
 	return t
 }
 
@@ -122,6 +135,10 @@ func (t *Table) increaseTo(x int, y int) {
 // Add finds the next free slot and adds a component there.
 // Increases the table if no free slot is available
 func (t *Table) Add(c *elements.Component) {
+	// Root element
+	if c.Typ == "" {
+		return
+	}
 	rowCount := t.Rows()
 	columnCount := t.Columns()
 	x, y := t.findFreeSlot()
@@ -154,12 +171,14 @@ func (t *Table) AddTo(x int, y int, c *elements.Component) error {
 		return ErrCellNotEmpty
 	}
 	// table starts at 1:1, slice at 0:0
-	t.cells[x-1][y-1] = NewCell(c)
+	t.cells[x-1][y-1] = NewCell(c, t.cl)
+	t.cells[x-1][y-1].SetX((x-1)*100 + 1)
+	t.cells[x-1][y-1].SetY((y-1)*100 + 1)
 
 	return nil
 }
 
-// Retries an element from pos x:y
+// Retrieves an element from pos x:y
 func (t *Table) GetFrom(x int, y int) (tableAbstract, error) {
 	if len(t.cells) < x {
 		return nil, ErrIndexOutOfBounds
@@ -170,6 +189,19 @@ func (t *Table) GetFrom(x int, y int) (tableAbstract, error) {
 	}
 
 	return t.cells[x-1][y-1], nil
+}
+
+// Calls render on all cell's
+func (t *Table) Render(svg *svg.SVG) error {
+	for x, vx := range t.cells {
+		for y, vy := range vx {
+			if vy != nil {
+				t.cells[x][y].Render(svg)
+			}
+		}
+	}
+
+	return nil
 }
 
 // Identifies next free slot in Table

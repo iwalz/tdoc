@@ -32,10 +32,13 @@ var serveCmd = &cobra.Command{
 			if err != nil {
 				log.Error("Could not open file ", args[0])
 			}
+			cl := elements.NewComponentsList(SvgDir)
+			cl.Parse()
 			p := &parser.TdocParserImpl{}
-			l := parser.NewLexer(string(content), elements.NewComponentsList(SvgDir))
+			l := parser.NewLexer(string(content), cl)
 			p.Parse(l)
-			m := renderer.NewMiddleware(p.AST())
+			ast := p.AST()
+			m := renderer.NewMiddleware(ast, cl)
 
 			m.Render(w, req)
 		}))

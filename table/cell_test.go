@@ -9,7 +9,8 @@ import (
 
 func TestCellInitialize(t *testing.T) {
 	c := elements.NewComponent("foo", "bar", "blubb")
-	cell := NewCell(c)
+	cl := elements.NewComponentsList("")
+	cell := NewCell(c, cl)
 	assert.Equal(t, c, cell.component)
 
 	assert.Equal(t, 100, cell.Height())
@@ -24,7 +25,8 @@ func TestCellInitialize(t *testing.T) {
 
 func TestColAndRowspan(t *testing.T) {
 	c := elements.NewComponent("foo", "bar", "blubb")
-	cell := NewCell(c)
+	cl := elements.NewComponentsList("")
+	cell := NewCell(c, cl)
 	assert.Equal(t, c, cell.component)
 	cell.Rowspan(1)
 	cell.Colspan(1)

@@ -35,6 +35,15 @@ func (cl *ComponentsList) Exists(s string) bool {
 	return false
 }
 
+func (cl *ComponentsList) GetFilenameByType(c *Component) string {
+	v, ok := cl.components[c.Typ]
+
+	if !ok {
+		return ""
+	}
+	return v
+}
+
 func (cl *ComponentsList) readDir() error {
 	if cl.dir != "" {
 		files, err := afero.ReadDir(cl.fs, cl.dir)
@@ -48,7 +57,7 @@ func (cl *ComponentsList) readDir() error {
 
 				for _, file := range f {
 					name := strings.Replace(file.Name(), ".svg", "", 1)
-					cl.components[v.Name()+"_"+name] = cl.dir + "/" + file.Name()
+					cl.components[v.Name()+"_"+name] = cl.dir + "/" + v.Name() + "/" + file.Name()
 				}
 			}
 			if strings.HasSuffix(v.Name(), ".svg") {
