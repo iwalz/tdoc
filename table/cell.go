@@ -4,19 +4,11 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
-	"os"
 
 	svg "github.com/ajstarks/svgo"
 	"github.com/iwalz/tdoc/elements"
+	"github.com/spf13/afero"
 )
-
-//var components chan elements.Element
-
-type PictureLocation struct {
-	x   int
-	y   int
-	typ string
-}
 
 type SVG struct {
 	Width  string `xml:"width,attr"`
@@ -30,12 +22,6 @@ const height = 100
 const borderwidth = 25
 const borderheight = 25
 
-var (
-	byrow                                          bool
-	startx, starty, count, gutter, gwidth, gheight int
-	canvas                                         *svg.SVG
-)
-
 // Renders the pic at its location
 func (c *cell) Render(svg *svg.SVG) error {
 	var (
@@ -47,7 +33,7 @@ func (c *cell) Render(svg *svg.SVG) error {
 	if filename == "" {
 		return nil
 	}
-	f, err := os.Open(filename)
+	f, err := c.fs.Open(filename)
 	if err != nil {
 		return err
 	}
@@ -84,11 +70,12 @@ type cell struct {
 	y         int
 	rowspan   int
 	colspan   int
-	cl        *elements.ComponentsList
+	cl        elements.ComponentsList
+	fs        afero.Fs
 }
 
 // Correctly initialize a cell
-func NewCell(c *elements.Component, cl *elements.ComponentsList) *cell {
+func NewCell(c *elements.Component, cl elements.ComponentsList) *cell {
 	return &cell{component: c, width: 100, height: 100, rowspan: 1, colspan: 1, cl: cl}
 }
 

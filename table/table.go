@@ -39,7 +39,7 @@ type Table struct {
 	border  int
 	image   string
 	caption string
-	cl      *elements.ComponentsList
+	cl      elements.ComponentsList
 }
 
 // Satisfy tableAbstract interface
@@ -53,6 +53,14 @@ func (t *Table) SetX(x int) {
 
 func (t *Table) SetY(y int) {
 	t.y = y
+}
+
+func (t *Table) X() int {
+	return t.x
+}
+
+func (t *Table) Y() int {
+	return t.y
 }
 
 // Set Border for table
@@ -101,7 +109,7 @@ func (t *Table) Columns() int {
 }
 
 // Returns and initializes and empty table
-func NewTable(cl *elements.ComponentsList) *Table {
+func NewTable(cl elements.ComponentsList) *Table {
 	cells := make([][]tableAbstract, 1)
 	t := &Table{cells: cells, cl: cl}
 	return t
@@ -135,10 +143,6 @@ func (t *Table) increaseTo(x int, y int) {
 // Add finds the next free slot and adds a component there.
 // Increases the table if no free slot is available
 func (t *Table) Add(c *elements.Component) {
-	// Root element
-	if c.Typ == "" {
-		return
-	}
 	rowCount := t.Rows()
 	columnCount := t.Columns()
 	x, y := t.findFreeSlot()

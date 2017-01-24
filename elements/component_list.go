@@ -6,28 +6,34 @@ import (
 	"github.com/spf13/afero"
 )
 
-type ComponentsList struct {
+type ComponentsList interface {
+	GetFilenameByType(*Component) string
+	Parse() error
+	Exists(string) bool
+}
+
+type CList struct {
 	dir        string            // Theme directory
 	components map[string]string // Internal component store
 	fs         afero.Fs          // File system mock
 }
 
-func NewComponentsList(s string) *ComponentsList {
+func NewComponentsList(s string) *CList {
 	c := make(map[string]string)
 	c["node"] = ""
 	c["actor"] = ""
 	c["cloud"] = ""
 	f := afero.NewOsFs()
-	cl := &ComponentsList{dir: s, components: c, fs: f}
+	cl := &CList{dir: s, components: c, fs: f}
 
 	return cl
 }
 
-func (cl *ComponentsList) Parse() error {
+func (cl *CList) Parse() error {
 	return cl.readDir()
 }
 
-func (cl *ComponentsList) Exists(s string) bool {
+func (cl *CList) Exists(s string) bool {
 	if _, ok := cl.components[s]; ok {
 		return true
 	}
@@ -35,7 +41,7 @@ func (cl *ComponentsList) Exists(s string) bool {
 	return false
 }
 
-func (cl *ComponentsList) GetFilenameByType(c *Component) string {
+func (cl *CList) GetFilenameByType(c *Component) string {
 	v, ok := cl.components[c.Typ]
 
 	if !ok {
@@ -44,7 +50,7 @@ func (cl *ComponentsList) GetFilenameByType(c *Component) string {
 	return v
 }
 
-func (cl *ComponentsList) readDir() error {
+func (cl *CList) readDir() error {
 	if cl.dir != "" {
 		files, err := afero.ReadDir(cl.fs, cl.dir)
 		if err != nil {
