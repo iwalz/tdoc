@@ -16,7 +16,7 @@ const (
 )
 
 // interface for table and cell (a cell can contain a table)
-type tableAbstract interface {
+type TableAbstract interface {
 	Component() *elements.Component
 	Height() int
 	Width() int
@@ -33,7 +33,7 @@ var ErrIndexOutOfBounds = errors.New("Index out of bounds")
 
 // Table representation
 type Table struct {
-	cells   [][]tableAbstract
+	cells   [][]TableAbstract
 	x       int
 	y       int
 	border  int
@@ -110,7 +110,7 @@ func (t *Table) Columns() int {
 
 // Returns and initializes and empty table
 func NewTable(cl elements.ComponentsList) *Table {
-	cells := make([][]tableAbstract, 1)
+	cells := make([][]TableAbstract, 1)
 	t := &Table{cells: cells, cl: cl}
 	return t
 }
@@ -120,7 +120,7 @@ func (t *Table) increaseTo(x int, y int) {
 	// Make sure first dimension works
 	for i := 0; i < x; i++ {
 		if len(t.cells) < x {
-			var rows []tableAbstract
+			var rows []TableAbstract
 			// Set second dimension
 			for index := 0; index < y; index++ {
 				rows = append(rows, nil)
@@ -184,7 +184,7 @@ func (t *Table) AddTo(x int, y int, c *elements.Component) error {
 }
 
 // Retrieves an element from pos x:y
-func (t *Table) GetFrom(x int, y int) (tableAbstract, error) {
+func (t *Table) GetFrom(x int, y int) (TableAbstract, error) {
 	if len(t.cells) < x {
 		return nil, ErrIndexOutOfBounds
 	}
