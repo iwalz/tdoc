@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
+	svg "github.com/ajstarks/svgo"
 	"github.com/dnephin/cobra"
 	"github.com/iwalz/tdoc/elements"
 	"github.com/iwalz/tdoc/parser"
@@ -34,13 +35,16 @@ var serveCmd = &cobra.Command{
 			}
 			cl := elements.NewComponentsList(SvgDir)
 			cl.Parse()
+
 			p := &parser.TdocParserImpl{}
 			l := parser.NewLexer(string(content), cl)
 			p.Parse(l)
 			ast := p.AST()
-			m := renderer.NewMiddleware(ast, cl)
 
-			m.Render(w, req)
+			m := renderer.NewMiddleware(ast, cl)
+			svg := svg.New(w)
+			m.Scan(ast, cl)
+			m.Render(svg)
 		}))
 
 		err := http.ListenAndServe(":"+port, nil)
