@@ -233,7 +233,7 @@ func (t *Table) Render(svg *svg.SVG) error {
 	if t.border > 0 {
 		x := t.X() + (borderheight / 2)
 		y := t.Y() + (borderwidth / 2)
-		svg.Roundrect(x, y, 100, 100, 5, 5, "fill:none;stroke:red")
+		svg.Roundrect(x, y, t.Width()-borderwidth, t.Height()-borderheight, 5, 5, "fill:none;stroke:black")
 	}
 
 	for x, vx := range t.cells {
