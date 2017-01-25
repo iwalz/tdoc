@@ -33,6 +33,7 @@ func (m *Middleware) Scan(e elements.Element, cl elements.ComponentsList) table.
 
 		if elem.HasChilds() {
 			st := m.Scan(c, cl)
+			st.(*table.Table).SetBorder(table.DASHED_BORDER)
 			t.Add(st)
 		} else {
 			// Add element

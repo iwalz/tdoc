@@ -116,6 +116,6 @@ func TestScan(t *testing.T) {
 	err := m.Render(svg)
 	assert.Nil(t, err)
 
-	assert.Equal(t, 200, table.Width())
-	assert.Equal(t, 200, table.Height())
+	assert.Equal(t, 240, table.Width())
+	assert.Equal(t, 240, table.Height())
 }

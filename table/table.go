@@ -229,10 +229,22 @@ func (t *Table) GetFrom(x int, y int) (TableAbstract, error) {
 
 // Calls render on all cell's
 func (t *Table) Render(svg *svg.SVG) error {
+	// Draw the border
+	if t.border > 0 {
+		x := t.X() + (borderheight / 2)
+		y := t.Y() + (borderwidth / 2)
+		svg.Roundrect(x, y, 100, 100, 5, 5, "fill:none;stroke:red")
+	}
+
 	for x, vx := range t.cells {
 		for y, vy := range vx {
 			if vy != nil {
-				t.cells[x][y].Render(svg)
+				cell := t.cells[x][y]
+				if t.border > 0 {
+					cell.SetX(cell.X() + (borderheight / 2))
+					cell.SetY(cell.Y() + (borderwidth / 2))
+				}
+				cell.Render(svg)
 			}
 		}
 	}
