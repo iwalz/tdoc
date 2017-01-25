@@ -80,17 +80,48 @@ func (t *Table) SetCaption(c string) {
 
 // Get width
 func (t *Table) Width() int {
-	w := t.Columns() * 100
-	if t.border > 0 {
-		w = w + BORDERHEIGHT
+	width := 0
+	for _, column := range t.cells {
+		colWidth := 0
+		// Only the widest row per column is of interest for the width
+		for _, component := range column {
+			if component != nil && component.Width() > colWidth {
+				colWidth = component.Width()
+			}
+		}
+		width = width + colWidth
 	}
 
-	return w
+	if t.border > 0 {
+		width = width + BORDERHEIGHT
+	}
+
+	return width
 }
 
 // Get height
 func (t *Table) Height() int {
-	h := t.Columns() * 100
+	var height []int
+	height = make([]int, 1)
+	for _, column := range t.cells {
+
+		// Only the highest column per row is of interest for the height
+		for r, component := range column {
+			if len(height) <= r {
+				height = append(height, 0)
+			}
+			h := height[r]
+			if component != nil && h < component.Height() {
+				height[r] = component.Height()
+			}
+		}
+	}
+
+	h := 0
+	for _, v := range height {
+		h = h + v
+	}
+
 	if t.border > 0 {
 		h = h + BORDERHEIGHT
 	}
@@ -142,7 +173,7 @@ func (t *Table) increaseTo(x int, y int) {
 
 // Add finds the next free slot and adds a component there.
 // Increases the table if no free slot is available
-func (t *Table) Add(c *elements.Component) {
+func (t *Table) Add(c TableAbstract) {
 
 	rowCount := t.Rows()
 	columnCount := t.Columns()
@@ -168,7 +199,7 @@ func (t *Table) Add(c *elements.Component) {
 }
 
 // Explicit add to x:y
-func (t *Table) AddTo(x int, y int, c *elements.Component) error {
+func (t *Table) AddTo(x int, y int, c TableAbstract) error {
 	t.increaseTo(x, y)
 	// check if cell is already used
 	r := t.cells[x-1][y-1]
@@ -176,7 +207,7 @@ func (t *Table) AddTo(x int, y int, c *elements.Component) error {
 		return ErrCellNotEmpty
 	}
 	// table starts at 1:1, slice at 0:0
-	t.cells[x-1][y-1] = NewCell(c, t.cl)
+	t.cells[x-1][y-1] = c
 	t.cells[x-1][y-1].SetX((x-1)*100 + 1)
 	t.cells[x-1][y-1].SetY((y-1)*100 + 1)
 

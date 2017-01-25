@@ -13,7 +13,8 @@ func TestAddTo(t *testing.T) {
 	cl := elements.NewComponentsList("")
 	table := NewTable(cl)
 	c := elements.NewComponent("node", "foo", "bar")
-	table.AddTo(1, 1, c)
+	cell := NewCell(c, cl)
+	table.AddTo(1, 1, cell)
 	c1, err := table.GetFrom(1, 1)
 	assert.Nil(t, err)
 
@@ -23,7 +24,7 @@ func TestAddTo(t *testing.T) {
 	assert.Equal(t, err, ErrIndexOutOfBounds)
 	assert.Nil(t, c2)
 
-	err = table.AddTo(1, 1, c)
+	err = table.AddTo(1, 1, cell)
 	assert.Equal(t, err, ErrCellNotEmpty)
 
 	c3, err := table.GetFrom(2, 1)
@@ -35,7 +36,8 @@ func TestHigherAddTo(t *testing.T) {
 	cl := elements.NewComponentsList("")
 	table := NewTable(cl)
 	c := elements.NewComponent("node", "foo", "bar")
-	table.AddTo(10, 10, c)
+	cell := NewCell(c, cl)
+	table.AddTo(10, 10, cell)
 	c1, err := table.GetFrom(10, 10)
 	assert.Nil(t, err)
 	assert.Equal(t, c, c1.Component())
@@ -47,7 +49,8 @@ func TestFindFreeSlot(t *testing.T) {
 	cl := elements.NewComponentsList("")
 	table := NewTable(cl)
 	c := elements.NewComponent("node", "foo", "bar")
-	table.AddTo(2, 2, c)
+	cell := NewCell(c, cl)
+	table.AddTo(2, 2, cell)
 	c1, err := table.GetFrom(2, 2)
 	assert.Nil(t, err)
 	assert.Equal(t, c, c1.Component())
@@ -62,7 +65,8 @@ func TestMoreDimensionFindFreeSlot(t *testing.T) {
 	cl := elements.NewComponentsList("")
 	table := NewTable(cl)
 	c := elements.NewComponent("node", "foo", "bar")
-	table.AddTo(1, 1, c)
+	cell := NewCell(c, cl)
+	table.AddTo(1, 1, cell)
 	c1, err := table.GetFrom(1, 1)
 	assert.Nil(t, err)
 	assert.Equal(t, c, c1.Component())
@@ -76,43 +80,43 @@ func TestMoreDimensionFindFreeSlot(t *testing.T) {
 	assert.Equal(t, 1, x)
 	assert.Equal(t, 2, y)
 
-	table.AddTo(1, 2, c)
+	table.AddTo(1, 2, cell)
 	x, y = table.findFreeSlot()
 	assert.Equal(t, 2, x)
 	assert.Equal(t, 1, y)
 
-	table.AddTo(2, 1, c)
+	table.AddTo(2, 1, cell)
 	x, y = table.findFreeSlot()
 	assert.Equal(t, 2, x)
 	assert.Equal(t, 2, y)
-	table.AddTo(2, 2, c)
+	table.AddTo(2, 2, cell)
 
 	table.increaseTo(3, 3)
 
 	x, y = table.findFreeSlot()
 	assert.Equal(t, 1, x)
 	assert.Equal(t, 3, y)
-	table.AddTo(1, 3, c)
+	table.AddTo(1, 3, cell)
 
 	x, y = table.findFreeSlot()
 	assert.Equal(t, 2, x)
 	assert.Equal(t, 3, y)
-	table.AddTo(2, 3, c)
+	table.AddTo(2, 3, cell)
 
 	x, y = table.findFreeSlot()
 	assert.Equal(t, 3, x)
 	assert.Equal(t, 1, y)
-	table.AddTo(3, 1, c)
+	table.AddTo(3, 1, cell)
 
 	x, y = table.findFreeSlot()
 	assert.Equal(t, 3, x)
 	assert.Equal(t, 2, y)
-	table.AddTo(3, 2, c)
+	table.AddTo(3, 2, cell)
 
 	x, y = table.findFreeSlot()
 	assert.Equal(t, 3, x)
 	assert.Equal(t, 3, y)
-	table.AddTo(3, 3, c)
+	table.AddTo(3, 3, cell)
 
 	x, y = table.findFreeSlot()
 	assert.Equal(t, 0, x)
@@ -123,9 +127,9 @@ func TestAdd(t *testing.T) {
 	cl := elements.NewComponentsList("")
 	table := NewTable(cl)
 	c := elements.NewComponent("node", "foo", "bar")
-
+	cell := NewCell(c, cl)
 	// Add first on row 1 and col 1
-	table.Add(c)
+	table.Add(cell)
 	assert.Equal(t, 1, table.Rows())
 	assert.Equal(t, 1, table.Columns())
 	e, err := table.GetFrom(1, 1)
@@ -133,7 +137,7 @@ func TestAdd(t *testing.T) {
 	assert.Nil(t, err)
 
 	// Add second on fist row and 2nd col
-	table.Add(c)
+	table.Add(cell)
 	assert.Equal(t, 1, table.Rows())
 	assert.Equal(t, 2, table.Columns())
 	e1, err := table.GetFrom(2, 1)
@@ -146,7 +150,7 @@ func TestAdd(t *testing.T) {
 	assert.Equal(t, 0, y)
 
 	// Third is on the 2nd row and first col
-	table.Add(c)
+	table.Add(cell)
 	assert.Equal(t, c, table.cells[0][1].Component())
 	e2, err := table.GetFrom(1, 2)
 	assert.Equal(t, c, e2.Component())
@@ -158,7 +162,7 @@ func TestAdd(t *testing.T) {
 	x, y = table.findFreeSlot()
 	assert.Equal(t, 2, x)
 	assert.Equal(t, 2, y)
-	table.Add(c)
+	table.Add(cell)
 	assert.Equal(t, c, table.cells[1][1].Component())
 	e3, err := table.GetFrom(2, 2)
 	assert.Equal(t, c, e3.Component())
@@ -172,12 +176,15 @@ func TestAdd(t *testing.T) {
 
 func TestBorderCalculation(t *testing.T) {
 	cl := elements.NewComponentsList("")
+	c := elements.NewComponent("node", "foo", "bar")
+	cell := NewCell(c, cl)
 	table := NewTable(cl)
 	table.SetX(1)
 	table.SetY(1)
 	table.SetBorder(BORDER)
 	table.SetCaption("Foo")
 	table.SetImage("bar")
+	table.Add(cell)
 
 	assert.Equal(t, 140, table.Width())
 	assert.Equal(t, 140, table.Height())
@@ -296,4 +303,32 @@ func TestRenderCall(t *testing.T) {
 	c14.AssertNumberOfCalls(t, "Render", 1)
 	c15.AssertNumberOfCalls(t, "Render", 1)
 	c16.AssertNumberOfCalls(t, "Render", 1)
+}
+
+func TestWidthAndHeight(t *testing.T) {
+	cl := elements.NewComponentsList("")
+	c1 := elements.NewComponent("node", "foo", "bar")
+	c2 := elements.NewComponent("node", "foo", "bar")
+	c3 := elements.NewComponent("node", "foo", "bar")
+	cell1 := NewCell(c1, cl)
+	cell2 := NewCell(c2, cl)
+	cell3 := NewCell(c3, cl)
+	t1 := NewTable(cl)
+	t1.SetX(1)
+	t1.SetY(1)
+
+	t2 := NewTable(cl)
+	t2.SetBorder(DASHED_BORDER)
+	t2.SetCaption("foo")
+	t2.SetImage("bla")
+	t2.SetX(1)
+	t2.SetY(1)
+	t2.Add(cell1)
+	t2.Add(cell2)
+	t2.Add(cell3)
+
+	assert.Equal(t, 240, t2.Width())
+	assert.Equal(t, 240, t2.Height())
+	assert.Equal(t, 1, t2.X())
+	assert.Equal(t, 1, t2.Y())
 }

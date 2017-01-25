@@ -32,10 +32,12 @@ func (m *Middleware) Scan(e elements.Element, cl elements.ComponentsList) table.
 		c := elem.(*elements.Component)
 
 		if elem.HasChilds() {
-			m.Scan(c, cl)
+			st := m.Scan(c, cl)
+			t.Add(st)
 		} else {
 			// Add element
-			t.Add(c)
+			cell := table.NewCell(c, cl)
+			t.Add(cell)
 		}
 	}
 	m.table = t
@@ -45,9 +47,7 @@ func (m *Middleware) Scan(e elements.Element, cl elements.ComponentsList) table.
 
 func (m *Middleware) Render(svg *svg.SVG) error {
 
-	svg.Start(m.table.Width(), m.table.Height())
 	m.table.Render(svg)
-	svg.End()
 	m.root.Reset()
 
 	return nil

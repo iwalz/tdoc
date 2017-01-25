@@ -43,8 +43,10 @@ var serveCmd = &cobra.Command{
 
 			m := renderer.NewMiddleware(ast, cl)
 			svg := svg.New(w)
-			m.Scan(ast, cl)
+			table := m.Scan(ast, cl)
+			svg.Start(table.Width(), table.Height())
 			m.Render(svg)
+			svg.End()
 		}))
 
 		err := http.ListenAndServe(":"+port, nil)
