@@ -16,11 +16,11 @@ type SVG struct {
 	Doc    string `xml:",innerxml"`
 }
 
-const width = 100
-const height = 100
+// Cell dimension
+var Dimension = 100
 
-const borderwidth = 25
-const borderheight = 25
+// Border dimension
+var Border = 40
 
 // Renders the pic at its location
 func (c *cell) Render(svg *svg.SVG) error {
@@ -54,11 +54,11 @@ func (c *cell) Render(svg *svg.SVG) error {
 	}
 	svg.Group(`clip-path="url(#pic)"`, fmt.Sprintf(`transform="translate(%d,%d)"`, c.X(), c.Y()))
 	svg.ClipPath(`id="pic"`)
-	svg.Rect(0, 0, width, height)
+	svg.Rect(0, 0, Dimension, Dimension)
 	svg.ClipEnd()
 	if Wireframe {
 		// Renders the clipPath wireframe
-		svg.Rect(0, 0, width, height, wireoptions)
+		svg.Rect(0, 0, Dimension, Dimension, wireoptions)
 	}
 	io.WriteString(svg.Writer, s.Doc)
 	svg.Gend()
@@ -81,7 +81,7 @@ type cell struct {
 // Correctly initialize a cell
 func NewCell(c *elements.Component, cl elements.ComponentsList) *cell {
 	fs := afero.NewOsFs()
-	return &cell{component: c, width: 100, height: 100, rowspan: 1, colspan: 1, cl: cl, fs: fs}
+	return &cell{component: c, width: Dimension, height: Dimension, rowspan: 1, colspan: 1, cl: cl, fs: fs}
 }
 
 // Set with

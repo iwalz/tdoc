@@ -97,7 +97,7 @@ func (t *Table) Width() int {
 	}
 
 	if t.border > 0 {
-		width = width + BORDERHEIGHT
+		width = width + BORDERHEIGHT*2
 	}
 
 	return width
@@ -127,7 +127,7 @@ func (t *Table) Height() int {
 	}
 
 	if t.border > 0 {
-		h = h + BORDERHEIGHT
+		h = h + BORDERHEIGHT*2
 	}
 
 	return h
@@ -212,8 +212,8 @@ func (t *Table) AddTo(x int, y int, c TableAbstract) error {
 	}
 	// table starts at 1:1, slice at 0:0
 	t.cells[x-1][y-1] = c
-	t.cells[x-1][y-1].SetX((x-1)*100 + 1)
-	t.cells[x-1][y-1].SetY((y-1)*100 + 1)
+	t.cells[x-1][y-1].SetX((x-1)*Dimension + 1)
+	t.cells[x-1][y-1].SetY((y-1)*Dimension + 1)
 
 	return nil
 }
@@ -235,9 +235,9 @@ func (t *Table) GetFrom(x int, y int) (TableAbstract, error) {
 func (t *Table) Render(svg *svg.SVG) error {
 	// Draw the border
 	if t.border > 0 {
-		x := t.X() + (borderheight / 2)
-		y := t.Y() + (borderwidth / 2)
-		svg.Roundrect(x, y, t.Width()-borderwidth, t.Height()-borderheight, 5, 5, "fill:none;stroke:black")
+		x := t.X() + (Border / 2)
+		y := t.Y() + (Border / 2)
+		svg.Roundrect(x, y, t.Width()-Border, t.Height()-Border, 5, 5, "fill:none;stroke:black")
 	}
 
 	// Draw wireframe
@@ -250,8 +250,8 @@ func (t *Table) Render(svg *svg.SVG) error {
 			if vy != nil {
 				cell := t.cells[x][y]
 				if t.border > 0 {
-					cell.SetX(cell.X() + (borderheight / 2))
-					cell.SetY(cell.Y() + (borderwidth / 2))
+					cell.SetX(cell.X() + Border)
+					cell.SetY(cell.Y() + Border)
 				}
 				cell.Render(svg)
 			}
@@ -263,10 +263,8 @@ func (t *Table) Render(svg *svg.SVG) error {
 
 // Identifies next free slot in Table
 func (t *Table) findFreeSlot() (int, int) {
-	//fmt.Println("Find free slot")
 	for x, vx := range t.cells {
 		for y, vy := range vx {
-			//spew.Dump(vy)
 			if vy == nil {
 				return x + 1, y + 1
 			}
