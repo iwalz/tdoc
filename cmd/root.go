@@ -9,6 +9,7 @@ import (
 	"github.com/dnephin/cobra"
 	"github.com/iwalz/tdoc/elements"
 	"github.com/iwalz/tdoc/parser"
+	"github.com/iwalz/tdoc/table"
 	"github.com/spf13/viper"
 )
 
@@ -67,6 +68,7 @@ func init() {
 	RootCmd.PersistentFlags().StringVar(&SvgDir, "svgdir", "/home/ingo/svg", "Source directory for components. foo.svg will make component foo available")
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enables verbose mode")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Enables debug mode")
+	RootCmd.PersistentFlags().BoolVarP(&table.Wireframe, "wireframe", "w", false, "Render wireframes")
 }
 
 // initConfig reads in config file and ENV variables if set.

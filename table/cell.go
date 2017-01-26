@@ -56,6 +56,10 @@ func (c *cell) Render(svg *svg.SVG) error {
 	svg.ClipPath(`id="pic"`)
 	svg.Rect(0, 0, width, height)
 	svg.ClipEnd()
+	if Wireframe {
+		// Renders the clipPath wireframe
+		svg.Rect(0, 0, width, height, wireoptions)
+	}
 	io.WriteString(svg.Writer, s.Doc)
 	svg.Gend()
 	return nil

@@ -31,6 +31,10 @@ type TableAbstract interface {
 var ErrCellNotEmpty = errors.New("Cell not empty")
 var ErrIndexOutOfBounds = errors.New("Index out of bounds")
 
+// Enables / disables the rendering of wireframes
+var Wireframe bool
+var wireoptions string = "fill:none;stroke:red;stroke-width:1"
+
 // Table representation
 type Table struct {
 	cells   [][]TableAbstract
@@ -234,6 +238,11 @@ func (t *Table) Render(svg *svg.SVG) error {
 		x := t.X() + (borderheight / 2)
 		y := t.Y() + (borderwidth / 2)
 		svg.Roundrect(x, y, t.Width()-borderwidth, t.Height()-borderheight, 5, 5, "fill:none;stroke:black")
+	}
+
+	// Draw wireframe
+	if Wireframe {
+		svg.Rect(t.X(), t.Y(), t.Width(), t.Height(), wireoptions)
 	}
 
 	for x, vx := range t.cells {
