@@ -4,9 +4,14 @@ import (
 	"reflect"
 	"testing"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/iwalz/tdoc/elements"
 	"github.com/stretchr/testify/assert"
 )
+
+func init() {
+	log.SetLevel(log.WarnLevel)
+}
 
 func TestSimpleComponent(t *testing.T) {
 	p := &TdocParserImpl{}

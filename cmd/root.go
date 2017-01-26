@@ -27,7 +27,6 @@ var RootCmd = &cobra.Command{
 	Long:  `Long description`,
 	Args:  CheckFile,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		spew.Dump(verbose)
 		if verbose {
 			log.SetLevel(log.InfoLevel)
 		}
