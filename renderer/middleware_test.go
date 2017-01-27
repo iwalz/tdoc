@@ -76,8 +76,8 @@ func TestRender(t *testing.T) {
 	svg := svg.New(b)
 	table := new(TableAbstractMock)
 	table.On("Render", svg).Return(nil)
-	table.On("Width").Return(100)
-	table.On("Height").Return(100)
+	table.On("Width").Return(120)
+	table.On("Height").Return(120)
 
 	m := NewMiddleware(c, cl)
 	m.table = table
@@ -108,14 +108,14 @@ func TestScan(t *testing.T) {
 	svg := svg.New(b)
 	mtable := new(TableAbstractMock)
 	mtable.On("Render", svg).Return(nil)
-	mtable.On("Width").Return(100)
-	mtable.On("Height").Return(100)
+	mtable.On("Width").Return(120)
+	mtable.On("Height").Return(120)
 
 	m := NewMiddleware(root, cl)
 	table := m.Scan(root, cl)
 	err := m.Render(svg)
 	assert.Nil(t, err)
 
-	assert.Equal(t, 280, table.Width())
-	assert.Equal(t, 280, table.Height())
+	assert.Equal(t, 320, table.Width())
+	assert.Equal(t, 320, table.Height())
 }

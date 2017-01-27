@@ -168,8 +168,8 @@ func TestAdd(t *testing.T) {
 	assert.Equal(t, c, e3.Component())
 	assert.Nil(t, err)
 
-	assert.Equal(t, 200, table.Width())
-	assert.Equal(t, 200, table.Height())
+	assert.Equal(t, 240, table.Width())
+	assert.Equal(t, 240, table.Height())
 
 	assert.Nil(t, table.Component())
 }
@@ -186,8 +186,8 @@ func TestBorderCalculation(t *testing.T) {
 	table.SetImage("bar")
 	table.Add(cell)
 
-	assert.Equal(t, 180, table.Width())
-	assert.Equal(t, 180, table.Height())
+	assert.Equal(t, 200, table.Width())
+	assert.Equal(t, 200, table.Height())
 	assert.Equal(t, 1, table.X())
 	assert.Equal(t, 1, table.Y())
 }
@@ -327,8 +327,8 @@ func TestWidthAndHeight(t *testing.T) {
 	t2.Add(cell2)
 	t2.Add(cell3)
 
-	assert.Equal(t, 280, t2.Width())
-	assert.Equal(t, 280, t2.Height())
+	assert.Equal(t, 320, t2.Width())
+	assert.Equal(t, 320, t2.Height())
 	assert.Equal(t, 1, t2.X())
 	assert.Equal(t, 1, t2.Y())
 }

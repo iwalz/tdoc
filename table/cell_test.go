@@ -17,8 +17,8 @@ func TestCellInitialize(t *testing.T) {
 	cell := NewCell(c, cl)
 	assert.Equal(t, c, cell.component)
 
-	assert.Equal(t, 100, cell.Height())
-	assert.Equal(t, 100, cell.Width())
+	assert.Equal(t, 120, cell.Height())
+	assert.Equal(t, 120, cell.Width())
 
 	cell.SetHeight(150)
 	cell.SetWidth(150)
@@ -36,8 +36,8 @@ func TestColAndRowspan(t *testing.T) {
 	cell.Colspan(1)
 	cell.x = 10
 	cell.y = 10
-	assert.Equal(t, 200, cell.Width())
-	assert.Equal(t, 200, cell.Height())
+	assert.Equal(t, 240, cell.Width())
+	assert.Equal(t, 240, cell.Height())
 	assert.Equal(t, 10, cell.X())
 	assert.Equal(t, 10, cell.Y())
 }
