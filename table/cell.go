@@ -17,7 +17,7 @@ type SVG struct {
 }
 
 // Cell dimension
-var Dimension = 100
+var Dimension = 120
 
 // Border dimension
 var Border = 40
@@ -46,22 +46,28 @@ func (c *cell) Render(svg *svg.SVG) error {
 	// if there are errors use 10 as a default
 	nw, _ := fmt.Sscanf(s.Width, "%d%s", &width, &wunit)
 	if nw < 1 {
-		width = 10
+		width = 100
 	}
 	nh, _ := fmt.Sscanf(s.Height, "%d%s", &height, &hunit)
 	if nh < 1 {
-		height = 10
+		height = 100
 	}
-	svg.Group(`clip-path="url(#pic)"`, fmt.Sprintf(`transform="translate(%d,%d)"`, c.X(), c.Y()))
-	svg.ClipPath(`id="pic"`)
-	svg.Rect(0, 0, Dimension, Dimension)
+	id := fmt.Sprintf("%p", c.Component())
+	svg.Group(`clip-path="url(#`+id+`)"`, fmt.Sprintf(`transform="translate(%d,%d)"`, c.X()+10, c.Y()))
+	svg.ClipPath(`id="` + id + `"`)
+	svg.Rect(10, 0, 100, 100)
 	svg.ClipEnd()
-	if Wireframe {
-		// Renders the clipPath wireframe
-		svg.Rect(0, 0, Dimension, Dimension, wireoptions)
-	}
+
 	io.WriteString(svg.Writer, s.Doc)
 	svg.Gend()
+	svg.Group("", fmt.Sprintf(`transform="translate(%d,%d)"`, c.X(), c.Y()+100))
+
+	svg.Text(60, 10, c.Component().Identifier, `text-anchor="middle" alignment-baseline="central"`)
+	svg.Gend()
+	if Wireframe {
+		// Renders the clipPath wireframe
+		svg.Rect(c.X(), c.Y(), Dimension, Dimension, wireoptions)
+	}
 	return nil
 }
 

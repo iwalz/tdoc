@@ -253,6 +253,12 @@ func (t *Table) Render(svg *svg.SVG) error {
 		placepic(svg, f, t.X()+30, t.Y(), 60, 60)
 	}
 
+	// Draw caption
+	if t.caption != "" {
+
+		text(svg, t.X()+90, t.Y()+Border, t.caption)
+	}
+
 	// Draw wireframe
 	if Wireframe {
 		svg.Rect(t.X(), t.Y(), t.Width(), t.Height(), wireoptions)

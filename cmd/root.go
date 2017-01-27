@@ -68,7 +68,7 @@ func init() {
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enables verbose mode")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Enables debug mode")
 	RootCmd.PersistentFlags().BoolVarP(&table.Wireframe, "wireframe", "w", false, "Render wireframes")
-	RootCmd.PersistentFlags().IntVar(&table.Dimension, "dimension", 100, "Set the width and height dimension per cell")
+	RootCmd.PersistentFlags().IntVar(&table.Dimension, "dimension", 120, "Set the width and height dimension per cell")
 	RootCmd.PersistentFlags().IntVar(&table.Border, "border", 40, "Set border dimension per cell")
 }
 
