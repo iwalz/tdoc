@@ -34,6 +34,8 @@ func (m *Middleware) Scan(e elements.Element, cl elements.ComponentsList) table.
 		if elem.HasChilds() {
 			st := m.Scan(c, cl)
 			st.(*table.Table).SetBorder(table.DASHED_BORDER)
+			st.(*table.Table).SetImage(cl.GetFilenameByType(c))
+			st.(*table.Table).SetCaption(c.Identifier)
 			t.Add(st)
 		} else {
 			// Add element

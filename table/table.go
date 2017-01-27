@@ -5,6 +5,7 @@ import (
 
 	svg "github.com/ajstarks/svgo"
 	"github.com/iwalz/tdoc/elements"
+	"github.com/spf13/afero"
 )
 
 const BORDERHEIGHT = 40
@@ -44,6 +45,7 @@ type Table struct {
 	image   string
 	caption string
 	cl      elements.ComponentsList
+	fs      afero.Fs
 }
 
 // Satisfy tableAbstract interface
@@ -146,7 +148,8 @@ func (t *Table) Columns() int {
 // Returns and initializes and empty table
 func NewTable(cl elements.ComponentsList) *Table {
 	cells := make([][]TableAbstract, 1)
-	t := &Table{cells: cells, cl: cl}
+	fs := afero.NewOsFs()
+	t := &Table{cells: cells, cl: cl, fs: fs}
 	return t
 }
 
@@ -238,6 +241,16 @@ func (t *Table) Render(svg *svg.SVG) error {
 		x := t.X() + (Border / 2)
 		y := t.Y() + (Border / 2)
 		svg.Roundrect(x, y, t.Width()-Border, t.Height()-Border, 5, 5, "fill:none;stroke:black")
+	}
+
+	// Draw small icon
+	if t.image != "" {
+		f, err := t.fs.Open(t.image)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		placepic(svg, f, t.X()+30, t.Y(), 60, 60)
 	}
 
 	// Draw wireframe
