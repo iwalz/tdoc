@@ -269,8 +269,8 @@ func (t *Table) Render(svg *svg.SVG) error {
 			if vy != nil {
 				cell := t.cells[x][y]
 				if t.border > 0 {
-					cell.SetX(cell.X() + Border)
-					cell.SetY(cell.Y() + Border)
+					cell.SetX(t.X() + cell.X() + Border)
+					cell.SetY(t.Y() + cell.Y() + Border)
 				}
 				cell.Render(svg)
 			}
