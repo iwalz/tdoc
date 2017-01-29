@@ -103,7 +103,7 @@ func TestErrors(t *testing.T) {
 	b := new(bytes.Buffer)
 	s := svg.New(b)
 	err := cell.Render(s)
-	assert.Error(t, err)
+	assert.Nil(t, err)
 
 	mfs = afero.NewMemMapFs()
 	mfs.MkdirAll("/foo", 0655)

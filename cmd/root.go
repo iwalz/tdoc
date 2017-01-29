@@ -3,12 +3,15 @@ package cmd
 import (
 	"io/ioutil"
 	"os"
+	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	svg "github.com/ajstarks/svgo"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/dnephin/cobra"
 	"github.com/iwalz/tdoc/elements"
 	"github.com/iwalz/tdoc/parser"
+	"github.com/iwalz/tdoc/renderer"
 	"github.com/iwalz/tdoc/table"
 	"github.com/spf13/viper"
 )
@@ -33,16 +36,29 @@ var RootCmd = &cobra.Command{
 		if debug {
 			log.SetLevel(log.DebugLevel)
 		}
+		filename := args[0]
+		newFilename := strings.Replace(filename, ".tdoc", ".svg", 1)
 
 		content, err := ioutil.ReadFile(args[0])
 		if err != nil {
 			return err
 		}
+		cl := elements.NewComponentsList(SvgDir)
+		cl.Parse()
 		p := &parser.TdocParserImpl{}
-		l := parser.NewLexer(string(content), elements.NewComponentsList(SvgDir))
+		l := parser.NewLexer(string(content), cl)
 		p.Parse(l)
+		ast := p.AST()
 
-		spew.Dump(args)
+		m := renderer.NewMiddleware(ast, cl)
+		file, err := os.Create(newFilename)
+		svg := svg.New(file)
+		table := m.Scan(ast, cl)
+		svg.Start(table.Width(), table.Height())
+		m.Render(svg)
+		svg.End()
+
+		spew.Dump(ast)
 
 		return nil
 	},
