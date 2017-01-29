@@ -51,6 +51,8 @@ func (f *File) HandleFile(file string) error {
 
 	f.middleware = renderer.NewMiddleware(ast, f.cl)
 	nfile, err := f.fs.Create(newFilename)
+	defer nfile.Close()
+
 	svg := svg.New(nfile)
 	table := f.middleware.Scan(ast, f.cl)
 	svg.Start(table.Width(), table.Height())
