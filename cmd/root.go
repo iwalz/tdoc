@@ -1,26 +1,22 @@
 package cmd
 
 import (
-	"io/ioutil"
 	"os"
-	"strings"
 
 	log "github.com/Sirupsen/logrus"
-	svg "github.com/ajstarks/svgo"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/dnephin/cobra"
-	"github.com/iwalz/tdoc/elements"
-	"github.com/iwalz/tdoc/parser"
-	"github.com/iwalz/tdoc/renderer"
+	"github.com/iwalz/tdoc/outputs"
 	"github.com/iwalz/tdoc/table"
+	"github.com/spf13/afero"
 	"github.com/spf13/viper"
 )
 
 var (
-	cfgFile string
-	SvgDir  string
-	verbose bool
-	debug   bool
+	cfgFile   string
+	SvgDir    string
+	extension string
+	verbose   bool
+	debug     bool
 )
 
 // RootCmd represents the base command when called without any subcommands
@@ -36,8 +32,14 @@ var RootCmd = &cobra.Command{
 		if debug {
 			log.SetLevel(log.DebugLevel)
 		}
-		filename := args[0]
-		newFilename := strings.Replace(filename, ".tdoc", ".svg", 1)
+
+		fs := afero.NewOsFs()
+		file := outputs.NewFile(fs, extension, SvgDir)
+		executor := outputs.NewExecutor(fs, extension)
+		executor.Exec(file, args)
+
+		/*filename := args[0]
+		newFilename := strings.Replace(filename, "."+extension, ".svg", 1)
 
 		content, err := ioutil.ReadFile(args[0])
 		if err != nil {
@@ -57,9 +59,7 @@ var RootCmd = &cobra.Command{
 		svg.Start(table.Width(), table.Height())
 		m.Render(svg)
 		svg.End()
-
-		spew.Dump(ast)
-
+		*/
 		return nil
 	},
 }
@@ -79,8 +79,9 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.tdoc.yaml)")
-	RootCmd.PersistentFlags().StringVar(&SvgDir, "svgdir", "/home/ingo/svg", "Source directory for components. foo.svg will make component foo available")
+	RootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is $HOME/.tdoc.yaml)")
+	RootCmd.PersistentFlags().StringVarP(&extension, "extension", "e", "tdoc", "file extension to use (default 'tdoc')")
+	RootCmd.PersistentFlags().StringVarP(&SvgDir, "svgdir", "s", "/home/ingo/svg", "Source directory for components. foo.svg will make component foo available")
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enables verbose mode")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Enables debug mode")
 	RootCmd.PersistentFlags().BoolVarP(&table.Wireframe, "wireframe", "w", false, "Render wireframes")
