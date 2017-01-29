@@ -1,15 +1,12 @@
 package cmd
 
 import (
-	"io/ioutil"
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
-	svg "github.com/ajstarks/svgo"
 	"github.com/dnephin/cobra"
-	"github.com/iwalz/tdoc/elements"
-	"github.com/iwalz/tdoc/parser"
-	"github.com/iwalz/tdoc/renderer"
+	"github.com/iwalz/tdoc/outputs"
+	"github.com/spf13/afero"
 )
 
 var port string
@@ -28,25 +25,13 @@ var serveCmd = &cobra.Command{
 			log.SetLevel(log.DebugLevel)
 		}
 
+		fs := afero.NewOsFs()
+		web := outputs.NewWeb(fs, extension, SvgDir)
+		executor := outputs.NewExecutor(fs, extension)
+		executor.Exec(web, args)
+
 		http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			content, err := ioutil.ReadFile(args[0])
-			if err != nil {
-				log.Error("Could not open file ", args[0])
-			}
-			cl := elements.NewComponentsList(SvgDir)
-			cl.Parse()
-
-			p := &parser.TdocParserImpl{}
-			l := parser.NewLexer(string(content), cl)
-			p.Parse(l)
-			ast := p.AST()
-
-			m := renderer.NewMiddleware(ast, cl)
-			svg := svg.New(w)
-			table := m.Scan(ast, cl)
-			svg.Start(table.Width(), table.Height())
-			m.Render(svg)
-			svg.End()
+			web.WebHandler(req.URL.Path, w)
 		}))
 
 		err := http.ListenAndServe(":"+port, nil)
