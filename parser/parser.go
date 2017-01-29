@@ -18,7 +18,12 @@ var registry *elements.Registry
 
 const debug = false
 
-//line parser/tdoc.y:25
+type Tdoc interface {
+	Parse(TdocLexer) int
+	AST() *elements.Component
+}
+
+//line parser/tdoc.y:30
 type TdocSymType struct {
 	yys       int
 	val       string
@@ -57,7 +62,7 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:225
+//line parser/tdoc.y:230
 
 /* Start of the program */
 
@@ -471,7 +476,7 @@ Tdocdefault:
 
 	case 1:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:38
+		//line parser/tdoc.y:43
 		{
 			log.Info("program: statement_list")
 
@@ -481,7 +486,7 @@ Tdocdefault:
 		}
 	case 2:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:47
+		//line parser/tdoc.y:52
 		{
 			log.Info("statement_list: statement")
 			log.Debug("Depth", depth)
@@ -495,7 +500,7 @@ Tdocdefault:
 		}
 	case 3:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:60
+		//line parser/tdoc.y:65
 		{
 			log.Info("statement_list statement")
 			log.Debug("Depth", depth)
@@ -510,7 +515,7 @@ Tdocdefault:
 		}
 	case 6:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:77
+		//line parser/tdoc.y:82
 		{
 			log.Info("relation_assignment: TEXT RELATION TEXT")
 			log.Debug(TdocDollar[1].val)
@@ -523,7 +528,7 @@ Tdocdefault:
 		}
 	case 7:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:89
+		//line parser/tdoc.y:94
 		{
 			log.Info("TEXT RELATION declaration")
 			log.Debug(TdocDollar[1].val)
@@ -541,7 +546,7 @@ Tdocdefault:
 		}
 	case 8:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:106
+		//line parser/tdoc.y:111
 		{
 			log.Info("declaration RELATION TEXT")
 			log.Debug(TdocDollar[1].component)
@@ -560,7 +565,7 @@ Tdocdefault:
 		}
 	case 9:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:124
+		//line parser/tdoc.y:129
 		{
 			log.Info("relation_assignment RELATION declaration")
 			log.Debug(TdocDollar[1].component)
@@ -578,7 +583,7 @@ Tdocdefault:
 		}
 	case 10:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:141
+		//line parser/tdoc.y:146
 		{
 			log.Info("declaration RELATION declaration")
 			log.Debug(TdocDollar[1].component)
@@ -605,7 +610,7 @@ Tdocdefault:
 		}
 	case 11:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:167
+		//line parser/tdoc.y:172
 		{
 			log.Info("declaration: COMPONENT IDENTIFIER")
 			log.Debug(TdocDollar[1].val)
@@ -625,7 +630,7 @@ Tdocdefault:
 		}
 	case 12:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:185
+		//line parser/tdoc.y:190
 		{
 			log.Info("COMPONENT IDENTIFIER ALIAS TEXT")
 			log.Debug(TdocDollar[1].val)
@@ -647,7 +652,7 @@ Tdocdefault:
 		}
 	case 13:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:206
+		//line parser/tdoc.y:211
 		{
 			log.Info("declaration SCOPEIN")
 			log.Debug(TdocDollar[1].component)
@@ -659,7 +664,7 @@ Tdocdefault:
 		}
 	case 14:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:217
+		//line parser/tdoc.y:222
 		{
 			log.Info("SCOPEOUT")
 			TdocVAL.component = roots[depth]

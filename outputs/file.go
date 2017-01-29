@@ -13,13 +13,21 @@ import (
 
 type File struct {
 	Output
-	fs  afero.Fs // File system mock
-	ext string   // File extension
-	dir string   // SVG directory
+	fs         afero.Fs                // File system mock
+	ext        string                  // File extension
+	dir        string                  // SVG directory
+	cl         elements.ComponentsList // component list
+	parser     parser.Tdoc             // YACC Parser
+	lexer      parser.TdocLexer        // Lexer
+	middleware renderer.MWare          // Middleware
 }
 
 func NewFile(fs afero.Fs, ext string, dir string) *File {
-	return &File{fs: fs, ext: ext, dir: dir}
+	file := &File{fs: fs, ext: ext, dir: dir}
+	file.parser = &parser.TdocParserImpl{}
+	file.cl = elements.NewComponentsList(dir)
+	file.cl.Parse()
+	return file
 }
 
 func (f *File) HandleDir(d string) error {
@@ -37,19 +45,16 @@ func (f *File) HandleFile(file string) error {
 		return err
 	}
 
-	cl := elements.NewComponentsList(f.dir)
-	cl.Parse()
-	p := &parser.TdocParserImpl{}
-	l := parser.NewLexer(string(content), cl)
-	p.Parse(l)
-	ast := p.AST()
+	f.lexer = parser.NewLexer(string(content), f.cl)
+	f.parser.Parse(f.lexer)
+	ast := f.parser.AST()
 
-	m := renderer.NewMiddleware(ast, cl)
+	f.middleware = renderer.NewMiddleware(ast, f.cl)
 	nfile, err := f.fs.Create(newFilename)
 	svg := svg.New(nfile)
-	table := m.Scan(ast, cl)
+	table := f.middleware.Scan(ast, f.cl)
 	svg.Start(table.Width(), table.Height())
-	m.Render(svg)
+	f.middleware.Render(svg)
 	svg.End()
 
 	return nil

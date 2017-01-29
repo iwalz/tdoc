@@ -16,6 +16,11 @@ var registry *elements.Registry
 
 const debug = false
 
+type Tdoc interface {
+  Parse(TdocLexer) int
+  AST() *elements.Component
+}
+
 %}
 
 %token <token> SCOPEIN SCOPEOUT

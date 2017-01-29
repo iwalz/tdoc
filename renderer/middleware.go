@@ -6,6 +6,11 @@ import (
 	"github.com/iwalz/tdoc/table"
 )
 
+type MWare interface {
+	Scan(elements.Element, elements.ComponentsList) table.TableAbstract
+	Render(*svg.SVG) error
+}
+
 type Middleware struct {
 	root  elements.Element
 	cl    elements.ComponentsList
