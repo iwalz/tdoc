@@ -64,6 +64,8 @@ func (web *Web) WebHandler(path string, w http.ResponseWriter) error {
 }
 
 func (web *Web) renderFile(path string, w http.ResponseWriter) error {
+	header := w.Header()
+	header.Set("Content-Type", "image/svg+xml")
 	// Strip trailing slash
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
