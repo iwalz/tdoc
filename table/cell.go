@@ -32,7 +32,7 @@ func (c *cell) Render(svg *svg.SVG) error {
 		return err
 	}
 	defer f.Close()
-	err = placepic(svg, f, c.X(), c.Y(), Dimension, Dimension)
+	err = placepic(svg, f, c.X()+10, c.Y(), 100, 100)
 	if err != nil {
 		return err
 	}
