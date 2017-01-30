@@ -332,3 +332,59 @@ func TestWidthAndHeight(t *testing.T) {
 	assert.Equal(t, 1, t2.X())
 	assert.Equal(t, 1, t2.Y())
 }
+
+func TestXAndYNestedTables(t *testing.T) {
+	cl := elements.NewComponentsList("")
+	c1 := elements.NewComponent("node", "foo", "bar")
+	c2 := elements.NewComponent("node", "foo", "bar")
+	c3 := elements.NewComponent("node", "foo", "bar")
+	cell1 := NewCell(c1, cl)
+	cell2 := NewCell(c2, cl)
+	cell3 := NewCell(c3, cl)
+
+	t0 := NewTable(cl)
+
+	t1 := NewTable(cl)
+	t1.SetBorder(DASHED_BORDER)
+	t1.SetCaption("foo")
+	t1.SetImage("bla")
+	t1.Add(cell1)
+	t1.Add(cell2)
+	t1.Add(cell3)
+
+	assert.Equal(t, 320, t1.Width())
+	assert.Equal(t, 320, t1.Height())
+
+	t2 := NewTable(cl)
+	t2.SetBorder(DASHED_BORDER)
+	t2.SetCaption("foo")
+	t2.SetImage("bla")
+	t2.Add(cell1)
+	t2.Add(cell2)
+	t2.Add(cell3)
+
+	assert.Equal(t, 320, t2.Width())
+	assert.Equal(t, 320, t2.Height())
+	assert.Equal(t, 0, t2.X())
+	assert.Equal(t, 0, t2.Y())
+
+	t0.Add(t1)
+	t0.Add(t2)
+
+	assert.Equal(t, 0, t1.X())
+	assert.Equal(t, 0, t1.Y())
+
+	assert.Equal(t, 320, t2.X())
+	assert.Equal(t, 0, t2.Y())
+
+	t3 := NewTable(cl)
+	t3.SetBorder(DASHED_BORDER)
+	t3.SetCaption("foo")
+	t3.SetImage("bla")
+	t3.Add(cell1)
+	t3.Add(cell2)
+	t3.Add(cell3)
+	t0.Add(t3)
+	assert.Equal(t, 0, t3.X())
+	assert.Equal(t, 320, t3.Y())
+}

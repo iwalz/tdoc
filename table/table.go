@@ -205,6 +205,62 @@ func (t *Table) Add(c TableAbstract) {
 	t.AddTo(x, y, c)
 }
 
+// Get px coords for x axis
+func (t *Table) getXFor(x int) int {
+	width := 0
+	for i, column := range t.cells {
+		if i == x-1 {
+			break
+		}
+		colWidth := 0
+		// Only the widest row per column is of interest for the width
+		for _, component := range column {
+			if component != nil && component.Width() > colWidth {
+				colWidth = component.Width()
+			}
+		}
+		width = width + colWidth
+	}
+
+	if t.border > 0 {
+		width = width + BORDERHEIGHT
+	}
+
+	return width
+}
+
+// Get px for y axis
+func (t *Table) getYFor(y int) int {
+	var height []int
+	height = make([]int, 1)
+	for _, column := range t.cells {
+		// Only the highest column per row is of interest for the height
+		for r, component := range column {
+			if r == y-1 {
+				break
+			}
+			if len(height) <= r {
+				height = append(height, 0)
+			}
+			h := height[r]
+			if component != nil && h < component.Height() {
+				height[r] = component.Height()
+			}
+		}
+	}
+
+	h := 0
+	for _, v := range height {
+		h = h + v
+	}
+
+	if t.border > 0 {
+		h = h + BORDERHEIGHT
+	}
+
+	return h
+}
+
 // Explicit add to x:y
 func (t *Table) AddTo(x int, y int, c TableAbstract) error {
 	t.increaseTo(x, y)
@@ -215,8 +271,8 @@ func (t *Table) AddTo(x int, y int, c TableAbstract) error {
 	}
 	// table starts at 1:1, slice at 0:0
 	t.cells[x-1][y-1] = c
-	t.cells[x-1][y-1].SetX((x-1)*Dimension + 1)
-	t.cells[x-1][y-1].SetY((y-1)*Dimension + 1)
+	t.cells[x-1][y-1].SetX(t.getXFor(x))
+	t.cells[x-1][y-1].SetY(t.getYFor(y))
 
 	return nil
 }
