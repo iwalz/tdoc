@@ -2,7 +2,6 @@ package outputs
 
 import (
 	"errors"
-	"io/ioutil"
 	"net/http"
 
 	svg "github.com/ajstarks/svgo"
@@ -66,8 +65,8 @@ func (web *Web) WebHandler(path string, w http.ResponseWriter) error {
 func (web *Web) renderFile(path string, w http.ResponseWriter) error {
 	header := w.Header()
 	header.Set("Content-Type", "image/svg+xml")
-	// Strip trailing slash
-	content, err := ioutil.ReadFile(path)
+
+	content, err := afero.ReadFile(web.fs, path)
 	if err != nil {
 		return errors.New("Could not open file " + path)
 	}

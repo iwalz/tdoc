@@ -1,7 +1,6 @@
 package outputs
 
 import (
-	"io/ioutil"
 	"strings"
 
 	svg "github.com/ajstarks/svgo"
@@ -40,7 +39,7 @@ func (f *File) HandleFile(file string) error {
 	newFilename := strings.Replace(file, "."+f.ext, ".svg", 1)
 
 	// Input file
-	content, err := ioutil.ReadFile(file)
+	content, err := afero.ReadFile(f.fs, file)
 	if err != nil {
 		return err
 	}
