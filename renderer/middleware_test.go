@@ -1,117 +1,121 @@
 package renderer
 
 import (
+	"bytes"
 	"testing"
 
+	svg "github.com/ajstarks/svgo"
 	"github.com/iwalz/tdoc/elements"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
-func TestAddSingleComponent(t *testing.T) {
-	b := &BaseMatrix{rows: 1, columns: 1}
-	m := elements.NewComponent("", "", "")
-
-	m.Add(elements.NewComponent("node", "foo", "bar"))
-
-	b.scan(m)
-	assert.Equal(t, 1, b.rows)
-	assert.Equal(t, 1, b.columns)
-
-	components := b.components
-	assert.Equal(t, 1, components[0].X())
-	assert.Equal(t, 1, components[0].Y())
+type ComponentsListMock struct {
+	mock.Mock
 }
 
-func TestThreeComponents(t *testing.T) {
-	b := &BaseMatrix{rows: 1, columns: 1}
-	m := elements.NewComponent("", "", "")
-
-	m.Add(elements.NewComponent("node", "foo", "bar"))
-	m.Add(elements.NewComponent("node", "foo1", "bar1"))
-	m.Add(elements.NewComponent("node", "foo2", "bar2"))
-
-	assert.Equal(t, true, m.HasChilds())
-
-	b.scan(m)
-	assert.Equal(t, 2, b.rows)
-	assert.Equal(t, 2, b.columns)
-
-	components := b.components
-	assert.Equal(t, 1, components[0].X())
-	assert.Equal(t, 1, components[0].Y())
-
-	/*assert.Equal(t, 100, components[1].x)
-	assert.Equal(t, 0, components[1].y)
-
-	assert.Equal(t, 100, components[2].x)
-	assert.Equal(t, 100, components[2].y)*/
+func (c *ComponentsListMock) GetFilenameByType(component *elements.Component) string {
+	args := c.Mock.Called(component)
+	return args.Get(0).(string)
 }
 
-func TestNestedComponents(t *testing.T) {
-	b := &BaseMatrix{rows: 1, columns: 1}
-	m := elements.NewComponent("", "", "")
-
-	e1 := elements.NewComponent("node", "foo1", "bar1")
-	e2 := elements.NewComponent("node", "foo2", "bar2")
-
-	e1.Add(elements.NewComponent("cloud", "foo1", "bar1"))
-	e1.Add(elements.NewComponent("cloud", "foo2", "bar2"))
-
-	e2.Add(elements.NewComponent("actor", "foo1", "bar1"))
-	e2.Add(elements.NewComponent("actor", "foo2", "bar2"))
-
-	m.Add(e1)
-	m.Add(e2)
-	assert.Equal(t, true, m.HasChilds())
-	assert.Equal(t, true, e1.HasChilds())
-	assert.Equal(t, true, e2.HasChilds())
-
-	b.scan(m)
-	assert.Equal(t, 2, b.rows)
-	assert.Equal(t, 2, b.columns)
-
-	assert.Equal(t, 50, b.heightoffset)
-	assert.Equal(t, 50, b.widthoffset)
-
-	components := b.components
-	// First component is nested, so we have a border
-	assert.Equal(t, 1, components[0].X())
-	assert.Equal(t, 1, components[0].Y())
-
-	/*assert.Equal(t, 125, components[1].x)
-	assert.Equal(t, 25, components[1].y)
-
-		assert.Equal(t, 150, components[2].x)
-		assert.Equal(t, 150, components[2].y)
-
-		assert.Equal(t, 150, components[3].x)
-		assert.Equal(t, 150, components[3].y)*/
+func (c *ComponentsListMock) Parse() error {
+	return c.Mock.Called().Error(0)
 }
 
-func TestMultiNestedComponents(t *testing.T) {
-	b := &BaseMatrix{rows: 1, columns: 1}
-	m := elements.NewComponent("", "", "")
+func (c *ComponentsListMock) Exists(s string) bool {
+	return c.Mock.Called(s).Bool(0)
+}
 
-	e1 := elements.NewComponent("node", "foo1", "bar1")
-	e2 := elements.NewComponent("node", "foo2", "bar2")
-	c1 := elements.NewComponent("cloud", "foo1", "bar1")
-	c1.Add(elements.NewComponent("cloud", "foo2", "bar2"))
-	c1.Add(elements.NewComponent("cloud", "foo3", "bar3"))
-	c1.Add(elements.NewComponent("cloud", "foo4", "bar4"))
-	e1.Add(c1)
+type TableAbstractMock struct {
+	mock.Mock
+}
 
-	e2.Add(elements.NewComponent("actor", "foo1", "bar1"))
-	e2.Add(elements.NewComponent("actor", "foo2", "bar2"))
+func (t *TableAbstractMock) Component() *elements.Component {
+	args := t.Mock.Called()
+	return args.Get(0).(*elements.Component)
+}
 
-	m.Add(e1)
-	m.Add(e2)
-	assert.Equal(t, true, m.HasChilds())
-	assert.Equal(t, true, e1.HasChilds())
-	assert.Equal(t, true, e2.HasChilds())
+func (t *TableAbstractMock) Height() int {
+	return t.Mock.Called().Get(0).(int)
+}
 
-	b.scan(m)
-	assert.Equal(t, 2, b.rows)
-	assert.Equal(t, 3, b.columns)
-	assert.Equal(t, 75, b.heightoffset)
-	assert.Equal(t, 75, b.widthoffset)
+func (t *TableAbstractMock) Width() int {
+	return t.Mock.Called().Get(0).(int)
+}
+
+func (t *TableAbstractMock) X() int {
+	return t.Mock.Called().Get(0).(int)
+}
+
+func (t *TableAbstractMock) Y() int {
+	return t.Mock.Called().Get(0).(int)
+}
+
+func (t *TableAbstractMock) SetX(x int) {
+	t.Mock.Called(x)
+}
+
+func (t *TableAbstractMock) SetY(y int) {
+	t.Mock.Called(y)
+}
+
+func (t *TableAbstractMock) Render(svg *svg.SVG) error {
+	args := t.Mock.Called(svg)
+	return args.Error(0)
+}
+
+func TestRender(t *testing.T) {
+	c := elements.NewComponent("node", "foo", "bar")
+	c1 := elements.NewComponent("node", "foo", "bar")
+	c.Add(c1)
+	cl := new(ComponentsListMock)
+	cl.On("GetFilenameByType", c).Return("/foo/bar.svg")
+
+	b := new(bytes.Buffer)
+	svg := svg.New(b)
+	table := new(TableAbstractMock)
+	table.On("Render", svg).Return(nil)
+	table.On("Width").Return(120)
+	table.On("Height").Return(120)
+
+	m := NewMiddleware(c, cl)
+	m.table = table
+	err := m.Render(svg)
+	assert.Nil(t, err)
+	table.AssertNumberOfCalls(t, "Render", 1)
+}
+
+func TestScan(t *testing.T) {
+	root := elements.NewComponent("", "", "")
+	c1 := elements.NewComponent("node", "foo", "bar")
+	c2 := elements.NewComponent("node", "foo", "bar")
+	c3 := elements.NewComponent("node", "foo", "bar")
+	c4 := elements.NewComponent("node", "foo", "bar")
+	c5 := elements.NewComponent("node", "foo", "bar")
+	c4.Add(c5)
+	root.Add(c1)
+	root.Add(c2)
+	root.Add(c3)
+	root.Add(c4)
+	cl := new(ComponentsListMock)
+	cl.On("GetFilenameByType", c1).Return("/foo/bar.svg")
+	cl.On("GetFilenameByType", c2).Return("/foo/bar.svg")
+	cl.On("GetFilenameByType", c3).Return("/foo/bar.svg")
+	cl.On("GetFilenameByType", c4).Return("/foo/bar.svg")
+
+	b := new(bytes.Buffer)
+	svg := svg.New(b)
+	mtable := new(TableAbstractMock)
+	mtable.On("Render", svg).Return(nil)
+	mtable.On("Width").Return(120)
+	mtable.On("Height").Return(120)
+
+	m := NewMiddleware(root, cl)
+	table := m.Scan(root, cl)
+	err := m.Render(svg)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 320, table.Width())
+	assert.Equal(t, 320, table.Height())
 }

@@ -1,6 +1,52 @@
 package table
 
-import "github.com/iwalz/tdoc/elements"
+import (
+	"fmt"
+
+	svg "github.com/ajstarks/svgo"
+	"github.com/iwalz/tdoc/elements"
+	"github.com/spf13/afero"
+)
+
+type SVG struct {
+	Width  string `xml:"width,attr"`
+	Height string `xml:"height,attr"`
+	Doc    string `xml:",innerxml"`
+}
+
+// Cell dimension
+var Dimension = 120
+
+// Border dimension
+var Border = 40
+
+// Renders the pic at its location
+func (c *cell) Render(svg *svg.SVG) error {
+
+	filename := c.cl.GetFilenameByType(c.Component())
+	if filename == "" {
+		return nil
+	}
+	f, err := c.fs.Open(filename)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	err = placepic(svg, f, c.X()+10, c.Y(), 100, 100)
+	if err != nil {
+		return err
+	}
+	svg.Group("", fmt.Sprintf(`transform="translate(%d,%d)"`, c.X(), c.Y()+100))
+
+	svg.Text(60, 10, c.Component().Identifier, `text-anchor="middle" alignment-baseline="central"`)
+	svg.Gend()
+
+	if Wireframe {
+		// Renders the clipPath wireframe
+		svg.Rect(c.X(), c.Y(), Dimension, Dimension, wireoptions)
+	}
+	return nil
+}
 
 // Represents a cell in a table
 type cell struct {
@@ -11,11 +57,14 @@ type cell struct {
 	y         int
 	rowspan   int
 	colspan   int
+	cl        elements.ComponentsList
+	fs        afero.Fs
 }
 
 // Correctly initialize a cell
-func NewCell(c *elements.Component) *cell {
-	return &cell{component: c, width: 100, height: 100, rowspan: 1, colspan: 1}
+func NewCell(c *elements.Component, cl elements.ComponentsList) *cell {
+	fs := afero.NewOsFs()
+	return &cell{component: c, width: Dimension, height: Dimension, rowspan: 1, colspan: 1, cl: cl, fs: fs}
 }
 
 // Set with
@@ -26,6 +75,14 @@ func (c *cell) SetWidth(w int) {
 // Set height
 func (c *cell) SetHeight(h int) {
 	c.height = h
+}
+
+func (c *cell) SetX(x int) {
+	c.x = x
+}
+
+func (c *cell) SetY(y int) {
+	c.y = y
 }
 
 // Get width (respects colspan)

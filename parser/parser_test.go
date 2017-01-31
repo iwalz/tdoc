@@ -4,13 +4,18 @@ import (
 	"reflect"
 	"testing"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/iwalz/tdoc/elements"
 	"github.com/stretchr/testify/assert"
 )
 
+func init() {
+	log.SetLevel(log.WarnLevel)
+}
+
 func TestSimpleComponent(t *testing.T) {
 	p := &TdocParserImpl{}
-	p.Parse(NewLexer("cloud abc", ""))
+	p.Parse(NewLexer("cloud abc", elements.NewComponentsList("")))
 	ast := p.AST()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
@@ -21,7 +26,8 @@ func TestSimpleComponent(t *testing.T) {
 
 func TestManyComponents(t *testing.T) {
 	p := &TdocParserImpl{}
-	p.Parse(NewLexer("cloud foo1 as bar1 cloud foo2 as bar2 cloud foo3 as bar3 cloud foo4 as bar4", ""))
+
+	p.Parse(NewLexer("cloud foo1 as bar1 cloud foo2 as bar2 cloud foo3 as bar3 cloud foo4 as bar4", elements.NewComponentsList("")))
 	ast := p.AST()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c1 := ast.Next()
@@ -51,7 +57,7 @@ func TestManyComponents(t *testing.T) {
 
 func TestAliasComponent(t *testing.T) {
 	p := &TdocParserImpl{}
-	p.Parse(NewLexer("cloud foo as bar", ""))
+	p.Parse(NewLexer("cloud foo as bar", elements.NewComponentsList("")))
 	ast := p.AST()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
@@ -62,7 +68,7 @@ func TestAliasComponent(t *testing.T) {
 
 func TestRecursiveAliasComponent(t *testing.T) {
 	p := &TdocParserImpl{}
-	p.Parse(NewLexer("cloud foo as bar node blubb as baz", ""))
+	p.Parse(NewLexer("cloud foo as bar node blubb as baz", elements.NewComponentsList("")))
 	ast := p.AST()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 
@@ -85,7 +91,7 @@ func TestNewlineScopedComponent(t *testing.T) {
 		actor blubb
 		actor baz
 	}
-	`, ""))
+	`, elements.NewComponentsList("")))
 	ast := p.AST()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
@@ -104,7 +110,7 @@ func TestNewlineScopedComponent(t *testing.T) {
 
 func TestScopedComponent(t *testing.T) {
 	p := &TdocParserImpl{}
-	p.Parse(NewLexer("cloud foo as bar { actor blubb as baz }", ""))
+	p.Parse(NewLexer("cloud foo as bar { actor blubb as baz }", elements.NewComponentsList("")))
 	ast := p.AST()
 
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
@@ -122,7 +128,7 @@ func TestScopedComponent(t *testing.T) {
 
 func TestAliasScopedComponent(t *testing.T) {
 	p := &TdocParserImpl{}
-	p.Parse(NewLexer("cloud foo as bar { actor blubb as baz }", ""))
+	p.Parse(NewLexer("cloud foo as bar { actor blubb as baz }", elements.NewComponentsList("")))
 	ast := p.AST()
 
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
@@ -142,7 +148,7 @@ func TestAliasScopedComponent(t *testing.T) {
 
 func TestMultiNestedComponent(t *testing.T) {
 	p := &TdocParserImpl{}
-	p.Parse(NewLexer("cloud foo as bar{   actor blubb as baz    {node foo as quo}}", ""))
+	p.Parse(NewLexer("cloud foo as bar{   actor blubb as baz    {node foo as quo}}", elements.NewComponentsList("")))
 	ast := p.AST()
 
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
@@ -176,7 +182,7 @@ func TestComplexMultiNestedComponent(t *testing.T) {
 				node blubb as quo1
 				node blubb as quo2
 			}
-		}`, ""))
+		}`, elements.NewComponentsList("")))
 	ast := p.AST()
 
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
@@ -228,7 +234,7 @@ func TestSimpleRelation(t *testing.T) {
 
 	p.Parse(NewLexer(`cloud foo
 		cloud bar
-		foo --> bar`, ""))
+		foo --> bar`, elements.NewComponentsList("")))
 	ast := p.AST()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
@@ -250,7 +256,7 @@ func TestSimpleRelationAlias(t *testing.T) {
 
 	p.Parse(NewLexer(`cloud foo as a1
 		cloud bar as a2
-		a1 --> a2`, ""))
+		a1 --> a2`, elements.NewComponentsList("")))
 	ast := p.AST()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
@@ -270,7 +276,7 @@ func TestSimpleRelationAlias(t *testing.T) {
 func TestSimpleRelationDeclaration(t *testing.T) {
 	p := &TdocParserImpl{}
 
-	p.Parse(NewLexer(`cloud foo as a1 --> cloud bar as a2`, ""))
+	p.Parse(NewLexer(`cloud foo as a1 --> cloud bar as a2`, elements.NewComponentsList("")))
 	ast := p.AST()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
@@ -292,7 +298,7 @@ func TestSimpleRelationDeclaration(t *testing.T) {
 func TestMultiRelationDeclaration(t *testing.T) {
 	p := &TdocParserImpl{}
 
-	p.Parse(NewLexer(`cloud foo as a1 --> cloud bar as a2 --> actor baz as a3 --> node blubb as a4`, ""))
+	p.Parse(NewLexer(`cloud foo as a1 --> cloud bar as a2 --> actor baz as a3 --> node blubb as a4`, elements.NewComponentsList("")))
 	ast := p.AST()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
@@ -339,7 +345,7 @@ func TestAliasRelationDeclaration(t *testing.T) {
 	p := &TdocParserImpl{}
 
 	p.Parse(NewLexer(`cloud foo as a1
-		a1 --> cloud bar as a2`, ""))
+		a1 --> cloud bar as a2`, elements.NewComponentsList("")))
 	ast := p.AST()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
@@ -364,7 +370,7 @@ func TestComplexAliasRelationDeclaration(t *testing.T) {
 	p.Parse(NewLexer(`cloud foo as a1
 		a1 --> cloud bar as a2 {
 			actor bar as a3
-		} --> node baz`, ""))
+		} --> node baz`, elements.NewComponentsList("")))
 	ast := p.AST()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 
@@ -412,7 +418,7 @@ func TestNestingOnRootLevel(t *testing.T) {
 	}
 	cloud bar as a3 {
 		actor bar as a4
-	}`, ""))
+	}`, elements.NewComponentsList("")))
 	ast := p.AST()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()
@@ -456,7 +462,7 @@ func TestNestingOnSameLevel(t *testing.T) {
 	}
 	cloud bar as a3 {
 		actor bar as a4
-	}`, ""))
+	}`, elements.NewComponentsList("")))
 	ast := p.AST()
 	assert.Equal(t, "*elements.Component", reflect.TypeOf(ast).String())
 	c := ast.Next()

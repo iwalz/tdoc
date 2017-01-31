@@ -1,13 +1,12 @@
 package cmd
 
 import (
-	"io/ioutil"
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/dnephin/cobra"
-	"github.com/iwalz/tdoc/parser"
-	"github.com/iwalz/tdoc/renderer"
+	"github.com/iwalz/tdoc/outputs"
+	"github.com/spf13/afero"
 )
 
 var port string
@@ -26,17 +25,13 @@ var serveCmd = &cobra.Command{
 			log.SetLevel(log.DebugLevel)
 		}
 
-		http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			content, err := ioutil.ReadFile(args[0])
-			if err != nil {
-				log.Error("Could not open file ", args[0])
-			}
-			p := &parser.TdocParserImpl{}
-			l := parser.NewLexer(string(content), SvgDir)
-			p.Parse(l)
-			m := renderer.NewMiddleware(p.AST(), SvgDir)
+		fs := afero.NewOsFs()
+		web := outputs.NewWeb(fs, extension, SvgDir)
+		executor := outputs.NewExecutor(fs, extension)
+		executor.Exec(web, args)
 
-			m.Render(w, req)
+		http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			web.WebHandler(req.URL.Path, w)
 		}))
 
 		err := http.ListenAndServe(":"+port, nil)
