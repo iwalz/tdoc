@@ -6,6 +6,7 @@ import (
 
 	svg "github.com/ajstarks/svgo"
 	"github.com/iwalz/tdoc/elements"
+	"github.com/iwalz/tdoc/image"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -54,6 +55,10 @@ func (t *TableAbstractMock) Y() int {
 
 func (t *TableAbstractMock) SetX(x int) {
 	t.Mock.Called(x)
+}
+
+func (t *TableAbstractMock) SetRewriter(r image.Rewriter) {
+	t.Mock.Called(r)
 }
 
 func (t *TableAbstractMock) SetY(y int) {
