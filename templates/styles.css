@@ -1,0 +1,58 @@
+#root{
+  display: flex;
+  font-family: cursive;
+}
+
+#border {
+  flex: 1;
+  border-right: 1px solid #333;
+  margin-left: 10px;
+  border-left: 1px dashed #333;
+  background-color: #efefef;
+  background-image: radial-gradient(circle closest-side,#efefef 60%, #ccc 5%, #efefef);
+  background-repeat: repeat-y;
+  background-size: 40px 300px;
+}
+
+#pagename {
+  font-size: 30px;
+  line-height: 120px;
+  text-align: center;
+}
+
+#header {
+  background: #efefef;
+  height: 120px;
+}
+#content {
+  background-image: linear-gradient(to bottom, #333 2%, #efefef 1%, #efefef 99%, #333 99%, #333 99%, #efefef 99%, #efefef);
+	background-size: 40px 40px;
+     flex: 5;
+ min-height: 100vh;
+}
+.list {
+  margin-left: 15px;
+}
+.entry {
+  max-height: 36px;
+  height: 36px;
+  padding-top: 4px;
+}
+.entry:hover {
+  background: white;
+}
+.entry.folder > a {
+  text-decoration: underline;
+}
+.entry a {
+  font-size: 16px;
+  text-decoration: none;
+  color: #000;
+  position: relative;
+  top: -9px;
+  margin-left: 5px;
+}
+
+.entry a:hover {
+  background: white;
+}

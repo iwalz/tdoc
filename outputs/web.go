@@ -2,7 +2,9 @@ package outputs
 
 import (
 	"errors"
+	"html/template"
 	"net/http"
+	"strings"
 
 	svg "github.com/ajstarks/svgo"
 	"github.com/iwalz/tdoc/elements"
@@ -20,8 +22,12 @@ type Web struct {
 	parser     parser.Tdoc             // YACC Parser
 	lexer      parser.TdocLexer        // Lexer
 	middleware renderer.MWare          // Middleware
-	dirs       map[string]bool         // Registered directories
-	files      map[string]bool         // Registered files
+	store      Store
+}
+
+type Store struct {
+	Dirs  map[string]bool // Registered directories
+	Files map[string]bool // Registered files
 }
 
 func NewWeb(fs afero.Fs, ext string, dir string) *Web {
@@ -30,34 +36,80 @@ func NewWeb(fs afero.Fs, ext string, dir string) *Web {
 	web.cl = elements.NewComponentsList(dir)
 	web.cl.Parse()
 
-	web.dirs = make(map[string]bool, 0)
-	web.files = make(map[string]bool, 0)
+	s := Store{}
+	s.Dirs = make(map[string]bool, 0)
+	s.Files = make(map[string]bool, 0)
+
+	web.store = s
 
 	return web
 }
 
 func (w *Web) HandleDir(d string) error {
-	w.dirs[d] = true
+	w.store.Dirs[d] = true
 	return nil
 }
 
 func (w *Web) HandleFile(file string) error {
-	w.files[file] = true
+	w.store.Files[file] = true
 
 	return nil
 }
 
 func (web *Web) WebHandler(path string, w http.ResponseWriter) error {
 	p := path[1:]
-	if ok, _ := web.files[p]; ok {
+
+	// Check if it's an asset
+	if p == "reset.css" || p == "styles.css" || p == "file.svg" || p == "folder.svg" {
+		web.renderAssets(p, w)
+	}
+	if ok, _ := web.store.Files[p]; ok {
 		web.renderFile(p, w)
 		return nil
 	}
 
-	if ok, _ := web.dirs[p]; ok {
-		//web.renderDir(p, w)
+	if ok, _ := web.store.Dirs[p]; ok || p == "" {
+		web.renderDir(p, w)
 		return nil
 	}
+
+	return nil
+}
+
+func (web *Web) renderAssets(path string, w http.ResponseWriter) error {
+	header := w.Header()
+	if strings.HasSuffix(path, ".css") {
+		header.Set("Content-Type", "text/css")
+	}
+
+	if strings.HasSuffix(path, ".svg") {
+		header.Set("Content-Type", "image/svg+xml")
+	}
+
+	d, err := Asset("templates/" + path)
+	if err != nil {
+		return err
+	}
+	w.Write(d)
+
+	return nil
+}
+
+func (web *Web) renderDir(path string, w http.ResponseWriter) error {
+	header := w.Header()
+	header.Set("Content-Type", "text/html")
+
+	d, err := Asset("templates/tdoc.html")
+	if err != nil {
+		return err
+	}
+
+	t := template.New("index")
+	t, err = t.Parse(string(d))
+	if err != nil {
+		return err
+	}
+	t.Execute(w, web.store)
 
 	return nil
 }

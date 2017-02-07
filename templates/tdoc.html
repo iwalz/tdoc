@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+		<link rel="stylesheet" type="text/css" href="/reset.css" media="screen" />
+		<link rel="stylesheet" type="text/css" href="/styles.css" media="screen" />
+    <title>tdoc</title>
+  </head>
+  <body>
+		<div id="root">
+			<div id="border">
+				<div id="pagename">tdoc</div>
+			</div>
+			<div id="content">
+				<header id="header"></header>
+				<ul class="list">
+          {{ . }}
+					<li class="entry"><img src="file.svg" width="32" height="32" /><a href="#">Foo</a></li>
+					<li class="entry"><img src="file.svg" width="32" height="32" /><a href="#">Bar</a></li>
+					<li class="entry"><img src="folder.svg" width="32" height="32" /><a href="#">Baz</a></li>
+					<li class="entry"><img src="file.svg" width="32" height="32" /><a href="#">Ente</a></li>
+					<li class="entry"><img src="file.svg" width="32" height="32" /><a href="#">Foo</a></li>
+					<li class="entry"><img src="file.svg" width="32" height="32" /><a href="#">Bar</a></li>
+					<li class="entry"><img src="folder.svg" width="32" height="32" /><a href="#">Baz</a></li>
+					<li class="entry"><img src="file.svg" width="32" height="32" /><a href="#">Ente</a></li>
+				</ul>
+			</div>
+		</div>
+	</body>
+</html>
