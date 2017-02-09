@@ -14,15 +14,19 @@
 			<div id="content">
 				<header id="header"></header>
 				<ul class="list">
-          {{ . }}
-					<li class="entry"><img src="file.svg" width="32" height="32" /><a href="#">Foo</a></li>
-					<li class="entry"><img src="file.svg" width="32" height="32" /><a href="#">Bar</a></li>
-					<li class="entry"><img src="folder.svg" width="32" height="32" /><a href="#">Baz</a></li>
-					<li class="entry"><img src="file.svg" width="32" height="32" /><a href="#">Ente</a></li>
-					<li class="entry"><img src="file.svg" width="32" height="32" /><a href="#">Foo</a></li>
-					<li class="entry"><img src="file.svg" width="32" height="32" /><a href="#">Bar</a></li>
-					<li class="entry"><img src="folder.svg" width="32" height="32" /><a href="#">Baz</a></li>
-					<li class="entry"><img src="file.svg" width="32" height="32" /><a href="#">Ente</a></li>
+          {{ $r := .}}
+          {{ range $key, $value := .Files }}
+            {{ $b := startsWith $r.Path $key}}
+            {{ if  $b }}
+              {{ $name := stripPath $r.Path $key}}
+              <li class="entry"><img src="/folder.svg" width="32" height="32" /><a href="{{ $key }}">{{ $name }}</a></li>
+            {{ end }}
+            {{ range $k, $v := $value }}
+              {{ if $b }}
+                <li class="entry"><img src="/file.svg" width="32" height="32" /><a href="{{ $r.Path }}/{{$v}}">{{$v}}</a></li>
+              {{end}}
+            {{ end }}
+          {{ end }}
 				</ul>
 			</div>
 		</div>

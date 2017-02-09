@@ -26,8 +26,8 @@ type Web struct {
 }
 
 type Store struct {
-	Dirs  map[string]bool // Registered directories
-	Files map[string]bool // Registered files
+	Files map[string][]string // Registered files, key is the directory
+	Path  string
 }
 
 func NewWeb(fs afero.Fs, ext string, dir string) *Web {
@@ -37,8 +37,7 @@ func NewWeb(fs afero.Fs, ext string, dir string) *Web {
 	web.cl.Parse()
 
 	s := Store{}
-	s.Dirs = make(map[string]bool, 0)
-	s.Files = make(map[string]bool, 0)
+	s.Files = make(map[string][]string, 0)
 
 	web.store = s
 
@@ -46,13 +45,24 @@ func NewWeb(fs afero.Fs, ext string, dir string) *Web {
 }
 
 func (w *Web) HandleDir(d string) error {
-	w.store.Dirs[d] = true
 	return nil
 }
 
-func (w *Web) HandleFile(file string) error {
-	w.store.Files[file] = true
+func getDirectoryAndFilename(file string) (string, string) {
+	index := strings.LastIndex(file, "/")
+	if index == -1 {
+		return "/", file
+	}
+	d := file[:index]
+	f := file[index+1:]
 
+	return d, f
+}
+
+func (w *Web) HandleFile(file string) error {
+	d, f := getDirectoryAndFilename(file)
+
+	w.store.Files[d] = append(w.store.Files[d], f)
 	return nil
 }
 
@@ -63,15 +73,13 @@ func (web *Web) WebHandler(path string, w http.ResponseWriter) error {
 	if p == "reset.css" || p == "styles.css" || p == "file.svg" || p == "folder.svg" {
 		web.renderAssets(p, w)
 	}
-	if ok, _ := web.store.Files[p]; ok {
-		web.renderFile(p, w)
-		return nil
-	}
 
-	if ok, _ := web.store.Dirs[p]; ok || p == "" {
+	if _, ok := web.store.Files[p]; ok || p == "" {
 		web.renderDir(p, w)
 		return nil
 	}
+
+	web.renderFile(p, w)
 
 	return nil
 }
@@ -95,16 +103,38 @@ func (web *Web) renderAssets(path string, w http.ResponseWriter) error {
 	return nil
 }
 
+func stripPath(prefix, path string) string {
+	return strings.Replace(path, prefix+"/", "", 1)
+}
+
+func startsWith(prefix, path string) bool {
+	if prefix == "" && path == "" {
+		return false
+	}
+
+	if strings.HasPrefix("/"+path, prefix+"/") {
+		return true
+	}
+
+	return false
+}
+
 func (web *Web) renderDir(path string, w http.ResponseWriter) error {
 	header := w.Header()
 	header.Set("Content-Type", "text/html")
+
+	web.store.Path = path
 
 	d, err := Asset("templates/tdoc.html")
 	if err != nil {
 		return err
 	}
 
-	t := template.New("index")
+	fmap := template.FuncMap{
+		"startsWith": startsWith,
+		"stripPath":  stripPath,
+	}
+	t := template.New("index").Funcs(fmap)
 	t, err = t.Parse(string(d))
 	if err != nil {
 		return err

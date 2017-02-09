@@ -51,10 +51,6 @@ func handleFile(e string, o Output) filepath.WalkFunc {
 		if err != nil {
 			return nil
 		}
-		// No action if it's a directory
-		if info.IsDir() {
-			o.HandleDir(path)
-		}
 
 		// Skip if file doesn't end with given extension
 		if !info.IsDir() && strings.HasSuffix(info.Name(), "."+e) {
