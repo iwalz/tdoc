@@ -28,6 +28,9 @@ type Tdoc interface {
 %token <val> COMPONENT TEXT ERROR IDENTIFIER ALIAS RELATION
 %type <component> declaration relation_assignment statement statement_list program
 
+%right SCOPEIN
+%right SCOPEOUT
+
 %union{
   val string
   pos int
@@ -45,6 +48,8 @@ program: statement_list
   log.Info("program: statement_list")
 
   $$ = roots[0][0]
+  log.Debug($$)
+  spew.Dump(roots)
   program = $$
   //spew.Dump(program)
 }
@@ -52,13 +57,15 @@ program: statement_list
 statement_list: statement
 {
   log.Info("statement_list: statement")
-  log.Debug("Depth", depth)
+  sub_depth := depths[depth]
+  log.Debug("Depth ", depth)
+  log.Debug("Index ", sub_depth)
   log.Debug($1)
 
   if depth == 0 && !$1.IsAdded() {
     $1.Added(true)
-    sub_depth := depths[depth]
     roots[depth][sub_depth].Add($1)
+    log.Debug("Added ", $1)
   }
   //spew.Dump(roots[depth])
 }
@@ -66,15 +73,16 @@ statement_list: statement
 statement_list statement
 {
   log.Info("statement_list statement")
-  log.Debug("Depth", depth)
+  sub_depth := depths[depth]
+  log.Debug("Depth ", depth)
+  log.Debug("Index ", sub_depth)
   log.Debug($1)
   log.Debug($2)
 
   if $2 != nil && !$2.IsAdded() {
     $2.Added(true)
-    sub_depth := depths[depth]
     roots[depth][sub_depth].Add($2)
-    //spew.Dump(roots[depth])
+    log.Debug("Added ", $2)
   }
 }
 ;
@@ -193,6 +201,7 @@ declaration: COMPONENT IDENTIFIER
 
   if depths == nil {
     depths = make([]int, 1)
+    depths[0] = 1
   }
 
   if registry == nil {
@@ -218,7 +227,7 @@ declaration: COMPONENT IDENTIFIER
   }
 
   if depths == nil {
-    depths = make([]int, 1)
+    depths = make([]int, 0)
   }
 
   if registry == nil {
@@ -232,7 +241,7 @@ declaration SCOPEIN
   log.Info("declaration SCOPEIN")
   log.Debug($1)
 
-  depth = depth + 1
+
   sub := make([]*elements.Component, 0)
   sub = append(sub, $1)
   roots = append(roots, sub)
@@ -241,12 +250,12 @@ declaration SCOPEIN
   fmt.Println("Scope in")
   depths = append(depths, 0)
   fmt.Println("Depth: ", depth)
-  fmt.Println("Index: ", depths[depth])
+  fmt.Println("Index: ", sub_depth)
   roots[depth] = append(roots[depth], $1)
-  roots[depth][sub_depth].Add($1)
+  //roots[sub_depth][depth].Add($1)
 
   $1.Added(true)
-  spew.Dump(roots)
+  //spew.Dump(roots)
 
   depths[depth] = depths[depth] + 1
   depth = depth + 1
@@ -256,6 +265,7 @@ SCOPEOUT
 {
   log.Info("SCOPEOUT")
   $$ = roots[depth][depths[depth]]
+  $$.Added(true)
   depth = depth - 1
 }
 ;
