@@ -44,10 +44,6 @@ func NewWeb(fs afero.Fs, ext string, dir string) *Web {
 	return web
 }
 
-func (w *Web) HandleDir(d string) error {
-	return nil
-}
-
 func getDirectoryAndFilename(file string) (string, string) {
 	index := strings.LastIndex(file, "/")
 	if index == -1 {

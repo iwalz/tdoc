@@ -9,7 +9,6 @@ import (
 )
 
 type Output interface {
-	HandleDir(string) error
 	HandleFile(string) error
 }
 

@@ -37,5 +37,4 @@ func TestExecutor(t *testing.T) {
 
 	e.Exec(om, []string{"/foo", "2.tdoc"})
 	om.AssertNumberOfCalls(t, "HandleFile", 2)
-	om.AssertNumberOfCalls(t, "HandleDir", 3)
 }
