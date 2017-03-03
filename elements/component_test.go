@@ -32,3 +32,19 @@ func TestRelationsComponent(t *testing.T) {
 	assert.Equal(t, c1.Relations()[0], r)
 	assert.Equal(t, c1.Relations()[0].Element(), c2)
 }
+
+func TestRemove(t *testing.T) {
+	c1 := NewComponent("foo", "bar", "blubb")
+	c2 := NewComponent("foo1", "bar", "blubb")
+	c3 := NewComponent("foo2", "bar", "blubb")
+
+	c1.Add(c2)
+	c1.Add(c3)
+	assert.Equal(t, c2, c1.Stack()[0])
+	assert.Equal(t, c3, c1.Stack()[1])
+	assert.Equal(t, 2, len(c1.Stack()))
+
+	c2.Remove()
+	assert.Equal(t, 1, len(c1.Stack()))
+	assert.Equal(t, c3, c1.Stack()[0])
+}

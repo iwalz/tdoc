@@ -63,7 +63,7 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:274
+//line parser/tdoc.y:276
 
 /* Start of the program */
 
@@ -81,51 +81,51 @@ var TdocExca = [...]int{
 	-2, 0,
 }
 
-const TdocNprod = 15
+const TdocNprod = 16
 const TdocPrivate = 57344
 
 var TdocTokenNames []string
 var TdocStates []string
 
-const TdocLast = 28
+const TdocLast = 26
 
 var TdocAct = [...]int{
 
-	4, 11, 14, 12, 18, 7, 6, 19, 10, 21,
-	13, 16, 11, 17, 1, 20, 7, 6, 15, 7,
-	6, 8, 7, 6, 3, 2, 5, 9,
+	5, 12, 15, 13, 20, 14, 8, 21, 11, 7,
+	8, 9, 17, 18, 19, 23, 22, 8, 16, 8,
+	3, 4, 1, 10, 2, 6,
 }
 var TdocPact = [...]int{
 
-	14, -1000, 14, -1000, -3, -8, 1, -1000, -9, -1000,
-	11, -1000, 17, -6, 0, -1000, 8, 8, 2, -1000,
-	8, -1000,
+	4, -1000, 4, -1000, -1000, -3, -8, -1000, -4, -9,
+	-1000, 11, 13, 13, -6, 0, -1000, -1000, -1000, -1000,
+	8, -1000, -1000, -1000,
 }
 var TdocPgo = [...]int{
 
-	0, 0, 26, 24, 25, 14,
+	0, 0, 25, 20, 24, 22, 21,
 }
 var TdocR1 = [...]int{
 
-	0, 5, 4, 4, 3, 3, 2, 2, 2, 2,
-	2, 1, 1, 1, 1,
+	0, 5, 4, 4, 3, 3, 3, 2, 2, 2,
+	2, 2, 1, 1, 6, 6,
 }
 var TdocR2 = [...]int{
 
-	0, 1, 1, 2, 1, 1, 3, 3, 3, 3,
-	3, 2, 4, 2, 1,
+	0, 1, 1, 2, 1, 1, 1, 3, 3, 3,
+	3, 3, 2, 4, 3, 1,
 }
 var TdocChk = [...]int{
 
-	-1000, -5, -4, -3, -1, -2, 6, 5, 7, -3,
-	11, 4, 11, 9, 11, 7, -1, -1, 10, 7,
-	-1, 7,
+	-1000, -5, -4, -3, -6, -1, -2, 5, 6, 7,
+	-3, 11, 4, 11, 9, 11, 7, -1, -1, -1,
+	10, 7, -1, 7,
 }
 var TdocDef = [...]int{
 
-	0, -2, 1, 2, 4, 5, 0, 14, 0, 3,
-	0, 13, 0, 11, 0, 8, 10, 9, 0, 6,
-	7, 12,
+	0, -2, 1, 2, 4, 5, 6, 15, 0, 0,
+	3, 0, 0, 0, 12, 0, 9, 11, 14, 10,
+	0, 7, 8, 13,
 }
 var TdocTok1 = [...]int{
 
@@ -497,17 +497,11 @@ Tdocdefault:
 			log.Debug("Depth ", depth)
 			log.Debug("Index ", sub_depth)
 			log.Debug(TdocDollar[1].component)
-
-			if depth == 0 && !TdocDollar[1].component.IsAdded() {
-				TdocDollar[1].component.Added(true)
-				roots[depth][sub_depth].Add(TdocDollar[1].component)
-				log.Debug("Added ", TdocDollar[1].component)
-			}
 			//spew.Dump(roots[depth])
 		}
 	case 3:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:74
+		//line parser/tdoc.y:68
 		{
 			log.Info("statement_list statement")
 			sub_depth := depths[depth]
@@ -515,16 +509,10 @@ Tdocdefault:
 			log.Debug("Index ", sub_depth)
 			log.Debug(TdocDollar[1].component)
 			log.Debug(TdocDollar[2].component)
-
-			if TdocDollar[2].component != nil && !TdocDollar[2].component.IsAdded() {
-				TdocDollar[2].component.Added(true)
-				roots[depth][sub_depth].Add(TdocDollar[2].component)
-				log.Debug("Added ", TdocDollar[2].component)
-			}
 		}
-	case 6:
+	case 7:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:93
+		//line parser/tdoc.y:81
 		{
 			log.Info("relation_assignment: TEXT RELATION TEXT")
 			log.Debug(TdocDollar[1].val)
@@ -535,9 +523,9 @@ Tdocdefault:
 			rel.To(elements.Get(registry, TdocDollar[3].val))
 			elements.Get(registry, TdocDollar[1].val).AddRelation(rel)
 		}
-	case 7:
+	case 8:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:105
+		//line parser/tdoc.y:93
 		{
 			log.Info("TEXT RELATION declaration")
 			log.Debug(TdocDollar[1].val)
@@ -554,9 +542,9 @@ Tdocdefault:
 			}
 			TdocVAL.component = TdocDollar[3].component
 		}
-	case 8:
+	case 9:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:123
+		//line parser/tdoc.y:111
 		{
 			log.Info("declaration RELATION TEXT")
 			log.Debug(TdocDollar[1].component)
@@ -574,9 +562,9 @@ Tdocdefault:
 			}
 			TdocVAL.component = c
 		}
-	case 9:
+	case 10:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:142
+		//line parser/tdoc.y:130
 		{
 			log.Info("relation_assignment RELATION declaration")
 			log.Debug(TdocDollar[1].component)
@@ -593,9 +581,9 @@ Tdocdefault:
 			TdocDollar[1].component.AddRelation(rel)
 			TdocVAL.component = TdocDollar[3].component
 		}
-	case 10:
+	case 11:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:160
+		//line parser/tdoc.y:148
 		{
 			log.Info("declaration RELATION declaration")
 			log.Debug(TdocDollar[1].component)
@@ -622,9 +610,9 @@ Tdocdefault:
 			TdocDollar[1].component.AddRelation(rel)
 			TdocVAL.component = TdocDollar[3].component
 		}
-	case 11:
+	case 12:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:188
+		//line parser/tdoc.y:176
 		{
 			log.Info("declaration: COMPONENT IDENTIFIER")
 			log.Debug(TdocDollar[1].val)
@@ -641,17 +629,24 @@ Tdocdefault:
 
 			if depths == nil {
 				depths = make([]int, 1)
-				depths[0] = 1
+				depths[0] = 0
 			}
 
 			if registry == nil {
 				registry = elements.NewRegistry()
 			}
 			registry.Add(TdocVAL.component)
+			log.Debug("Depth: ", depth)
+			sub_depth := depths[depth]
+			log.Debug("Index: ", sub_depth)
+			TdocVAL.component.Added(true)
+
+			roots[depth][sub_depth].Add(TdocVAL.component)
+			log.Debug("Added ", TdocVAL.component)
 		}
-	case 12:
+	case 13:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:213
+		//line parser/tdoc.y:208
 		{
 			log.Info("COMPONENT IDENTIFIER ALIAS TEXT")
 			log.Debug(TdocDollar[1].val)
@@ -676,10 +671,16 @@ Tdocdefault:
 				registry = elements.NewRegistry()
 			}
 			registry.Add(TdocVAL.component)
+
+			sub_depth := depths[depth]
+			TdocVAL.component.Added(true)
+			roots[depth][sub_depth].Add(TdocVAL.component)
+			log.Debug("Added ", TdocVAL.component)
+
 		}
-	case 13:
-		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:240
+	case 14:
+		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
+		//line parser/tdoc.y:241
 		{
 			log.Info("declaration SCOPEIN")
 			log.Debug(TdocDollar[1].component)
@@ -697,14 +698,15 @@ Tdocdefault:
 			//roots[sub_depth][depth].Add($1)
 
 			TdocDollar[1].component.Added(true)
+			TdocDollar[1].component.Add(TdocDollar[3].component)
 			//spew.Dump(roots)
 
 			depths[depth] = depths[depth] + 1
 			depth = depth + 1
 		}
-	case 14:
+	case 15:
 		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:265
+		//line parser/tdoc.y:267
 		{
 			log.Info("SCOPEOUT")
 			TdocVAL.component = roots[depth][depths[depth]]

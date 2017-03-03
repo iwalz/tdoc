@@ -1,5 +1,11 @@
 package elements
 
+import (
+	"fmt"
+
+	"github.com/davecgh/go-spew/spew"
+)
+
 type Stackable interface {
 	Add(*Component)
 }
@@ -11,8 +17,12 @@ type Element interface {
 	Next() Element
 	HasChilds() bool
 	Reset()
+	Root(Element)
 	Added(bool)
 	IsAdded() bool
+	Remove()
+	Stack() []Element
+	SetStack([]Element)
 }
 
 type DefaultElement struct {
@@ -20,6 +30,15 @@ type DefaultElement struct {
 	stack     []Element
 	relations []*Relation
 	added     bool
+	root      Element
+}
+
+func (d *DefaultElement) Stack() []Element {
+	return d.stack
+}
+
+func (d *DefaultElement) SetStack(s []Element) {
+	d.stack = s
 }
 
 func (d *DefaultElement) AddRelation(r *Relation) {
@@ -38,8 +57,33 @@ func (d *DefaultElement) IsAdded() bool {
 	return d.added
 }
 
+func (d *DefaultElement) Remove() {
+	index := 0
+	found := false
+	stack := d.root.Stack()
+	for i, v := range stack {
+		if v == d {
+			index = i
+			found = true
+			break
+		}
+	}
+	fmt.Println("Blubb")
+	if found {
+		fmt.Println("Found element on ", index)
+		stack = append(stack[:index], stack[index+1:]...)
+		spew.Dump(stack)
+		d.root.SetStack(stack)
+	}
+}
+
 func (d *DefaultElement) Add(e Element) {
 	d.stack = append(d.stack, e)
+	e.Root(d)
+}
+
+func (d *DefaultElement) Root(e Element) {
+	d.root = e
 }
 
 func (d *DefaultElement) Reset() {

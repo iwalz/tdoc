@@ -26,7 +26,7 @@ type Tdoc interface {
 
 %token <token> SCOPEIN SCOPEOUT
 %token <val> COMPONENT TEXT ERROR IDENTIFIER ALIAS RELATION
-%type <component> declaration relation_assignment statement statement_list program
+%type <component> declaration relation_assignment statement statement_list program scope
 
 %right SCOPEIN
 %right SCOPEOUT
@@ -61,12 +61,6 @@ statement_list: statement
   log.Debug("Depth ", depth)
   log.Debug("Index ", sub_depth)
   log.Debug($1)
-
-  if depth == 0 && !$1.IsAdded() {
-    $1.Added(true)
-    roots[depth][sub_depth].Add($1)
-    log.Debug("Added ", $1)
-  }
   //spew.Dump(roots[depth])
 }
 |
@@ -78,16 +72,10 @@ statement_list statement
   log.Debug("Index ", sub_depth)
   log.Debug($1)
   log.Debug($2)
-
-  if $2 != nil && !$2.IsAdded() {
-    $2.Added(true)
-    roots[depth][sub_depth].Add($2)
-    log.Debug("Added ", $2)
-  }
 }
 ;
 
-statement: declaration | relation_assignment
+statement: scope|declaration | relation_assignment
 
 relation_assignment: TEXT RELATION TEXT
 {
@@ -201,13 +189,20 @@ declaration: COMPONENT IDENTIFIER
 
   if depths == nil {
     depths = make([]int, 1)
-    depths[0] = 1
+    depths[0] = 0
   }
 
   if registry == nil {
     registry = elements.NewRegistry()
   }
   registry.Add($$)
+  log.Debug("Depth: ", depth)
+  sub_depth := depths[depth]
+  log.Debug("Index: ", sub_depth)
+  $$.Added(true)
+
+  roots[depth][sub_depth].Add($$)
+  log.Debug("Added ", $$)
 }
 | COMPONENT IDENTIFIER ALIAS TEXT
 {
@@ -234,9 +229,15 @@ declaration: COMPONENT IDENTIFIER
     registry = elements.NewRegistry()
   }
   registry.Add($$)
+
+sub_depth := depths[depth]
+    $$.Added(true)
+    roots[depth][sub_depth].Add($$)
+    log.Debug("Added ", $$)
+
 }
-|
-declaration SCOPEIN
+;
+scope: declaration SCOPEIN declaration
 {
   log.Info("declaration SCOPEIN")
   log.Debug($1)
@@ -255,6 +256,7 @@ declaration SCOPEIN
   //roots[sub_depth][depth].Add($1)
 
   $1.Added(true)
+  $1.Add($3)
   //spew.Dump(roots)
 
   depths[depth] = depths[depth] + 1
