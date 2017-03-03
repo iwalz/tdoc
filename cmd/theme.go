@@ -5,8 +5,6 @@ import (
 	"github.com/dnephin/cobra"
 )
 
-var port string
-
 // themeCmd represents the theme command
 var themeCmd = &cobra.Command{
 	Use:   "theme",
