@@ -10,7 +10,7 @@ test:
 	done
 
 yacc:
-	@go tool yacc -o parser/parser.go -p Tdoc parser/tdoc.y
+	@goyacc -o parser/parser.go -p Tdoc parser/tdoc.y
 
 cover:
 	@go tool cover -html=gover.coverprofile
@@ -31,3 +31,4 @@ deps:
 	@go get golang.org/x/tools/cmd/cover
 	@go get github.com/modocache/gover
 	@go get github.com/jteeuwen/go-bindata
+	@go get golang.org/x/tools/cmd/goyacc
