@@ -5,6 +5,7 @@ import (
 
 	svg "github.com/ajstarks/svgo"
 	"github.com/iwalz/tdoc/elements"
+	"github.com/iwalz/tdoc/image"
 	"github.com/spf13/afero"
 )
 
@@ -26,6 +27,7 @@ type TableAbstract interface {
 	SetX(int)
 	SetY(int)
 	Render(*svg.SVG) error
+	SetRewriter(image.Rewriter)
 }
 
 // Errors
@@ -46,6 +48,11 @@ type Table struct {
 	caption string
 	cl      elements.ComponentsList
 	fs      afero.Fs
+	rewrite image.Rewriter
+}
+
+func (t *Table) SetRewriter(r image.Rewriter) {
+	t.rewrite = r
 }
 
 // Satisfy tableAbstract interface
@@ -306,13 +313,24 @@ func (t *Table) Render(svg *svg.SVG) error {
 			return err
 		}
 		defer f.Close()
-		placepic(svg, f, t.X()+30, t.Y(), 60, 60)
+
+		t.rewrite.SetX(t.X() + 30)
+		t.rewrite.SetY(t.Y())
+		t.rewrite.SetWidth(60)
+		t.rewrite.SetHeight(60)
+		t.rewrite.SetName("")
+		t.rewrite.Place(svg, f)
+
+		if Wireframe {
+			// Renders the embedded wireframe
+			svg.Rect(t.rewrite.X(), t.rewrite.Y(), t.rewrite.Width(), t.rewrite.Height(), wireoptions)
+		}
 	}
 
 	// Draw caption
 	if t.caption != "" {
 
-		text(svg, t.X()+90, t.Y()+Border, t.caption)
+		image.Text(svg, t.X()+90, t.Y()+Border, t.caption)
 	}
 
 	// Draw wireframe

@@ -9,7 +9,6 @@ import (
 )
 
 type Output interface {
-	HandleDir(string) error
 	HandleFile(string) error
 }
 
@@ -50,10 +49,6 @@ func handleFile(e string, o Output) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return nil
-		}
-		// No action if it's a directory
-		if info.IsDir() {
-			o.HandleDir(path)
 		}
 
 		// Skip if file doesn't end with given extension

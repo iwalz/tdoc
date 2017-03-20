@@ -5,6 +5,7 @@ import (
 
 	svg "github.com/ajstarks/svgo"
 	"github.com/iwalz/tdoc/elements"
+	"github.com/iwalz/tdoc/image"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -223,6 +224,10 @@ func (c *CellMock) SetX(x int) {
 
 func (c *CellMock) SetY(y int) {
 	c.Mock.Called(y)
+}
+
+func (c *CellMock) SetRewriter(r image.Rewriter) {
+	c.Mock.Called(r)
 }
 
 func (c *CellMock) Render(svg *svg.SVG) error {

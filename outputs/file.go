@@ -29,11 +29,6 @@ func NewFile(fs afero.Fs, ext string, dir string) *File {
 	return file
 }
 
-func (f *File) HandleDir(d string) error {
-	// Nothing to do
-	return nil
-}
-
 func (f *File) HandleFile(file string) error {
 	// New filename
 	newFilename := strings.Replace(file, "."+f.ext, ".svg", 1)

@@ -10,10 +10,13 @@ test:
 	done
 
 yacc:
-	@go tool yacc -o parser/parser.go -p Tdoc parser/tdoc.y
+	@goyacc -o parser/parser.go -p Tdoc parser/tdoc.y
 
 cover:
 	@go tool cover -html=gover.coverprofile
+
+assets:
+	@go-bindata -o outputs/assets.go -pkg outputs templates/
 
 deps:
 	@go get github.com/stretchr/testify/assert
@@ -27,3 +30,5 @@ deps:
 	@go get github.com/mattn/goveralls
 	@go get golang.org/x/tools/cmd/cover
 	@go get github.com/modocache/gover
+	@go get github.com/jteeuwen/go-bindata
+	@go get golang.org/x/tools/cmd/goyacc

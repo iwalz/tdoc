@@ -6,6 +6,7 @@ import (
 
 	svg "github.com/ajstarks/svgo"
 	"github.com/iwalz/tdoc/elements"
+	"github.com/iwalz/tdoc/image"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -79,6 +80,8 @@ func TestRender(t *testing.T) {
 </svg>`), 0644)
 
 	cell := NewCell(c, cl)
+	r := image.NewRewrite()
+	cell.SetRewriter(r)
 	cell.fs = mfs
 
 	b := new(bytes.Buffer)
@@ -98,6 +101,8 @@ func TestErrors(t *testing.T) {
 	afero.WriteFile(mfs, "/foo/bar.svg", []byte(``), 0644)
 
 	cell := NewCell(c, cl)
+	r := image.NewRewrite()
+	cell.SetRewriter(r)
 	cell.fs = mfs
 
 	b := new(bytes.Buffer)

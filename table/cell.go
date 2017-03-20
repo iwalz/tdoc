@@ -5,6 +5,7 @@ import (
 
 	svg "github.com/ajstarks/svgo"
 	"github.com/iwalz/tdoc/elements"
+	"github.com/iwalz/tdoc/image"
 	"github.com/spf13/afero"
 )
 
@@ -32,7 +33,14 @@ func (c *cell) Render(svg *svg.SVG) error {
 		return err
 	}
 	defer f.Close()
-	err = placepic(svg, f, c.X()+10, c.Y(), 100, 100)
+
+	c.rewrite.SetX(c.X() + 10)
+	c.rewrite.SetY(c.Y())
+	c.rewrite.SetWidth(100)
+	c.rewrite.SetHeight(100)
+	c.rewrite.SetName(c.Component().Typ)
+
+	err = c.rewrite.Place(svg, f)
 	if err != nil {
 		return err
 	}
@@ -59,6 +67,11 @@ type cell struct {
 	colspan   int
 	cl        elements.ComponentsList
 	fs        afero.Fs
+	rewrite   image.Rewriter
+}
+
+func (c *cell) SetRewriter(r image.Rewriter) {
+	c.rewrite = r
 }
 
 // Correctly initialize a cell
