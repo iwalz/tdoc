@@ -2,3 +2,5 @@ y.go
 y.output
 coverage.out
 *.coverprofile
+main
+samples/*.svg

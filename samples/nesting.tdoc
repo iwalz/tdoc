@@ -1,0 +1,9 @@
+cloud foo {
+  vpc bar {
+    EC2_Instance blubb
+  }
+
+  vpc baz {
+    EC2_Instance quo
+  }
+}
