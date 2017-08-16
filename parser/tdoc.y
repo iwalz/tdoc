@@ -25,7 +25,7 @@ type Tdoc interface {
 
 %token <token> SCOPEIN SCOPEOUT
 %token <val> COMPONENT TEXT ERROR IDENTIFIER ALIAS RELATION
-%type <component> declaration relation_assignment statement statement_list program
+%type <component> declaration relation_assignment program declaration_list
 
 %union{
   val string
@@ -37,46 +37,6 @@ type Tdoc interface {
 }
 
 %%
-
-// Statement declaration, only do add here
-program: statement_list
-{
-  log.Info("program: statement_list")
-
-  $$ = roots[0]
-  program = $$
-  //spew.Dump(program)
-}
-;
-statement_list: statement
-{
-  log.Info("statement_list: statement")
-  log.Debug("Depth", depth)
-  log.Debug($1)
-
-  if depth == 0 && !$1.IsAdded() {
-    $1.Added(true)
-    roots[depth].Add($1)
-  }
-  //spew.Dump(roots[depth])
-}
-|
-statement_list statement
-{
-  log.Info("statement_list statement")
-  log.Debug("Depth", depth)
-  log.Debug($1)
-  log.Debug($2)
-
-  if $2 != nil && !$2.IsAdded() {
-    $2.Added(true)
-    roots[depth].Add($2)
-    //spew.Dump(roots[depth])
-  }
-}
-;
-
-statement: declaration | relation_assignment
 
 relation_assignment: TEXT RELATION TEXT
 {
@@ -167,6 +127,15 @@ declaration RELATION declaration
   $1.AddRelation(rel)
   $$ = $3
 }
+;
+
+program: declaration_list
+{
+  log.Info("program: declaration_list")
+  log.Debug($1)
+  program = $1;
+};
+declaration_list: declaration | declaration declaration_list;
 
 declaration: COMPONENT IDENTIFIER
 {
@@ -174,12 +143,6 @@ declaration: COMPONENT IDENTIFIER
   log.Debug($1)
   log.Debug($2)
   $$ = elements.NewComponent($1, $2, "")
-
-  if roots == nil {
-    roots = make([]*elements.Component, 0)
-    program = elements.NewComponent("", "", "")
-    roots = append(roots, program)
-  }
 
   if registry == nil {
     registry = elements.NewRegistry()
@@ -195,36 +158,26 @@ declaration: COMPONENT IDENTIFIER
   log.Debug($4)
   $$ = elements.NewComponent($1, $2, $4)
 
-  if roots == nil {
-    roots = make([]*elements.Component, 0)
-    program = elements.NewComponent("", "", "")
-    roots = append(roots, program)
+  if registry == nil {
+    registry = elements.NewRegistry()
   }
+  registry.Add($$)
+}
+| COMPONENT IDENTIFIER ALIAS TEXT SCOPEIN declaration_list SCOPEOUT
+{
+  log.Info("COMPONENT IDENTIFIER ALIAS TEXT SCOPEIN declaration SCOPEOUT")
+  log.Debug($1)
+  log.Debug($2)
+  log.Debug($3)
+  log.Debug($4)
+  log.Debug($6)
+  $$ = elements.NewComponent($1, $2, $4)
 
   if registry == nil {
     registry = elements.NewRegistry()
   }
   registry.Add($$)
 }
-|
-declaration SCOPEIN
-{
-  log.Info("declaration SCOPEIN")
-  log.Debug($1)
-  roots[depth].Add($1)
-  depth = depth + 1
-  $1.Added(true)
-  roots = append(roots, $1)
-  //roots[depth].Add($1)
-}
-|
-SCOPEOUT
-{
-  log.Info("SCOPEOUT")
-  $$ = roots[depth]
-  depth = depth - 1
-}
-;
 ;
 
 %% /* Start of the program */

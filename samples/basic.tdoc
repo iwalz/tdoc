@@ -1,3 +1,5 @@
-cloud first as foo
-client second as bar
-dc third as blubb
+cloud first as foo {
+  cloud second as bar {
+    cloud third as blubb
+  }
+}

@@ -62,7 +62,7 @@ const TdocEofCode = 1
 const TdocErrCode = 2
 const TdocInitialStackSize = 16
 
-//line parser/tdoc.y:230
+//line parser/tdoc.y:183
 
 /* Start of the program */
 
@@ -79,51 +79,51 @@ var TdocExca = [...]int{
 	-2, 0,
 }
 
-const TdocNprod = 15
+const TdocNprod = 12
 const TdocPrivate = 57344
 
 var TdocTokenNames []string
 var TdocStates []string
 
-const TdocLast = 28
+const TdocLast = 23
 
 var TdocAct = [...]int{
 
-	4, 11, 14, 12, 18, 7, 6, 19, 10, 21,
-	13, 16, 11, 17, 1, 20, 7, 6, 15, 7,
-	6, 8, 7, 6, 3, 2, 5, 9,
+	17, 7, 6, 5, 18, 3, 14, 8, 4, 12,
+	9, 11, 13, 4, 10, 4, 2, 15, 4, 20,
+	19, 16, 1,
 }
 var TdocPact = [...]int{
 
-	14, -1000, 14, -1000, -3, -8, 1, -1000, -9, -1000,
-	11, -1000, 17, -6, 0, -1000, 8, 8, 2, -1000,
-	8, -1000,
+	9, -8, -9, -10, -2, 12, 7, 2, -4, -1000,
+	-1000, -1000, -1000, -1000, 10, 17, 12, 15, 12, -1000,
+	-1000,
 }
 var TdocPgo = [...]int{
 
-	0, 0, 26, 24, 25, 14,
+	0, 4, 22, 22, 0,
 }
 var TdocR1 = [...]int{
 
-	0, 5, 4, 4, 3, 3, 2, 2, 2, 2,
-	2, 1, 1, 1, 1,
+	0, 2, 2, 2, 2, 2, 3, 4, 4, 1,
+	1, 1,
 }
 var TdocR2 = [...]int{
 
-	0, 1, 1, 2, 1, 1, 3, 3, 3, 3,
-	3, 2, 4, 2, 1,
+	0, 3, 3, 3, 3, 3, 1, 1, 2, 2,
+	4, 7,
 }
 var TdocChk = [...]int{
 
-	-1000, -5, -4, -3, -1, -2, 6, 5, 7, -3,
-	11, 4, 11, 9, 11, 7, -1, -1, 10, 7,
-	-1, 7,
+	-1000, -2, 7, -1, 6, 11, 11, 11, 9, -1,
+	7, -1, 7, -1, 10, 7, 4, -4, -1, 5,
+	-4,
 }
 var TdocDef = [...]int{
 
-	0, -2, 1, 2, 4, 5, 0, 14, 0, 3,
-	0, 13, 0, 11, 0, 8, 10, 9, 0, 6,
-	7, 12,
+	0, -2, 0, 0, 0, 0, 0, 0, 9, 4,
+	1, 2, 3, 5, 0, 10, 0, 0, 7, 11,
+	8,
 }
 var TdocTok1 = [...]int{
 
@@ -475,47 +475,8 @@ Tdocdefault:
 	switch Tdocnt {
 
 	case 1:
-		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:43
-		{
-			log.Info("program: statement_list")
-
-			TdocVAL.component = roots[0]
-			program = TdocVAL.component
-			//spew.Dump(program)
-		}
-	case 2:
-		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:52
-		{
-			log.Info("statement_list: statement")
-			log.Debug("Depth", depth)
-			log.Debug(TdocDollar[1].component)
-
-			if depth == 0 && !TdocDollar[1].component.IsAdded() {
-				TdocDollar[1].component.Added(true)
-				roots[depth].Add(TdocDollar[1].component)
-			}
-			//spew.Dump(roots[depth])
-		}
-	case 3:
-		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:65
-		{
-			log.Info("statement_list statement")
-			log.Debug("Depth", depth)
-			log.Debug(TdocDollar[1].component)
-			log.Debug(TdocDollar[2].component)
-
-			if TdocDollar[2].component != nil && !TdocDollar[2].component.IsAdded() {
-				TdocDollar[2].component.Added(true)
-				roots[depth].Add(TdocDollar[2].component)
-				//spew.Dump(roots[depth])
-			}
-		}
-	case 6:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:82
+		//line parser/tdoc.y:42
 		{
 			log.Info("relation_assignment: TEXT RELATION TEXT")
 			log.Debug(TdocDollar[1].val)
@@ -526,9 +487,9 @@ Tdocdefault:
 			rel.To(elements.Get(registry, TdocDollar[3].val))
 			elements.Get(registry, TdocDollar[1].val).AddRelation(rel)
 		}
-	case 7:
+	case 2:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:94
+		//line parser/tdoc.y:54
 		{
 			log.Info("TEXT RELATION declaration")
 			log.Debug(TdocDollar[1].val)
@@ -544,9 +505,9 @@ Tdocdefault:
 			}
 			TdocVAL.component = TdocDollar[3].component
 		}
-	case 8:
+	case 3:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:111
+		//line parser/tdoc.y:71
 		{
 			log.Info("declaration RELATION TEXT")
 			log.Debug(TdocDollar[1].component)
@@ -563,9 +524,9 @@ Tdocdefault:
 			}
 			TdocVAL.component = c
 		}
-	case 9:
+	case 4:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:129
+		//line parser/tdoc.y:89
 		{
 			log.Info("relation_assignment RELATION declaration")
 			log.Debug(TdocDollar[1].component)
@@ -581,9 +542,9 @@ Tdocdefault:
 			TdocDollar[1].component.AddRelation(rel)
 			TdocVAL.component = TdocDollar[3].component
 		}
-	case 10:
+	case 5:
 		TdocDollar = TdocS[Tdocpt-3 : Tdocpt+1]
-		//line parser/tdoc.y:146
+		//line parser/tdoc.y:106
 		{
 			log.Info("declaration RELATION declaration")
 			log.Debug(TdocDollar[1].component)
@@ -608,29 +569,31 @@ Tdocdefault:
 			TdocDollar[1].component.AddRelation(rel)
 			TdocVAL.component = TdocDollar[3].component
 		}
-	case 11:
+	case 6:
+		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
+		//line parser/tdoc.y:133
+		{
+			log.Info("program: declaration_list")
+			log.Debug(TdocDollar[1].component)
+			program = TdocDollar[1].component
+		}
+	case 9:
 		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:172
+		//line parser/tdoc.y:141
 		{
 			log.Info("declaration: COMPONENT IDENTIFIER")
 			log.Debug(TdocDollar[1].val)
 			log.Debug(TdocDollar[2].val)
 			TdocVAL.component = elements.NewComponent(TdocDollar[1].val, TdocDollar[2].val, "")
 
-			if roots == nil {
-				roots = make([]*elements.Component, 0)
-				program = elements.NewComponent("", "", "")
-				roots = append(roots, program)
-			}
-
 			if registry == nil {
 				registry = elements.NewRegistry()
 			}
 			registry.Add(TdocVAL.component)
 		}
-	case 12:
+	case 10:
 		TdocDollar = TdocS[Tdocpt-4 : Tdocpt+1]
-		//line parser/tdoc.y:190
+		//line parser/tdoc.y:153
 		{
 			log.Info("COMPONENT IDENTIFIER ALIAS TEXT")
 			log.Debug(TdocDollar[1].val)
@@ -639,36 +602,27 @@ Tdocdefault:
 			log.Debug(TdocDollar[4].val)
 			TdocVAL.component = elements.NewComponent(TdocDollar[1].val, TdocDollar[2].val, TdocDollar[4].val)
 
-			if roots == nil {
-				roots = make([]*elements.Component, 0)
-				program = elements.NewComponent("", "", "")
-				roots = append(roots, program)
-			}
-
 			if registry == nil {
 				registry = elements.NewRegistry()
 			}
 			registry.Add(TdocVAL.component)
 		}
-	case 13:
-		TdocDollar = TdocS[Tdocpt-2 : Tdocpt+1]
-		//line parser/tdoc.y:211
+	case 11:
+		TdocDollar = TdocS[Tdocpt-7 : Tdocpt+1]
+		//line parser/tdoc.y:167
 		{
-			log.Info("declaration SCOPEIN")
-			log.Debug(TdocDollar[1].component)
-			roots[depth].Add(TdocDollar[1].component)
-			depth = depth + 1
-			TdocDollar[1].component.Added(true)
-			roots = append(roots, TdocDollar[1].component)
-			//roots[depth].Add($1)
-		}
-	case 14:
-		TdocDollar = TdocS[Tdocpt-1 : Tdocpt+1]
-		//line parser/tdoc.y:222
-		{
-			log.Info("SCOPEOUT")
-			TdocVAL.component = roots[depth]
-			depth = depth - 1
+			log.Info("COMPONENT IDENTIFIER ALIAS TEXT SCOPEIN declaration SCOPEOUT")
+			log.Debug(TdocDollar[1].val)
+			log.Debug(TdocDollar[2].val)
+			log.Debug(TdocDollar[3].val)
+			log.Debug(TdocDollar[4].val)
+			log.Debug(TdocDollar[6].component)
+			TdocVAL.component = elements.NewComponent(TdocDollar[1].val, TdocDollar[2].val, TdocDollar[4].val)
+
+			if registry == nil {
+				registry = elements.NewRegistry()
+			}
+			registry.Add(TdocVAL.component)
 		}
 	}
 	goto Tdocstack /* stack new state and value */
