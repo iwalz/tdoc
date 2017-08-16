@@ -9,7 +9,7 @@ test:
 		fi \
 	done
 
-yacc:
+yacc: deps
 	@goyacc -o parser/parser.go -p Tdoc parser/tdoc.y
 
 cover:
